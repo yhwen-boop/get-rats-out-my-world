@@ -4,6 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Get Rats Out My World</title>
+<meta name="theme-color" content="#0d0e1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="驱鼠办公室">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<style>
+/* 与 Artifact 外壳一致的基础样式：刘海/底部横条安全区、隐藏元素 */
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:#0d0e1a}
+[hidden]{display:none!important}
+</style>
 </head>
 <body>
 <style>
@@ -36,7 +48,8 @@ html,body{min-height:100%}
 body{margin:0;background:var(--void);color:var(--ink);font-family:var(--f-pixel);font-size:var(--fs);line-height:1.6;
   -webkit-font-smoothing:none;font-smooth:never;text-rendering:optimizeSpeed;
   background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px);background-size:100% 3px}
-button{font:inherit;color:inherit}
+button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .wrap{max-width:1200px;margin:0 auto;padding-inline:16px;padding-block:16px 48px}
 
@@ -103,9 +116,10 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .choice .k{color:var(--dim)}
 .choice .t{color:var(--ink)}
 .choice .d{grid-column:3;font-size:var(--fs-s);color:var(--muted);line-height:1.6}
-.choice:hover,.choice:focus-visible{background:var(--win-2);outline:none}
-.choice:hover .cur,.choice:focus-visible .cur{visibility:visible;animation:blink 1s steps(1) infinite}
-.choice:hover .t,.choice:focus-visible .t{color:var(--gold)}
+.choice:focus-visible,.choice:active{background:var(--win-2);outline:none}
+.choice:focus-visible .cur,.choice:active .cur{visibility:visible;animation:blink 1s steps(1) infinite}
+.choice:focus-visible .t,.choice:active .t{color:var(--gold)}
+@media (hover:hover){.choice:hover{background:var(--win-2)}.choice:hover .cur{visibility:visible;animation:blink 1s steps(1) infinite}.choice:hover .t{color:var(--gold)}}
 .choice.star .t{color:var(--gold)}
 .choice.star .k::after{content:"★";color:var(--gold)}
 .choice.star .k{font-size:0}
@@ -113,7 +127,7 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .choice.locked{cursor:not-allowed}
 .choice.locked .t{color:var(--dim)}
 .choice.locked .d{color:var(--dim)}
-.choice.locked:hover{background:none}.choice.locked:hover .cur{visibility:hidden}
+.choice.locked:hover,.choice.locked:active{background:none}.choice.locked:hover .cur,.choice.locked:active .cur{visibility:hidden}
 .choice.primary .t{color:var(--gold)}
 .choice.primary .cur{visibility:visible;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{visibility:hidden}}
@@ -200,6 +214,42 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .reveal .narr{font-size:var(--fs);color:var(--ink);text-align:center;margin:10px auto 0}
 .reveal .narr b{color:var(--rat);font-weight:400}
 
+/* ---------- 手机：顶部固定状态栏 + 底部抽屉 ---------- */
+.hud,.scrim,.sheet-close{display:none}
+@media (max-width:880px){
+  body.ingame .top{display:none}
+  body.ingame .wrap{padding-top:86px}
+  .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
+  body.ingame .hud{display:block;position:fixed;top:0;left:0;right:0;z-index:20;background:var(--void);border-bottom:3px solid var(--frame-in);
+    padding:calc(8px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-right,0px)) 8px calc(12px + env(safe-area-inset-left,0px))}
+  .hud-row{display:flex;align-items:center;gap:10px;font-size:var(--fs-s)}
+  .hud-row .day{background:var(--frame);color:var(--win);padding:0 8px}
+  .hud-btns{margin-left:auto;display:flex;gap:6px}
+  .hud-btns button{background:var(--win);border:2px solid var(--dim);color:var(--ink);font-size:var(--fs-s);padding:3px 9px;min-height:32px;cursor:pointer}
+  .hud-btns button:active{border-color:var(--gold);color:var(--gold)}
+  .hud-btns .n{color:var(--gold)}
+  .hud-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:8px;font-size:var(--fs-s);line-height:1.3}
+  .hud-stats div{display:grid;grid-template-columns:auto 1fr auto;gap:5px;align-items:center;min-width:0}
+  .hud-stats i{display:block;height:8px;background:var(--win-2);position:relative;overflow:hidden}
+  .hud-stats i b{position:absolute;inset:0 auto 0 0;display:block}
+  .hud-stats em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--muted)}
+  .hud-stats .bump{animation:bump .5s steps(2) 2}
+  @keyframes bump{50%{color:var(--gold)}}
+
+  .side{position:fixed;left:0;right:0;bottom:0;z-index:30;max-height:78vh;max-height:78dvh;overflow:auto;-webkit-overflow-scrolling:touch;
+    background:var(--void);border-top:3px solid var(--frame);padding:14px calc(14px + env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) calc(14px + env(safe-area-inset-left,0px));
+    transform:translateY(105%);transition:transform .22s steps(4);visibility:hidden}
+  body.sheet .side{transform:none;visibility:visible}
+  body.sheet .scrim{display:block;position:fixed;inset:0;z-index:25;background:rgba(13,14,26,.7)}
+  body.sheet{overflow:hidden}
+  .sheet-close{display:block;align-self:flex-end;background:none;border:2px solid var(--dim);color:var(--ink);font-size:var(--fs-s);padding:4px 12px;min-height:34px;cursor:pointer}
+  .choice{padding:10px 6px;min-height:48px}
+  .tab{min-height:34px;padding:0 12px}
+  .rat{padding:8px}
+  .evlist{grid-template-columns:repeat(auto-fill,minmax(58px,1fr))}
+}
+@media (max-width:880px) and (prefers-reduced-motion:reduce){.side{transition:none}}
+
 /* 结局 */
 .ending-tag{font-size:var(--fs-s);letter-spacing:.14em;color:var(--rat)}
 .scene h2{font-weight:400;font-size:40px;line-height:1.15;margin:0;color:var(--gold);text-shadow:4px 4px 0 var(--red)}
@@ -212,8 +262,8 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .verdict .y img{filter:grayscale(1) brightness(.7)}
 
 /* 弹窗 */
-.modal{position:fixed;inset:0;background:rgba(13,14,26,.8);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
-.card{max-width:480px;width:100%;padding:26px 22px 18px;max-height:90vh;overflow:auto}
+.modal{position:fixed;inset:0;background:rgba(13,14,26,.8);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
+.card{max-width:480px;width:100%;padding:26px 22px 18px;max-height:85vh;max-height:85dvh;overflow:auto;-webkit-overflow-scrolling:touch}
 .card .hd{display:flex;gap:16px;align-items:center}
 .card .hd img{width:72px;height:72px;background:var(--win-2);padding:4px}
 .card .nm{font-size:40px;line-height:1;color:var(--rat)}
@@ -227,6 +277,8 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 @media (prefers-reduced-motion:reduce){.fade,.roster img,.lurk img,.lurk i,.press,.choice .cur{animation:none!important}.morph .a{opacity:0}.morph .b{opacity:1}}
 </style>
 
+<div class="hud" id="hud"></div>
+<div class="scrim" id="scrim"></div>
 <div class="wrap">
   <header class="top">
     <div class="brand">GET RATS OUT MY WORLD<small>驱鼠办公室</small></div>
@@ -1010,13 +1062,30 @@ function render(){
     const c = choiceList[+b.dataset.i]; if(!c || (c.need && !c.need())) return;
     pick(c);
   });
-  if(window.matchMedia('(max-width:880px)').matches) el.scrollIntoView({block:'start'});
-  else window.scrollTo({top:0});
+  window.scrollTo({top:0});
   renderSide(); renderClock(); showReveal();
 }
 
+let _hudPrev = {};
+function renderHud(){
+  const el = document.getElementById('hud');
+  if(S.scene === 'title'){ el.innerHTML = ''; return; }
+  const st = (k, label, v, col) => `<div class="${_hudPrev[k] !== undefined && _hudPrev[k] !== v ? 'bump' : ''}"><span>${label}</span><i><b style="width:${v}%;background:${col}"></b></i><em>${v}</em></div>`;
+  el.innerHTML = `<div class="hud-row"><span class="day">${DAYS[S.day]}</span><span class="pips">${[0,1,2].map(i => `<i class="${i < S.ap ? 'on':''}"></i>`).join('')}</span>
+    <span class="hud-btns"><button data-sheet="rats">图鉴 <span class="n">${Object.keys(S.seen).length}</span></button><button data-sheet="ev">证据 <span class="n">${S.ev.length}</span></button><button id="hudMenu">菜单</button></span></div>
+    <div class="hud-stats">${st('stress','压力',S.stress,S.stress >= 75 ? 'var(--red)' : 'var(--rat)')}${st('trust','信任',S.trust,'var(--green)')}${st('neutral','好感',S.neutral,'var(--gold)')}</div>`;
+  _hudPrev = {stress:S.stress, trust:S.trust, neutral:S.neutral};
+  el.querySelectorAll('[data-sheet]').forEach(b => b.onclick = () => openSheet(b.dataset.sheet));
+  document.getElementById('hudMenu').onclick = () => { closeSheet(); S.scene = 'title'; render(); };
+}
+function openSheet(tab){ S.tab = tab; renderSide(); document.body.classList.add('sheet'); document.getElementById('side').scrollTop = 0; }
+function closeSheet(){ document.body.classList.remove('sheet'); }
+document.getElementById('scrim').onclick = closeSheet;
+
 function renderClock(){
   const el = document.getElementById('clock');
+  document.body.classList.toggle('ingame', S.scene !== 'title');
+  renderHud();
   if(S.scene === 'title'){ el.innerHTML = ''; return; }
   el.innerHTML = `<span class="day">${DAYS[S.day]}</span><span class="pips" title="今日剩余行动">AP ${[0,1,2].map(i => `<i class="${i < S.ap ? 'on':''}"></i>`).join('')}</span><button class="iconbtn" id="toTitle">MENU</button>`;
   document.getElementById('toTitle').onclick = () => { S.scene = 'title'; render(); };
@@ -1053,7 +1122,7 @@ function renderSide(){
   } else {
     content = S.log.length ? `<div class="log">${S.log.map(l => `<div>${esc(l)}</div>`).join('')}</div>` : '<p class="empty">还没有发生任何事。</p>';
   }
-  el.innerHTML = `
+  el.innerHTML = `<button class="sheet-close" id="sheetClose">关闭 ✕</button>
     <section class="panel win"><span class="win-title">STATUS</span>
       ${row('压力值', S.stress, 'stress' + (S.stress >= 75 ? ' hot' : ''))}${row('组长信任', S.trust, 'trust')}${row('中立好感', S.neutral, 'neutral')}
       <div class="stat"><span>业务产出</span><div class="outdots">${[0,1,2,3,4].map(i => `<i class="${i<S.output?'on':''}"></i>`).join('')}</div><span class="v">${S.output}</span></div>
@@ -1066,6 +1135,7 @@ function renderSide(){
         <button class="tab" role="tab" aria-selected="${tab==='log'}" data-tab="log">日志</button>
       </div>${content}
     </section>`;
+  el.querySelector('#sheetClose').onclick = closeSheet;
   el.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; save(); renderSide(); });
   el.querySelectorAll('[data-rat]').forEach(b => b.onclick = () => openRat(b.dataset.rat));
   el.querySelectorAll('[data-ev]').forEach(b => b.onclick = () => { if(has(b.dataset.ev)){ evSel = b.dataset.ev; renderSide(); } });
@@ -1111,6 +1181,7 @@ function showReveal(){
 /* 键盘：数字键直选，↑↓ 移动光标，Enter 确认 */
 document.addEventListener('keydown', e => {
   const m = document.getElementById('modal');
+  if(e.key === 'Escape') closeSheet();
   if(e.key === 'Escape'){ if(!m.hidden && m.querySelector('.reveal')) m.querySelector('#mclose').click(); else m.hidden = true; return; }
   if(!m.hidden || e.metaKey || e.ctrlKey || e.altKey) return;
   const btns = [...document.querySelectorAll('#scene .choice:not(.locked)')];
