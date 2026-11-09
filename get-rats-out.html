@@ -1,1452 +1,838 @@
 <meta charset="utf-8">
 <title>Get Rats Out My World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
-/* Layout: 16色像素RPG —— 左侧主对话窗（头像+名牌+台词、▶光标选项），右侧 STATUS / 图鉴 / 道具栏三个小窗；窄屏上下堆叠。单一暗色复古画面（刻意不做亮色主题） */
-@font-face{font-family:"FusionPixel";src:url("fonts/fusion-pixel-12px-zh_hans.woff2") format("woff2");font-display:swap}
+/* Layout: 手机优先的"打工人日常"小游戏。顶部状态卡（日期/时钟/三条数值），中间是地点插画 + 站在画里的同事 + 圆角行动按钮，底部四个页签；对话是视觉小说式底部气泡。单一亮色主题：薄荷绿底 + 白卡片 + 珊瑚色强调 */
 :root{
-  --void:#0d0e1a;      /* 屏幕外 */
-  --win:#1a1c2c;       /* 窗口底色 */
-  --win-2:#232741;
-  --frame:#f4f4f4;     /* 窗框白 */
-  --frame-in:#566c86;  /* 内框 */
-  --ink:#f4f4f4;
-  --muted:#94b0c2;
-  --dim:#566c86;
-  --gold:#ffcd75;      /* 光标/证据/星标 */
-  --rat:#ef7d57;       /* 蛀虫 */
-  --red:#b13e53;
-  --good:#a7f070;
-  --green:#38b764;
-  --cyan:#73eff7;      /* 内心OS */
-  --blue:#41a6f6;
-  --navy:#29366f;
-  --f-pixel:"FusionPixel","PingFang SC","Microsoft YaHei",monospace;
-  --fs:18px; --fs-s:12px; --fs-l:24px;
-  color-scheme:dark;
+  --bg:#E4F5EE;        /* 薄荷底 */
+  --card:#FFFFFF;
+  --soft:#F4F1FB;      /* 浅薰衣草，次级卡片 */
+  --ink:#2E2A3B;
+  --muted:#8A86A0;
+  --line:#E7E3F0;
+  --coral:#FF8A7A;     /* 主强调 */
+  --coral-d:#E96A5A;
+  --sky:#7CC6FE;
+  --sun:#FFD66B;
+  --mint:#5CCB9F;
+  --pink:#FF9EC4;
+  --grape:#A98BFF;
+  --f-disp:"ZCOOL KuaiLe","PingFang SC","Microsoft YaHei",sans-serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  color-scheme:light;
 }
 *{box-sizing:border-box}
-[hidden]{display:none!important}  /* Artifact 外壳自带这条；GitHub Pages 没有，必须自己写，否则弹窗遮罩会一直盖住页面 */
-html,body{min-height:100%}
-body{margin:0;background:var(--void);color:var(--ink);font-family:var(--f-pixel);font-size:var(--fs);line-height:1.6;
-  -webkit-font-smoothing:none;font-smooth:never;text-rendering:optimizeSpeed;
-  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px);background-size:100% 3px}
-button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
-.wrap{max-width:1200px;margin:0 auto;padding-inline:16px;padding-block:16px 48px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  background-image:radial-gradient(rgba(92,203,159,.18) 1.5px,transparent 1.5px);background-size:22px 22px}
+button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;border:0;background:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
+.app{max-width:460px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding-inline:14px;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
 
-/* 像素窗口：白外框 + 灰内框 + 切角 */
-.win{background:var(--win);border:3px solid var(--frame);box-shadow:inset 0 0 0 3px var(--win),inset 0 0 0 6px var(--frame-in);
-  clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 6px,100% calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,0 calc(100% - 6px),0 6px);position:relative;min-width:0}
-.win-title{position:absolute;top:-1px;left:18px;background:var(--frame);color:var(--win);font-size:var(--fs-s);padding:0 8px;line-height:18px;letter-spacing:.1em}
+/* 顶部状态卡 */
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-top:10px;background:var(--card);border-radius:22px;padding:12px 14px;box-shadow:0 6px 0 rgba(46,42,59,.06),0 10px 24px rgba(46,42,59,.06)}
+.hud-top{display:flex;align-items:center;gap:10px}
+.date{font-size:12px;font-weight:700;background:var(--soft);color:var(--grape);padding:3px 10px;border-radius:99px}
+.clock{font-family:var(--f-disp);font-size:30px;line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.money{margin-left:auto;font-weight:700;font-size:14px;background:#FFF4D1;color:#B07A00;padding:3px 10px;border-radius:99px;font-variant-numeric:tabular-nums}
+.meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.meter{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+.meter b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.meter .top{display:flex;justify-content:space-between}
+.bar{height:9px;border-radius:99px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .4s cubic-bezier(.3,1.4,.5,1)}
+.bar.energy i{background:var(--sun)} .bar.mood i{background:var(--pink)} .bar.perf i{background:var(--mint)}
+.bar.low i{background:var(--coral)}
 
-/* 顶栏 */
-.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-bottom:18px}
-.brand{font-size:var(--fs-l);line-height:1.2;color:var(--gold);text-shadow:3px 3px 0 var(--red)}
-.brand small{display:block;font-size:var(--fs-s);color:var(--muted);text-shadow:none;letter-spacing:.08em}
-.clock{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:var(--fs-s)}
-.clock .day{padding:2px 10px;background:var(--frame);color:var(--win)}
-.pips{display:flex;gap:4px;align-items:center}
-.pips i{width:12px;height:12px;background:var(--dim);display:block}
-.pips i.on{background:var(--gold);box-shadow:inset -3px -3px 0 #d39a3f}
-.iconbtn{background:var(--win);border:2px solid var(--dim);padding:2px 10px;font-size:var(--fs-s);cursor:pointer;color:var(--muted)}
-.iconbtn:hover,.iconbtn:focus-visible{border-color:var(--gold);color:var(--gold);outline:none}
+/* 地点 */
+.view{margin-top:14px;display:flex;flex-direction:column;gap:14px}
+.place-head{display:flex;align-items:center;gap:10px}
+.place-head h1{font-family:var(--f-disp);font-weight:400;font-size:26px;margin:0;line-height:1.1}
+.place-head .move{margin-left:auto;background:var(--ink);color:#fff;font-weight:700;font-size:13px;padding:8px 14px;border-radius:99px;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.place-head .move:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.stage{position:relative;border-radius:24px;overflow:hidden;background:var(--card);box-shadow:0 6px 0 rgba(46,42,59,.07)}
+.stage svg.bgart{display:block;width:100%;height:auto}
+.cast{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:center;gap:4px;padding-inline:8px;flex-wrap:wrap}
+.person{display:flex;flex-direction:column;align-items:center;animation:idle 2.4s ease-in-out infinite}
+.person:nth-child(2){animation-delay:.5s}.person:nth-child(3){animation-delay:1s}.person:nth-child(4){animation-delay:1.5s}
+.person .av{width:62px;height:62px;filter:drop-shadow(0 3px 0 rgba(46,42,59,.12))}
+.person .tag{font-size:11px;font-weight:700;background:var(--card);padding:0 8px;border-radius:99px;margin-top:-4px;box-shadow:0 2px 0 rgba(46,42,59,.08)}
+.person .tag.new{background:var(--coral);color:#fff}
+.person:active .av{transform:scale(.94)}
+.cast.crowd{gap:0}.cast.crowd .person .av{width:50px;height:50px}
+@keyframes idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.recent{background:var(--card);border-radius:16px;padding:10px 14px;font-size:14px;color:var(--muted);display:flex;gap:8px;align-items:flex-start}
+.recent b{color:var(--ink);font-weight:500}
+.acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.act{background:var(--card);border-radius:18px;padding:12px;text-align:left;display:flex;gap:10px;align-items:center;box-shadow:0 5px 0 rgba(46,42,59,.07);transition:transform .1s;min-width:0}
+.act:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(46,42,59,.07)}
+.act .ic{font-size:26px;line-height:1;width:42px;height:42px;border-radius:14px;background:var(--soft);display:grid;place-items:center;flex:none}
+.act .tx{min-width:0}
+.act .t{font-weight:700;font-size:14px;line-height:1.3;display:block}
+.act .d{font-size:12px;color:var(--muted);line-height:1.35;display:block}
+.act.hot{background:#FFF0EC}.act.hot .ic{background:#FFD9D2}
+.act.off{opacity:.55}
+.act.wide{grid-column:1 / -1}
 
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start}
-@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+/* 页签 */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;padding:8px 14px calc(8px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.tabbar .in{pointer-events:auto;max-width:432px;width:100%;background:var(--ink);border-radius:24px;display:grid;grid-template-columns:repeat(4,1fr);padding:6px;box-shadow:0 8px 24px rgba(46,42,59,.25)}
+.tabbar button{color:#B9B5CC;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0;border-radius:18px;position:relative}
+.tabbar button .i{font-size:20px;line-height:1.1}
+.tabbar button[aria-selected="true"]{background:rgba(255,255,255,.12);color:#fff}
+.badge{position:absolute;top:2px;right:calc(50% - 24px);min-width:18px;height:18px;border-radius:99px;background:var(--coral);color:#fff;font-size:11px;line-height:18px;padding:0 5px}
 
-/* 主窗 */
-.scene{padding:26px 26px 20px}
-@media (max-width:520px){.scene{padding:22px 16px 16px}}
-.scene-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:var(--fs-s);color:var(--muted);padding-bottom:12px;margin-bottom:16px;border-bottom:3px dotted var(--dim)}
-.scene-head b{color:var(--gold);font-weight:400}
-.scene-body{display:flex;flex-direction:column;gap:16px}
-.narr{margin:0;max-width:40em}
-.sys{margin:0;font-size:var(--fs-s);color:var(--gold);line-height:1.8}
-.sys::before{content:"» "}
-.h3{font-size:var(--fs-s);color:var(--muted);letter-spacing:.12em;margin-top:4px}
-.os{color:var(--cyan);border:2px dashed var(--navy);padding:12px 14px;background:rgba(65,166,246,.06)}
-.os .tag{display:inline-block;font-size:var(--fs-s);background:var(--cyan);color:var(--win);padding:0 6px;margin-bottom:6px}
-.os p{margin:0 0 .5em}.os p:last-child{margin:0}
+/* 通用卡片列表 */
+.sec-title{font-family:var(--f-disp);font-weight:400;font-size:26px;margin:2px 0 0}
+.card{background:var(--card);border-radius:20px;padding:14px;box-shadow:0 5px 0 rgba(46,42,59,.06)}
+.task{display:flex;flex-direction:column;gap:8px}
+.task .row{display:flex;gap:8px;align-items:flex-start}
+.task .nm{font-weight:700;line-height:1.4;flex:1;min-width:0}
+.pill{font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--soft);color:var(--grape);white-space:nowrap}
+.pill.due{background:#FFE3DE;color:var(--coral-d)}
+.pill.ok{background:#DDF5EA;color:#2F9B70}
+.task .bar i{background:var(--sky)}
+.task.done{opacity:.7}.task.done .bar i{background:var(--mint)}
+.task.focus{box-shadow:0 0 0 3px var(--sky),0 5px 0 rgba(46,42,59,.06)}
+.task .meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+.focusbtn{font-size:12px;font-weight:700;color:#3D9BE0;white-space:nowrap}
+.empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 0;margin:0}
+.people{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pc{background:var(--card);border-radius:18px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 5px 0 rgba(46,42,59,.06);text-align:center;min-width:0}
+.pc .av{width:60px;height:60px}
+.pc b{font-size:14px}
+.pc small{font-size:11px;color:var(--muted);line-height:1.3}
+.hearts{font-size:11px;color:var(--pink);letter-spacing:1px}
+.pc.rat{background:#FFF0F3}
+.ratchip{display:inline-block;font-size:10px;font-weight:700;background:var(--coral);color:#fff;border-radius:99px;padding:0 7px;line-height:1.7}
+.msg{display:flex;gap:10px;align-items:flex-start}
+.msg .av{width:42px;height:42px;flex:none}
+.msg .bd{background:var(--card);border-radius:4px 16px 16px 16px;padding:8px 12px;font-size:14px;min-width:0;box-shadow:0 3px 0 rgba(46,42,59,.05)}
+.msg .who{font-size:12px;color:var(--muted)}
+.msg.unread .bd{box-shadow:0 0 0 2px var(--coral)}
 
-/* 对话：头像 + 名牌 + 台词框 */
-.dlg{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:start;max-width:92%}
-.dlg .face{width:52px;height:52px;background:var(--win-2);border:3px solid var(--frame-in);padding:2px}
-.dlg .face img{width:42px;height:42px}
-.dlg .box{background:var(--win-2);border:3px solid var(--frame-in);padding:8px 12px 10px;position:relative;min-width:0}
-.dlg .nm{display:inline-block;font-size:var(--fs-s);background:var(--frame-in);color:var(--ink);padding:0 8px;margin:-8px 0 6px -12px}
-.dlg.rat .face,.dlg.rat .box{border-color:var(--rat)}
-.dlg.rat .nm{background:var(--rat);color:var(--win)}
-.dlg.me{align-self:flex-end;grid-template-columns:minmax(0,1fr) 52px}
-.dlg.me .face{order:2;border-color:var(--blue)}
-.dlg.me .box{border-color:var(--blue);background:#1d2c4a}
-.dlg.me .nm{background:var(--blue);color:var(--win)}
-@media (max-width:520px){.dlg{max-width:100%;grid-template-columns:40px minmax(0,1fr);gap:8px}.dlg.me{grid-template-columns:minmax(0,1fr) 40px}.dlg .face{width:40px;height:40px;padding:1px}.dlg .face img{width:32px;height:32px}}
+/* 对话 */
+.dlg{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(46,42,59,.28);padding:0 12px calc(12px + env(safe-area-inset-bottom,0px))}
+.dlg .box{max-width:460px;width:100%;margin:0 auto;background:var(--card);border-radius:26px;padding:16px 16px 14px;position:relative;box-shadow:0 10px 40px rgba(46,42,59,.25);animation:up .22s cubic-bezier(.3,1.4,.5,1)}
+@keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+.dlg .face{position:absolute;top:-58px;left:16px;width:84px;height:84px;background:var(--card);border-radius:50%;padding:6px;box-shadow:0 6px 0 rgba(46,42,59,.08)}
+.dlg .face .av{width:72px;height:72px}
+.dlg .name{margin-left:96px;font-weight:700;font-size:15px;display:flex;gap:6px;align-items:center;min-height:24px;flex-wrap:wrap}
+.dlg .name small{font-weight:400;color:var(--muted);font-size:12px}
+.dlg .text{font-size:16px;line-height:1.75;margin-top:10px;min-height:3.4em}
+.dlg.narr .face{display:none}.dlg.narr .name{margin-left:0;color:var(--muted);font-size:12px}
+.dlg.narr .text{color:#55506A}
+.dlg .next{display:block;text-align:right;margin-top:6px;font-size:13px;color:var(--muted);animation:nudge 1s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(3px)}}
+.dlg .choices{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.dlg .ch{background:var(--soft);border-radius:16px;padding:11px 14px;text-align:left;font-weight:500;line-height:1.45}
+.dlg .ch small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.dlg .ch:active{background:#E7E1FA}
+.dlg .ch.main{background:var(--coral);color:#fff}.dlg .ch.main small{color:#FFE8E4}
 
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-size:var(--fs-s);padding:1px 8px;border:2px solid var(--dim);color:var(--muted)}
-.chip.good{border-color:var(--green);color:var(--good)}
-.chip.bad{border-color:var(--red);color:var(--rat)}
-.chip.ev{border-color:var(--gold);color:var(--gold)}
-.chip.expel{background:var(--red);border-color:var(--red);color:var(--ink)}
-.chip.buff{border-style:dashed;color:var(--ink)}
+/* 底部面板 */
+.sheet{position:fixed;inset:0;z-index:45;background:rgba(46,42,59,.3);display:flex;align-items:flex-end;justify-content:center}
+.sheet .in{background:var(--bg);width:100%;max-width:460px;border-radius:28px 28px 0 0;padding:16px 14px calc(18px + env(safe-area-inset-bottom,0px));max-height:85vh;max-height:85dvh;overflow:auto;animation:up .22s cubic-bezier(.3,1.4,.5,1)}
+.sheet h2{font-family:var(--f-disp);font-weight:400;font-size:24px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+.sheet h2 button{font-family:var(--f-body);font-size:13px;color:var(--muted);padding:6px 10px}
+.locs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.loc{background:var(--card);border-radius:18px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:4px;box-shadow:0 5px 0 rgba(46,42,59,.06);min-width:0}
+.loc .t{font-weight:700;display:flex;gap:6px;align-items:center}
+.loc .t span{font-size:20px}
+.loc .who{display:flex;gap:2px;min-height:28px;flex-wrap:wrap}
+.loc .who .av{width:28px;height:28px}
+.loc small{font-size:11px;color:var(--muted)}
+.loc.here{box-shadow:0 0 0 3px var(--coral),0 5px 0 rgba(46,42,59,.06)}
+.loc:disabled{opacity:.5;cursor:default}
 
-/* 选项：▶ 光标 */
-.choices{display:flex;flex-direction:column;gap:4px;margin-top:20px;padding-top:14px;border-top:3px dotted var(--dim)}
-.choice{display:grid;grid-template-columns:22px 28px minmax(0,1fr);gap:2px 4px;text-align:left;background:none;border:0;padding:6px 8px;cursor:pointer}
-.choice .cur{color:var(--gold);visibility:hidden}
-.choice .k{color:var(--dim)}
-.choice .t{color:var(--ink)}
-.choice .d{grid-column:3;font-size:var(--fs-s);color:var(--muted);line-height:1.6}
-.choice:focus-visible,.choice:active{background:var(--win-2);outline:none}
-.choice:focus-visible .cur,.choice:active .cur{visibility:visible;animation:blink 1s steps(1) infinite}
-.choice:focus-visible .t,.choice:active .t{color:var(--gold)}
-@media (hover:hover){.choice:hover{background:var(--win-2)}.choice:hover .cur{visibility:visible;animation:blink 1s steps(1) infinite}.choice:hover .t{color:var(--gold)}}
-.choice.star .t{color:var(--gold)}
-.choice.star .k::after{content:"★";color:var(--gold)}
-.choice.star .k{font-size:0}
-.choice.star .k::after{font-size:var(--fs)}
-.choice.locked{cursor:not-allowed}
-.choice.locked .t{color:var(--dim)}
-.choice.locked .d{color:var(--dim)}
-.choice.locked:hover,.choice.locked:active{background:none}.choice.locked:hover .cur,.choice.locked:active .cur{visibility:hidden}
-.choice.primary .t{color:var(--gold)}
-.choice.primary .cur{visibility:visible;animation:blink 1s steps(1) infinite}
-@keyframes blink{50%{visibility:hidden}}
+/* 飘字 */
+.toasts{position:fixed;left:0;right:0;top:calc(128px + env(safe-area-inset-top,0px));z-index:60;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+.toast{background:var(--ink);color:#fff;font-weight:700;font-size:13px;padding:6px 14px;border-radius:99px;animation:pop 1.9s ease forwards;box-shadow:0 6px 18px rgba(46,42,59,.25)}
+.toast.good{background:var(--mint)}.toast.bad{background:var(--coral)}.toast.gold{background:var(--sun);color:#5A4300}
+@keyframes pop{0%{transform:translateY(10px) scale(.9);opacity:0}12%{transform:none;opacity:1}80%{opacity:1}100%{transform:translateY(-14px);opacity:0}}
 
-/* 日期卡 */
-.daycard{display:flex;align-items:center;gap:16px;padding:6px 0 4px}
-.daycard b{font-weight:400;font-size:48px;line-height:1;color:var(--gold);text-shadow:4px 4px 0 var(--red)}
-.daycard span{font-size:var(--fs-s);color:var(--muted);line-height:1.6}
-
-/* 侧栏 */
-.side{display:flex;flex-direction:column;gap:22px;min-width:0}
-.panel{padding:24px 18px 16px}
-.stat{display:grid;grid-template-columns:4.6em minmax(0,1fr) 2.2em;align-items:center;gap:8px;font-size:var(--fs-s);margin-bottom:8px}
-.stat .v{text-align:right;font-variant-numeric:tabular-nums}
-.seg{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;height:12px}
-.seg i{background:var(--win-2)}
-.seg.stress i.on{background:var(--rat)} .seg.stress.hot i.on{background:var(--red)}
-.seg.trust i.on{background:var(--green)}
-.seg.neutral i.on{background:var(--gold)}
-.seg.alert i.on{background:var(--red)}
-.outdots{display:flex;gap:3px}
-.outdots i{width:16px;height:12px;background:var(--win-2)}
-.outdots i.on{background:var(--blue)}
-.debuffs{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-
-.tabs{display:flex;gap:4px;margin:0 0 14px;flex-wrap:wrap}
-.tab{background:none;border:2px solid var(--dim);padding:0 10px;cursor:pointer;font-size:var(--fs-s);color:var(--muted)}
-.tab[aria-selected="true"]{background:var(--frame);border-color:var(--frame);color:var(--win)}
-.tab:focus-visible{outline:2px solid var(--gold)}
-
-.rats{display:flex;flex-direction:column;gap:8px}
-.rat{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;background:var(--win-2);border:2px solid transparent;padding:6px 8px;text-align:left;cursor:pointer;position:relative}
-.rat:hover,.rat:focus-visible{border-color:var(--gold);outline:none}
-.rat img{width:44px;height:44px}
-.rat .nm{font-size:var(--fs);line-height:1.2;display:flex;gap:8px;align-items:baseline}
-.rat .nm em{font-style:normal;font-size:var(--fs-s);padding:0 5px;background:var(--rat);color:var(--win)}
-.rat.out .nm em{background:var(--red);color:var(--ink)}
-.rat .tg{font-size:var(--fs-s);color:var(--muted);line-height:1.5;margin:2px 0 4px}
-.rat.unseen{opacity:.6}
-.rat.out img{filter:grayscale(1) brightness(.7)}
-
-.evlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
-.evi{aspect-ratio:1;max-width:100%;background:var(--win-2);border:2px solid var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:var(--fs-s);cursor:pointer;padding:0;color:var(--dim)}
-.evi .ico{width:22px;height:16px;background:var(--dim);margin-bottom:4px;box-shadow:inset 0 3px 0 rgba(0,0,0,.25)}
-.evi.got{border-color:var(--gold);color:var(--gold)}
-.evi.got .ico{background:var(--gold)}
-.evi:hover,.evi:focus-visible{outline:2px solid var(--ink)}
-.evdesc{margin-top:10px;font-size:var(--fs-s);line-height:1.7;min-height:3.4em;border-top:2px dotted var(--dim);padding-top:8px;color:var(--muted)}
-.evdesc b{color:var(--gold);font-weight:400}
-.log{font-size:var(--fs-s);color:var(--muted);display:flex;flex-direction:column;gap:6px;max-height:320px;overflow:auto;line-height:1.6}
-.log div{border-bottom:2px dotted var(--win-2);padding-bottom:4px}
-.empty{font-size:var(--fs-s);color:var(--muted)}
-
-/* 标题 */
-.title-screen{display:flex;flex-direction:column;gap:22px;padding:18px 4px 6px}
-.title-screen .big{font-weight:400;font-size:clamp(36px,7vw,72px);line-height:1.05;margin:0;color:var(--ink);text-shadow:4px 4px 0 var(--navy)}
-.title-screen .big span{color:var(--rat);text-shadow:4px 4px 0 var(--red)}
-.title-screen .cn{color:var(--muted);max-width:30em;margin:0}
-.roster{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-@media (max-width:620px){.roster{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.roster div{background:var(--win-2);padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
-.roster img{width:60px;height:60px;animation:bob 1.2s steps(2) infinite}
-.roster div:nth-child(2) img{animation-delay:.3s}.roster div:nth-child(3) img{animation-delay:.6s}.roster div:nth-child(4) img{animation-delay:.9s}
-.roster b{font-weight:400;font-size:var(--fs-l);line-height:1.1}
-.roster small{color:var(--muted);font-size:var(--fs-s);line-height:1.5}
-@keyframes bob{50%{transform:translateY(-3px)}}
-.press{color:var(--gold);font-size:var(--fs-s);letter-spacing:.2em;animation:blink 1.2s steps(1) infinite}
-
-.lurk{display:flex;gap:14px;align-items:flex-end}
-.lurk img{width:56px;height:56px;opacity:.55}
-.lurk .sus{position:relative}
-.lurk .sus img{opacity:1;animation:bob 1.2s steps(2) infinite}
-.lurk .sus i{position:absolute;top:-14px;right:-6px;font-style:normal;color:var(--gold);animation:blink 1s steps(1) infinite}
-.reveal{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
-.reveal .choices{align-self:stretch}
-.morph{position:relative;width:120px;height:120px;margin:8px 0 4px;background:var(--win-2);border:3px solid var(--rat)}
-.morph img{position:absolute;inset:6px;width:102px;height:102px}
-.morph .a{animation:hideA 1.6s steps(1) forwards}
-.morph .b{animation:showB 1.6s steps(1) forwards}
-@keyframes hideA{0%{opacity:1}35%{opacity:0}45%{opacity:1}55%{opacity:0}65%{opacity:1}75%,100%{opacity:0}}
-@keyframes showB{0%{opacity:0}35%{opacity:1}45%{opacity:0}55%{opacity:1}65%{opacity:0}75%,100%{opacity:1}}
-.rv-no{font-size:var(--fs-s);color:var(--gold);letter-spacing:.2em}
-.rv-tag{font-size:var(--fs-s);color:var(--muted)}
-.reveal .narr{font-size:var(--fs);color:var(--ink);text-align:center;margin:10px auto 0}
-.reveal .narr b{color:var(--rat);font-weight:400}
-
-/* ---------- 办公室地图 ---------- */
-.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:8px;background:#11121f;border:3px solid var(--frame-in);position:relative}
-.map::after{content:"";position:absolute;inset:0;pointer-events:none}
-.map[data-slot="1"]::after{background:rgba(255,205,117,.05)}
-.map[data-slot="3"]::after{background:rgba(239,125,87,.14)}
-.tile{--fl:#3b4466;position:relative;min-height:100px;min-width:0;padding:6px 6px 4px;display:flex;flex-direction:column;justify-content:space-between;gap:4px;text-align:left;cursor:pointer;border:2px solid #0d0e1a;
-  background-color:var(--fl);background-image:linear-gradient(rgba(0,0,0,.2) 2px,transparent 2px),linear-gradient(90deg,rgba(0,0,0,.2) 2px,transparent 2px);background-size:16px 16px}
-.tile.k-sky{--fl:#257179}.tile.k-room{--fl:#29366f}.tile.k-tea{--fl:#5d275d}.tile.k-dark{--fl:#1f2133}.tile.k-lift{--fl:#566c86}.tile.k-cafe{--fl:#2f6a46}
-.tile .tn{font-size:var(--fs-s);background:rgba(13,14,26,.78);padding:0 5px;align-self:flex-start;line-height:1.6;max-width:100%}
-.tile .spark{font-style:normal;color:var(--gold);margin-left:4px;animation:blink 1s steps(1) infinite}
-.tile .ppl{display:flex;flex-wrap:wrap;gap:2px;align-items:flex-end;min-height:26px}
-.tile .ppl img{width:26px;height:26px}
-.tile .you{margin-left:auto}
-.tile .you img{width:30px;height:30px}
-.tile.here{border-color:var(--gold);box-shadow:inset 0 0 0 2px var(--gold)}
-.tile:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
-.tile:active{filter:brightness(1.25)}
-@media (hover:hover){.tile:hover{border-color:var(--ink)}}
-@media (max-width:520px){.map{gap:4px;padding:5px}.tile{min-height:86px;padding:4px}.tile .ppl img{width:18px;height:18px}.tile .you img{width:22px;height:22px}.tile .tn{padding:0 3px}}
-.seg.love i.on{background:#f5a3c7}
-
-/* ---------- 手机：顶部固定状态栏 + 底部抽屉 ---------- */
-.hud,.scrim,.sheet-close{display:none}
-@media (max-width:880px){
-  body.ingame .top{display:none}
-  body.ingame .wrap{padding-top:86px}
-  .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
-  body.ingame .hud{display:block;position:fixed;top:0;left:0;right:0;z-index:20;background:var(--void);border-bottom:3px solid var(--frame-in);
-    padding:calc(8px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-right,0px)) 8px calc(12px + env(safe-area-inset-left,0px))}
-  .hud-row{display:flex;align-items:center;gap:10px;font-size:var(--fs-s)}
-  .hud-row .day{background:var(--frame);color:var(--win);padding:0 8px}
-  .hud-btns{margin-left:auto;display:flex;gap:6px}
-  .hud-btns button{background:var(--win);border:2px solid var(--dim);color:var(--ink);font-size:var(--fs-s);padding:3px 9px;min-height:32px;cursor:pointer}
-  .hud-btns button:active{border-color:var(--gold);color:var(--gold)}
-  .hud-btns .n{color:var(--gold)}
-  .hud-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:8px;font-size:var(--fs-s);line-height:1.3}
-  .hud-stats div{display:grid;grid-template-columns:auto 1fr auto;gap:5px;align-items:center;min-width:0}
-  .hud-stats i{display:block;height:8px;background:var(--win-2);position:relative;overflow:hidden}
-  .hud-stats i b{position:absolute;inset:0 auto 0 0;display:block}
-  .hud-stats em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--muted)}
-  .hud-stats .bump{animation:bump .5s steps(2) 2}
-  @keyframes bump{50%{color:var(--gold)}}
-
-  .side{position:fixed;left:0;right:0;bottom:0;z-index:30;max-height:78vh;max-height:78dvh;overflow:auto;-webkit-overflow-scrolling:touch;
-    background:var(--void);border-top:3px solid var(--frame);padding:14px calc(14px + env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) calc(14px + env(safe-area-inset-left,0px));
-    transform:translateY(105%);transition:transform .22s steps(4);visibility:hidden}
-  body.sheet .side{transform:none;visibility:visible}
-  body.sheet .scrim{display:block;position:fixed;inset:0;z-index:25;background:rgba(13,14,26,.7)}
-  body.sheet{overflow:hidden}
-  .sheet-close{display:block;align-self:flex-end;background:none;border:2px solid var(--dim);color:var(--ink);font-size:var(--fs-s);padding:4px 12px;min-height:34px;cursor:pointer}
-  .choice{padding:10px 6px;min-height:48px}
-  .tab{min-height:34px;padding:0 12px}
-  .rat{padding:8px}
-  .evlist{grid-template-columns:repeat(auto-fill,minmax(58px,1fr))}
-}
-@media (max-width:880px) and (prefers-reduced-motion:reduce){.side{transition:none}}
-
-/* 结局 */
-.ending-tag{font-size:var(--fs-s);letter-spacing:.14em;color:var(--rat)}
-.scene h2{font-weight:400;font-size:40px;line-height:1.15;margin:0;color:var(--gold);text-shadow:4px 4px 0 var(--red)}
-.verdict{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-@media (max-width:620px){.verdict{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.verdict div{background:var(--win-2);padding:10px;display:flex;flex-direction:column;align-items:center;gap:4px}
-.verdict img{width:48px;height:48px}
-.verdict em{font-style:normal;font-size:var(--fs-s);color:var(--muted)}
-.verdict .y em{color:var(--ink);background:var(--red);padding:0 6px}
-.verdict .y img{filter:grayscale(1) brightness(.7)}
-
-/* 弹窗 */
-.modal{position:fixed;inset:0;background:rgba(13,14,26,.8);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
-.card{max-width:480px;width:100%;padding:26px 22px 18px;max-height:85vh;max-height:85dvh;overflow:auto;-webkit-overflow-scrolling:touch}
-.card .hd{display:flex;gap:16px;align-items:center}
-.card .hd img{width:72px;height:72px;background:var(--win-2);padding:4px}
-.card .nm{font-size:40px;line-height:1;color:var(--rat)}
-.card dl{display:grid;grid-template-columns:5em minmax(0,1fr);gap:8px 12px;margin:16px 0;font-size:var(--fs-s);line-height:1.7}
-.card dt{color:var(--gold)}
-.card dd{margin:0}
-.card .narr{font-size:var(--fs-s);line-height:1.8;color:var(--muted);margin-top:12px}
-
-.fade{animation:pop .22s steps(3) both}
-@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.fade,.roster img,.lurk img,.lurk i,.press,.choice .cur{animation:none!important}.morph .a{opacity:0}.morph .b{opacity:1}}
+/* 大卡片（标题/早晨/晚上/揭露/结局） */
+.big{display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;padding:26px 20px}
+.big h1{font-family:var(--f-disp);font-weight:400;font-size:34px;line-height:1.15;margin:0;text-wrap:balance}
+.big h1 em{font-style:normal;color:var(--coral)}
+.big p{margin:0;color:#55506A;max-width:28em}
+.big .row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.big .row .av{width:56px;height:56px}
+.btn{background:var(--coral);color:#fff;font-weight:700;font-size:16px;padding:13px 28px;border-radius:99px;box-shadow:0 5px 0 var(--coral-d);width:100%;max-width:300px}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--coral-d)}
+.btn.ghost{background:var(--card);color:var(--ink);box-shadow:0 5px 0 rgba(46,42,59,.12)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+.stats div{background:var(--soft);border-radius:14px;padding:8px 10px;text-align:left;font-size:13px;color:var(--muted)}
+.stats b{display:block;color:var(--ink);font-size:18px;font-variant-numeric:tabular-nums}
+.grade{font-family:var(--f-disp);font-size:72px;line-height:1;color:var(--coral)}
+.reveal .av{width:120px;height:120px;animation:wob .6s ease 2}
+@keyframes wob{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
-<div class="hud" id="hud"></div>
-<div class="scrim" id="scrim"></div>
-<div class="wrap">
-  <header class="top">
-    <div class="brand">GET RATS OUT MY WORLD<small>驱鼠办公室</small></div>
-    <div class="clock" id="clock"></div>
-  </header>
-  <div class="grid">
-    <main class="scene win" id="scene" aria-live="polite"></main>
-    <aside class="side" id="side"></aside>
-  </div>
+<div class="app" id="app">
+  <header class="hud" id="hud" hidden></header>
+  <main class="view" id="view"></main>
 </div>
-<div class="modal" id="modal" hidden></div>
+<nav class="tabbar" id="tabbar" hidden></nav>
+<div class="dlg" id="dlg" hidden></div>
+<div class="sheet" id="sheet" hidden></div>
+<div class="toasts" id="toasts"></div>
 
 <script>
-/* ============ 数据 ============ */
-const RATS = {
-  r1:{name:'闻灏', tag:'越界派活 · 双标 · 爱指挥平级', story:'主线核心Rat。加两天班就觉得自己有资格给别的组派活，点子归他，脏活归你。', how:'用证据和书面分工，堵死"平级口头派活"这条路。'},
-  r2:{name:'汶昊', tag:'抢功劳 · 偷方案 · 甩锅栽赃', story:'手上没什么拿得出手的产出，于是盯上了你的。改个页眉，删掉编辑记录，方案就成了他的。', how:'版本历史、时间戳、证人。让"移花接木"在核验面前失效。'},
-  r3:{name:'玟颢', tag:'打小报告 · 茶水间造谣 · 挑拨', story:'从不正面冲突。半句真话掺半句假话，在茶水间、在领导私聊里，把你的维权说成"难合作"。', how:'收集证言和他打小报告的记录，让碎片谣言拼不成形。'},
-  r4:{name:'雯灏', tag:'PUA · 画大饼 · 道德绑架', story:'从不写工单，只讲人情。"大家都在扛""别分这么清楚"。功劳算集体，锅算干活的人。', how:'把口头人情变成书面任务。没有书面，就没有义务。'},
+/* =================== 角色 =================== */
+const CHARS = {
+  me:   {name:'我', hair:'#3B3A57', style:'short', shirt:'#7CC6FE'},
+  lin:  {name:'小林', role:'同组搭子', hair:'#7A4E3A', style:'bob', shirt:'#9EE6B8',
+         facts:['工位抽屉里永远有三种口味的薯片。','其实偷偷在考公，书藏在显示器底下。','说你是TA在这家公司唯一的朋友。']},
+  zhe:  {name:'阿哲', role:'同组 · 降噪耳机常驻', hair:'#2D2D3A', style:'spiky', shirt:'#FFD59E', acc:'phones',
+         facts:['耳机里放的其实是白噪音，不是音乐。','养了一只叫"需求"的猫。','三年没请过假，因为不知道请假要找谁审批。']},
+  boss: {name:'老周', role:'组长', hair:'#A7B0BA', style:'thin', shirt:'#5B7BD5', acc:'glasses',
+         facts:['手机壁纸是女儿画的全家福。','也被他的老板抢过功劳。','很想早点下班，但他的老板不下班。']},
+  jiang:{name:'江屿', role:'设计组', hair:'#2F3E64', style:'messy', shirt:'#C9B8FF', love:true,
+         facts:['午休在天台画像素画，画过整栋楼的平面图。','设计稿被人"借"去汇报过，从那以后每版都留源文件。','觉得你笑起来像他画过的一个小人。']},
+  man:  {name:'陈蔓', role:'隔壁组产品', hair:'#3A2A2A', style:'long', shirt:'#FFB3C1', love:true,
+         facts:['美式不加糖，奶茶全糖。','隔壁组最常接到奇怪需求的人，正在写一本《需求吐槽大全》。','买了两张像素艺术展的票，还没想好约谁。']},
+  amy:  {name:'Amy', role:'行政', hair:'#C97B4A', style:'bun', shirt:'#FFF1A8',
+         facts:['公司每台打印机卡纸的姿势她都记得。','下午茶是她自掏腰包补的差价。','知道全公司每个人的生日。']},
+  xu:   {name:'许姐', role:'HRBP', hair:'#4A3B52', style:'bob', shirt:'#E9E9F2', acc:'earring',
+         facts:['桌上的龟背竹养了六年。','面试过公司一半的人，包括你。','说"有事随时找我"是真心的。']},
+  wh1:  {name:'闻灏', role:'隔壁组 · 爱提方案', hair:'#5A5A66', style:'side', shirt:'#FFFFFF', acc:'tie', rat:'越界派活 · 双标',
+         facts:['加过两次班，发过六次朋友圈。','提的方案很多，落地的都不是他。','到点就走，从不例外。']},
+  wh2:  {name:'汶昊', role:'隔壁组', hair:'#8A5A3C', style:'short', shirt:'#A3B1C2', acc:'shades', rat:'抢功劳 · 改页眉',
+         facts:['汇报能力一流。','文件属性里的作者名，经常不是他。','最常说的话："这个是我们一起讨论的。"']},
+  wh3:  {name:'玟颢', role:'行政部 · 消息灵通', hair:'#9B7BB0', style:'long', shirt:'#D7B6E8', rat:'传八卦 · 打小报告',
+         facts:['茶水间的消息，一半从她这里出去。','另一半，也是。','和每个领导都"很聊得来"。']},
+  wh4:  {name:'雯灏', role:'项目经理', hair:'#C59A5B', style:'thin', shirt:'#7FC8C0', acc:'glasses', rat:'画大饼 · 人情绑架',
+         facts:['口头禅："大家都在扛。"','从不建工单，只建群。','上线庆功宴@了所有人，除了干活的人。']},
 };
-const RAT_TEMPLATE = {tag:'文浩系蛀虫', trait:'披着普通同事的外壳，用体面话术转嫁成本、掠夺他人成果', goal:'击碎他赖以得逞的规则漏洞，让他的越界手段失效'};
+const RATS = ['wh1','wh2','wh3','wh4'];
+const LOVERS = ['jiang','man'];
 
-const EV = {
-  E01:{name:'工单分配记录', desc:'过往多份需求，闻灏只输出需求描述，落地全部指派本组，本人无交付产出。'},
-  E02:{name:'打卡导出记录', desc:'近22个工作日，闻灏19天准点/提前离岗，仅2天加班。'},
-  E03:{name:'历史私聊失联记录', desc:'之前约定联调，到点直接下班失联。'},
-  E04:{name:'同步会会议纪要', desc:'闻灏在会上原话："主要是你们组维护、调试规则。"'},
-  E05:{name:'私聊：回避分工边界', desc:'闻灏拒绝写明承接范围和排期，"先跑起来再说"。'},
-  E06:{name:'私聊：证据对质归档', desc:'你逐条摆出工单与打卡记录，闻灏回复"我知道了，我找组长对齐"。'},
-  E07:{name:'外组塞活截图', desc:'隔壁组陈蔓发来的截图：闻灏用同一套话术给他们组塞过活。'},
-  E08:{name:'文档版本历史', desc:'方案文档全部版本、草稿与提交时间戳，作者均为你。'},
-  E09:{name:'茶水间证言', desc:'在场同事确认：玟颢说你"配合度差、爱顶撞跨组同事"。'},
-  E10:{name:'小报告记录', desc:'玟颢私下发给组长的消息，把你的边界维权描述成"情绪化、难合作"。'},
-  E11:{name:'口头派活录音 / 书面任务单', desc:'雯灏靠人情话术让你无偿兜底的完整记录。'},
-  E12:{name:'双鼠口径对照表', desc:'闻灏和汶昊在不同场合说法前后矛盾的逐条对照。'},
-  E13:{name:'蛀虫互撕截图', desc:'闻灏与汶昊互相甩锅、互爆黑料的聊天记录。'},
-  E14:{name:'会议室白板照片', desc:'同步会前，闻灏就在白板上写好了"落地：xx组维护（他们下班早，有余量）"。'},
+/* 卡通头像（SVG） */
+const HAIR_BACK = {
+  long:'M13 30 Q13 7 32 7 Q51 7 51 30 L53 56 Q32 62 11 56Z',
+  bob:'M12 31 Q12 7 32 7 Q52 7 52 31 L52 45 Q32 50 12 45Z',
+  bun:'M32 2 a7 7 0 1 0 .1 0Z',
 };
-const R1_EV = ['E01','E02','E03','E04','E05','E06','E07','E14'];
-const DAYS = ['','W1 周一','W1 周二','W1 周三','W1 周四','W1 周五','W2 周一','W2 周二','W2 周三'];
-const LAST_DAY = 8;
-
-/* ============ 状态 ============ */
-const fresh = () => ({day:1, ap:4, loc:'desk', love:{jiang:{v:0,st:0,last:0}, man:{v:0,st:0,last:0}}, partner:null, stress:30, trust:50, neutral:50, output:0,
-  alert:{r1:10,r2:5,r3:5,r4:5}, ev:[], flags:{}, seen:{}, expelled:{}, log:[], scene:'title', reveal:[],
-  morning:[], out:null, pendingTo:null, ending:null, tab:'rats'});
-let S = fresh();
-const has = e => S.ev.includes(e);
-const f = () => S.flags;
-const clamp = v => Math.max(0, Math.min(100, v));
-const r1Count = () => R1_EV.filter(has).length;
-function markSeen(r){ if(!S.seen[r]){ S.seen[r] = true; (S.reveal = S.reveal || []).push(r); } }
-
-function save(){ try{ localStorage.setItem('grom-save', JSON.stringify(S)); }catch(e){} }
-function load(){ try{ const t = localStorage.getItem('grom-save'); return t ? JSON.parse(t) : null; }catch(e){ return null; } }
-
-function applyFx(fx){
-  const out = [];
-  const st = (k, label, v) => { if(!v) return; S[k] = clamp(S[k] + v); out.push({label, v, k}); };
-  st('stress','压力值',fx.stress); st('trust','组长信任',fx.trust); st('neutral','中立好感',fx.neutral);
-  if(fx.output){ S.output = Math.max(0, S.output + fx.output); out.push({label:'业务产出', v:fx.output, k:'output'}); }
-  if(fx.alert) for(const r in fx.alert){ S.alert[r] = clamp(S.alert[r] + fx.alert[r]); markSeen(r); out.push({label:RATS[r].name+' 戒备值', v:fx.alert[r], k:'alert'}); }
-  if(fx.ev) for(const e of [].concat(fx.ev)) if(!has(e)){ S.ev.push(e); out.push({label:'获得证据 '+e+'｜'+EV[e].name, ev:true}); }
-  if(fx.expel) for(const r of [].concat(fx.expel)) if(!S.expelled[r]){ S.expelled[r] = true; markSeen(r); out.push({label:'驱逐成功：'+RATS[r].name, expel:true}); }
-  if(fx.see) for(const r of [].concat(fx.see)) markSeen(r);
-  if(fx.set) Object.assign(S.flags, fx.set);
-  if(fx.buff) for(const b of [].concat(fx.buff)) out.push({label:b, buff:true});
-  if(out.length) S.log.unshift(DAYS[S.day]+'：'+out.map(c => c.v ? `${c.label} ${c.v>0?'+':''}${c.v}` : c.label).join('，'));
-  S.log = S.log.slice(0,60);
-  return out;
+const HAIR_FRONT = {
+  short:'M14 31 Q12 9 32 9 Q52 9 50 31 Q46 19 32 18 Q20 18 14 31Z',
+  bob:'M13 31 Q13 9 32 9 Q51 9 51 31 Q45 21 37 17 Q31 24 21 21 Q16 25 13 31Z',
+  long:'M13 31 Q13 9 32 9 Q51 9 51 31 Q45 21 37 17 Q31 24 21 21 Q16 25 13 31Z',
+  bun:'M14 30 Q13 10 32 10 Q51 10 50 30 Q45 20 32 19 Q20 19 14 30Z',
+  spiky:'M14 29 L15 15 L21 18 L24 8 L30 16 L35 6 L39 15 L46 9 L47 19 L50 29 Q44 20 32 20 Q20 20 14 29Z',
+  messy:'M13 31 Q11 11 30 9 Q47 7 51 22 L52 31 Q47 20 41 23 Q37 15 30 22 Q24 17 18 25Z',
+  thin:'M15 27 Q18 14 32 13 Q46 14 49 27 Q44 19 32 19 Q20 19 15 27Z',
+  side:'M13 31 Q11 9 32 9 Q51 9 50 29 Q40 13 22 22 Q17 25 13 31Z',
+};
+const SKIN = '#FFE1C9', INK = '#2B2840';
+function avatar(id, opt = {}){
+  const c = CHARS[id];
+  const ghost = opt.ghost, rat = !ghost && (opt.rat ?? (S && S.revealed && S.revealed[id]));
+  const g = col => ghost ? '#D9D4EA' : col;
+  let s = `<svg class="av" viewBox="0 0 64 64" aria-hidden="true">`;
+  if(rat) s += `<g><circle cx="14" cy="14" r="9" fill="#BDB7CC"/><circle cx="14" cy="14" r="5" fill="#FFB3C6"/><circle cx="50" cy="14" r="9" fill="#BDB7CC"/><circle cx="50" cy="14" r="5" fill="#FFB3C6"/></g>`;
+  if(HAIR_BACK[c.style]) s += `<path d="${HAIR_BACK[c.style]}" fill="${g(c.hair)}"/>`;
+  s += `<path d="M9 64 Q9 46 32 46 Q55 46 55 64Z" fill="${g(c.shirt)}"/>`;
+  if(c.acc === 'tie' && !ghost) s += `<path d="M32 47 l-3.2 3 3.2 12 3.2-12z" fill="#FF6B6B"/>`;
+  s += `<circle cx="14" cy="33" r="3.2" fill="${g(SKIN)}"/><circle cx="50" cy="33" r="3.2" fill="${g(SKIN)}"/><circle cx="32" cy="31" r="18.5" fill="${g(SKIN)}"/>`;
+  s += `<path d="${HAIR_FRONT[c.style]}" fill="${g(c.hair)}"/>`;
+  if(ghost) return s + `<text x="32" y="38" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">?</text></svg>`;
+  s += `<ellipse cx="25" cy="32" rx="2.4" ry="3" fill="${INK}"/><ellipse cx="39" cy="32" rx="2.4" ry="3" fill="${INK}"/><circle cx="25.9" cy="30.8" r=".9" fill="#fff"/><circle cx="39.9" cy="30.8" r=".9" fill="#fff"/>`;
+  s += `<ellipse cx="20.5" cy="38" rx="3.3" ry="2" fill="#FF9EB0" opacity=".6"/><ellipse cx="43.5" cy="38" rx="3.3" ry="2" fill="#FF9EB0" opacity=".6"/>`;
+  s += opt.sad ? `<path d="M29 42 Q32 39.5 35 42" stroke="${INK}" stroke-width="1.6" fill="none" stroke-linecap="round"/>` : `<path d="M29 40 Q32 43 35 40" stroke="${INK}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+  if(c.acc === 'glasses') s += `<g fill="none" stroke="${INK}" stroke-width="1.4"><circle cx="25" cy="32" r="4.6"/><circle cx="39" cy="32" r="4.6"/><path d="M29.6 32h4.8"/></g>`;
+  if(c.acc === 'phones') s += `<path d="M11 33 Q11 6 32 6 Q53 6 53 33" stroke="#4A4560" stroke-width="3" fill="none"/><rect x="8" y="28" width="7" height="11" rx="3.5" fill="#4A4560"/><rect x="49" y="28" width="7" height="11" rx="3.5" fill="#4A4560"/>`;
+  if(c.acc === 'shades') s += `<g fill="${INK}"><rect x="19" y="12" width="11" height="5" rx="2.5"/><rect x="34" y="12" width="11" height="5" rx="2.5"/><rect x="29" y="13" width="6" height="1.6"/></g>`;
+  if(c.acc === 'earring') s += `<circle cx="13" cy="38" r="1.7" fill="#FFD66B"/>`;
+  if(rat) s += `<ellipse cx="32" cy="37" rx="2.2" ry="1.6" fill="#FF7A9A"/><g stroke="${INK}" stroke-width=".9" stroke-linecap="round"><path d="M21 38 h-9 M21 40.5 l-8 2.5 M43 38 h9 M43 40.5 l8 2.5"/></g>`;
+  return s + `</svg>`;
 }
 
-/* ============ 场景 ============ */
-const N = t => ({n:t}), OS = t => ({os:t}), SYS = t => ({sys:t}), H = t => ({h:t});
-const C = (who, t) => ({c:who, t}), ME = t => ({me:t});
-
-const SC = {};
-
-SC.intro = () => ({loc:'入职第三年 · 你的工位', blocks:[
-  N('你在一家中型互联网公司做业务研发，入职第三年。工作不算轻松，但你习惯白天把事情做完、准点交付、准点下班。你一直以为，这就是一个打工人最体面的状态。'),
-  N('直到最近，你发现办公室里多了一种东西。它们长着普通同事的脸，说着体面的话，开会时点头最用力，复盘时声音最大。它们从不直接抢，它们只是让成本一点一点地，流到你身上。'),
-  N('你说不清那是什么。你只是越来越确定：有些同事，不太对劲。'),
-  OS('先别急着动手。没有证据的愤怒，在职场里只会变成"你情绪不稳定"。我得先看清楚，是谁，靠什么得逞。'),
-  H('玩法'),
-  N('每天分上午、午休、下午、傍晚四个时段（右上角黄点）。办公室地图上可以自由走动，走动不花时间；在某个地方做事，会用掉一个时段。不同时段，不同的人在不同的地方。'),
-  N('有些东西，只有你自己摸过去才会发现。有些人，只有你主动接近才会露出真面目。压力值到 100 会失控。'),
-], choices:[{t:'周一早上九点，打开电脑', to:'dayStart', primary:true, act:() => { S.morning = morningMessages(); }}]});
-
-SC.dayStart = () => {
-  const b = [...S.morning];
-  return {loc:'早上 09:30 · 工位', title:DAYS[S.day], blocks:b, choices:[{t:'开始今天的工作', to:'morning', primary:true, act:() => { if(S.day === 1) markSeen('r1'); }}]};
+/* =================== 地点插画 =================== */
+const ART = {
+  desk:`<rect width="360" height="190" fill="#DCF0FF"/><rect y="130" width="360" height="60" fill="#F3E6D8"/><rect x="24" y="22" width="90" height="60" rx="10" fill="#fff"/><rect x="32" y="30" width="74" height="10" rx="5" fill="#FFD6CF"/><rect x="32" y="46" width="50" height="8" rx="4" fill="#CDEBFF"/><rect x="32" y="60" width="62" height="8" rx="4" fill="#D8F3E6"/>
+    <rect x="160" y="64" width="110" height="68" rx="10" fill="#3B3F5C"/><rect x="168" y="72" width="94" height="52" rx="6" fill="#7CC6FE"/><rect x="176" y="82" width="40" height="5" rx="2.5" fill="#fff" opacity=".8"/><rect x="176" y="92" width="62" height="5" rx="2.5" fill="#fff" opacity=".6"/><rect x="176" y="102" width="30" height="5" rx="2.5" fill="#fff" opacity=".6"/>
+    <rect x="205" y="132" width="20" height="10" fill="#3B3F5C"/><rect x="120" y="140" width="220" height="14" rx="7" fill="#F2C9A0"/><rect x="300" y="104" width="26" height="36" rx="8" fill="#FF9E80"/><circle cx="306" cy="96" r="12" fill="#5CCB9F"/><circle cx="320" cy="90" r="11" fill="#7ADBB3"/><rect x="134" y="120" width="18" height="20" rx="4" fill="#fff"/><path d="M152 125 q8 2 0 10" stroke="#fff" stroke-width="3" fill="none"/>`,
+  tea:`<rect width="360" height="190" fill="#FFF1D6"/><rect y="132" width="360" height="58" fill="#F6DDC3"/><rect x="20" y="96" width="220" height="44" rx="8" fill="#fff"/><rect x="20" y="92" width="220" height="10" rx="5" fill="#E8C8A6"/>
+    <rect x="40" y="48" width="48" height="50" rx="10" fill="#3B3F5C"/><rect x="50" y="58" width="28" height="12" rx="4" fill="#FFD66B"/><rect x="56" y="78" width="16" height="14" rx="3" fill="#fff"/>
+    <rect x="110" y="70" width="18" height="24" rx="5" fill="#FF8A7A"/><rect x="134" y="74" width="18" height="20" rx="5" fill="#7CC6FE"/><rect x="158" y="72" width="18" height="22" rx="5" fill="#A98BFF"/>
+    <rect x="270" y="30" width="66" height="110" rx="12" fill="#E8F4FF"/><rect x="276" y="38" width="54" height="40" rx="6" fill="#fff"/><rect x="276" y="84" width="54" height="48" rx="6" fill="#fff"/><rect x="320" y="52" width="4" height="14" rx="2" fill="#C9D3E0"/><rect x="200" y="28" width="46" height="34" rx="6" fill="#fff"/><text x="223" y="50" text-anchor="middle" font-size="12" fill="#FF8A7A">TEA</text>`,
+  meeting:`<rect width="360" height="190" fill="#ECE7FF"/><rect y="138" width="360" height="52" fill="#DCD3F7"/><rect x="110" y="18" width="140" height="80" rx="10" fill="#fff"/><rect x="126" y="70" width="16" height="18" rx="3" fill="#FF8A7A"/><rect x="150" y="56" width="16" height="32" rx="3" fill="#FFD66B"/><rect x="174" y="40" width="16" height="48" rx="3" fill="#5CCB9F"/><rect x="198" y="30" width="16" height="58" rx="3" fill="#7CC6FE"/><path d="M128 66 L158 50 L182 36 L222 26" stroke="#A98BFF" stroke-width="3" fill="none"/>
+    <rect x="40" y="118" width="280" height="22" rx="11" fill="#fff"/><circle cx="70" cy="112" r="10" fill="#C9B8FF"/><circle cx="290" cy="112" r="10" fill="#C9B8FF"/><rect x="18" y="40" width="70" height="46" rx="8" fill="#fff" opacity=".7"/><text x="53" y="68" text-anchor="middle" font-size="11" fill="#A98BFF">对齐！</text>`,
+  bossroom:`<rect width="360" height="190" fill="#E3F2EA"/><rect y="136" width="360" height="54" fill="#D0E6DA"/><rect x="200" y="20" width="130" height="90" rx="10" fill="#fff"/><g fill="#CDEBFF"><rect x="208" y="28" width="114" height="10" rx="3"/><rect x="208" y="44" width="114" height="10" rx="3"/><rect x="208" y="60" width="114" height="10" rx="3"/><rect x="208" y="76" width="114" height="10" rx="3"/><rect x="208" y="92" width="114" height="10" rx="3"/></g>
+    <rect x="40" y="108" width="190" height="34" rx="10" fill="#B98B64"/><rect x="70" y="80" width="54" height="30" rx="5" fill="#3B3F5C"/><rect x="150" y="88" width="16" height="20" rx="4" fill="#FFD66B"/><path d="M146 90 h24" stroke="#FFD66B" stroke-width="4"/><rect x="30" y="30" width="60" height="40" rx="6" fill="#fff"/><text x="60" y="55" text-anchor="middle" font-size="11" fill="#5CCB9F">KPI</text>`,
+  roof:`<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FD8FF"/><stop offset="1" stop-color="#FFF4E0"/></linearGradient></defs><rect width="360" height="190" fill="url(#sky)"/>
+    <g fill="#fff"><ellipse cx="70" cy="40" rx="30" ry="12"/><ellipse cx="92" cy="34" rx="20" ry="12"/><ellipse cx="270" cy="56" rx="34" ry="12"/><ellipse cx="296" cy="50" rx="20" ry="11"/></g>
+    <g fill="#C9D9EE"><rect x="10" y="88" width="40" height="60"/><rect x="56" y="70" width="34" height="78"/><rect x="250" y="80" width="44" height="68"/><rect x="300" y="96" width="50" height="52"/></g>
+    <rect y="140" width="360" height="50" fill="#B9C6D6"/><g stroke="#7E8BA3" stroke-width="4"><path d="M0 128 H360"/><path d="M20 128 V150 M70 128 V150 M120 128 V150 M170 128 V150 M220 128 V150 M270 128 V150 M320 128 V150"/></g><rect x="150" y="96" width="50" height="40" rx="6" fill="#E6EDF5"/>`,
+  canteen:`<rect width="360" height="190" fill="#FFE7E0"/><rect y="134" width="360" height="56" fill="#F7D3C8"/><rect x="20" y="20" width="320" height="40" rx="10" fill="#fff"/><text x="180" y="46" text-anchor="middle" font-size="14" fill="#FF8A7A">今日菜单：番茄炒蛋 · 红烧肉 · 麻辣烫</text>
+    <rect x="30" y="112" width="130" height="16" rx="8" fill="#fff"/><rect x="200" y="112" width="130" height="16" rx="8" fill="#fff"/><g fill="#FFD66B"><ellipse cx="70" cy="108" rx="18" ry="6"/><ellipse cx="240" cy="108" rx="18" ry="6"/></g><g fill="#FF8A7A"><ellipse cx="115" cy="108" rx="14" ry="5"/><ellipse cx="290" cy="108" rx="14" ry="5"/></g><rect x="40" y="70" width="40" height="30" rx="6" fill="#fff" opacity=".7"/><rect x="280" y="70" width="40" height="30" rx="6" fill="#fff" opacity=".7"/>`,
+  store:`<rect width="360" height="190" fill="#E2FAEF"/><rect y="140" width="360" height="50" fill="#CBEBDD"/><rect x="0" y="0" width="360" height="22" fill="#5CCB9F"/><text x="180" y="16" text-anchor="middle" font-size="12" fill="#fff">楼下便利店 · 24H</text>
+    <g><rect x="20" y="40" width="150" height="100" rx="8" fill="#fff"/><g fill="#FF8A7A"><rect x="30" y="50" width="20" height="24" rx="3"/><rect x="56" y="50" width="20" height="24" rx="3"/></g><g fill="#FFD66B"><rect x="82" y="50" width="20" height="24" rx="3"/><rect x="108" y="50" width="20" height="24" rx="3"/></g><g fill="#7CC6FE"><rect x="30" y="86" width="26" height="20" rx="3"/><rect x="62" y="86" width="26" height="20" rx="3"/></g><g fill="#A98BFF"><rect x="96" y="86" width="26" height="20" rx="3"/><rect x="130" y="86" width="26" height="20" rx="3"/></g><g fill="#5CCB9F"><rect x="30" y="114" width="126" height="16" rx="3"/></g></g>
+    <rect x="200" y="36" width="140" height="104" rx="10" fill="#DFF3FF"/><g fill="#fff"><rect x="210" y="46" width="56" height="84" rx="6"/><rect x="274" y="46" width="56" height="84" rx="6"/></g><g fill="#FF9EC4"><rect x="218" y="56" width="12" height="20" rx="3"/><rect x="236" y="56" width="12" height="20" rx="3"/></g><g fill="#FFD66B"><rect x="282" y="56" width="12" height="20" rx="3"/><rect x="300" y="56" width="12" height="20" rx="3"/></g>`,
+  wc:`<rect width="360" height="190" fill="#E6F1F8"/><g stroke="#D3E3EE" stroke-width="2"><path d="M0 40 H360 M0 80 H360 M0 120 H360 M60 0 V190 M120 0 V190 M180 0 V190 M240 0 V190 M300 0 V190"/></g><rect y="140" width="360" height="50" fill="#D7E6F0"/>
+    <rect x="40" y="30" width="80" height="60" rx="30" fill="#fff"/><rect x="30" y="100" width="100" height="20" rx="8" fill="#fff"/><rect x="74" y="92" width="12" height="10" rx="3" fill="#B9C6D6"/>
+    <rect x="220" y="30" width="110" height="110" rx="10" fill="#C9D9EE"/><rect x="228" y="38" width="94" height="102" rx="6" fill="#DCE8F5"/><circle cx="310" cy="92" r="4" fill="#7E8BA3"/><rect x="250" y="56" width="50" height="16" rx="8" fill="#5CCB9F"/><text x="275" y="68" text-anchor="middle" font-size="10" fill="#fff">无人</text>`,
 };
 
-function morningMessages(){
-  const m = [], fl = f();
-  if(S.day === 1){
-    m.push(N('企业微信的跨组大群在九点零三分跳出一条消息。'));
-    m.push(C('闻灏', '这两天连着加了两天班，深感咱们现在的流程太低效了😮‍💨 周三跨组同步会我准备提一个AI提效方案，大家可以期待一下～'));
-    m.push(C('小林（同组）', '[私聊] 他加两天班就要改造全世界了？'));
-    m.push(OS('闻灏，隔壁组，和你平级。他的需求过去一年几乎全落在你们组身上，而他本人，你印象里是那种六点一到就消失的人。"加了两天班"这件事，他大概会讲一整周。'));
-  } else if(S.day === 2){
-    m.push(C('闻灏', '[大群·图片] 昨晚 21:47 下班打卡截图。"为了周三的方案又熬了一晚，值得。"'));
-    m.push(N('组长老周在下面点了个赞。你看着那个赞，说不清是什么心情。'));
-    m.push(OS('周三下午的同步会，他一定会把那个"AI提效"扔出来。我还有今天和明天上午，可以先把手里的东西准备好。'));
-  } else if(S.day === 3){
-    m.push(SYS('日程提醒：今天 15:00「跨组AI提效同步会」｜发起人：闻灏'));
-    m.push(N('日程提醒一直挂在屏幕右下角，像一颗没拆的雷。上午和午休，你还能自由活动。'));
-  } else if(S.day === LAST_DAY){
-    m.push(N('最后一个周三。一周半过去了，你的待办列表、你的证据文件夹、还有你的心态，都和十天前不太一样了。'));
-    if(S.output >= 3){ m.push(C('猎头 Grace', '在吗？上次聊的那家，二面反馈很好，offer 今天下午能发。你考虑一下～')); S.flags.offer = true; }
-  } else {
-    m.push(N(['又是普通的一天。空调有点冷。','早会开了二十分钟，说了五分钟的事。','工位上的绿萝又黄了一片叶子。','楼下咖啡店换了新的季节限定，你没买。'][S.day % 4]));
-  }
-  if(fl.nag && !S.expelled.r1){
-    m.push(C('闻灏', ['早～那个AI流程评估得怎么样啦？今天能给个初版吗？','在吗，组长那边也在问进度哈，你们先搭个架子就行','我看你们昨天又是六点走的，应该有空搞一下吧😊'][S.day % 3]));
-    m.push(SYS('Debuff【闻灏持续催办】压力 +8'));
-    S.stress = clamp(S.stress + 8);
-  }
-  if(fl.rumorSpread && !S.expelled.r3){
-    m.push(SYS('谣言在扩散：有人开始用"那个不好合作的"来指代你。组长信任 -3'));
-    S.trust = clamp(S.trust - 3);
-  }
-  return m;
-}
-
-/* 早间强制事件队列 */
-function morningRoute(){
-  const fl = f();
-  if(S.day === 4 && !fl.d4Done) return 'd4chain';
-  if(fl.r2Pending && !fl.r2Reviewed) return 'r2review';
-  if(S.day >= 6 && !fl.linkDone){
-    if(S.alert.r1 >= 40 && !S.expelled.r2 && fl.r2Done) return 'ally';
-    if(S.alert.r1 >= 15 && fl.r2Done) return 'feud';
-    S.flags.linkDone = true;
-  }
-  return 'hub';
-}
-/* 晚间强制事件队列 */
-function eveningRoute(){
-  const fl = f();
-  if(!fl.r2Done && S.output >= 2 && S.day >= 4 && S.day < LAST_DAY) return 'r2eve';
-  if(S.day === 5 && !fl.r4Done) return 'friday';
-  if(S.day === LAST_DAY) return 'finale';
-  return 'night';
-}
-
-/* ---------- 时间与地图 ---------- */
-const SLOTS = ['09:30 上午','12:00 午休','14:30 下午','17:30 傍晚'];
-const SLOT_N = 4;
-const slot = () => Math.min(SLOT_N - 1, SLOT_N - S.ap);
-const PEOPLE = {lin:'小林（同组）', zhe:'阿哲（同组）', boss:'老周（组长）', hr:'许姐（HRBP）', man:'陈蔓（隔壁组）', jiang:'江屿（设计组）', admin:'行政 Amy', r1:'闻灏', r2:'汶昊', r3:'玟颢', r4:'雯灏'};
-const peopleSprite = id => id in RATS ? (S.seen[id] ? id : 'd' + id.slice(1)) : (id === 'admin' ? 'npc' : id);
-
-function present(loc){
-  const s = slot(), d = S.day, p = [];
-  if(loc === 'desk' && s !== 1) p.push('lin','zhe');
-  if(loc === 'tea'){ if(s === 1) p.push('r3','zhe'); else if(s === 2) p.push('lin'); }
-  if(loc === 'next'){ if(s !== 3) p.push('r1'); if(s === 0 || s === 2) p.push('r2'); if(s !== 1) p.push('man'); }
-  if(loc === 'meet' && s === 2 && d !== 3) p.push('r4');
-  if(loc === 'boss' && (s === 0 || s === 2)) p.push('boss');
-  if(loc === 'hrroom' && (s === 0 || s === 2)) p.push('hr');
-  if(loc === 'roof' && (s === 1 || s === 3)) p.push('jiang');
-  if(loc === 'cafe' && s === 1) p.push('man');
-  if(loc === 'admin' && s !== 1) p.push('admin');
-  return p;
-}
-const here = id => present(S.loc).includes(id);
-
-/* 恋爱：江屿（天台）/ 陈蔓（隔壁组 · 咖啡店） */
-const LOVE = {jiang:{name:'江屿', where:'roof'}, man:{name:'陈蔓', where:'next'}};
-const loveOk = k => {
-  const L = S.love[k];
-  if(S.partner && S.partner !== k) return false;
-  if(L.st >= 4 || L.last === S.day) return false;
-  if(L.st === 2 && slot() !== 3) return false;           // 第三次见面只在傍晚
-  if(L.st === 3 && (S.day < 6 || slot() !== 3 || L.v < 35)) return false;  // 告白：W2 傍晚，心动够了
-  return here(k);
-};
-const loveStep = (k, v, extra = {}) => () => { const L = S.love[k]; L.v = clamp(L.v + v); L.st++; L.last = S.day; Object.assign(S.flags, extra); };
-
+/* =================== 地点 =================== */
 const LOCS = {
-  roof:{name:'天台', kind:'sky', desc:() => slot() === 3 ? '傍晚的天台。远处的写字楼一格一格亮起来，风很大。' : slot() === 1 ? '午休时间的天台，晾着几把没人收的伞。有人坐在水箱旁边吃饭团。' : '天台的门没锁。风吹得通风管嗡嗡响。',
-    acts:() => [
-      {t:'靠着栏杆吹会儿风', d:'压力 -8', fx:{stress:-8}, res:() => [N('你在栏杆边站了一会儿。楼下的车像一串移动的像素点。')]},
-      {t: S.love.jiang.st ? '去找江屿' : '和水箱边那个人搭话', d:'设计组的人', special:true, need:() => loveOk('jiang'), to:'jiang', free:true},
-    ]},
-  meet:{name:'会议室 B2', kind:'room', desc:() => here('r4') ? '雯灏在会议室里对着投屏排期，甘特图密密麻麻，最后一列全是红色。' : '会议室空着。白板上留着一些没擦干净的字。',
-    acts:() => [
-      {t:'看看白板上没擦掉的字', d:'可能有发现', special:true, need:() => !has('E14') && !f().meetingDone && !here('r4'), fx:{ev:'E14'},
-        res:() => [N('白板角落里有一块没擦干净。你凑近了看，是闻灏的字迹：'), SYS('AI提效 · 落地：xx组维护（他们下班早，有余量）'), N('你拍了张照片。原来"你们组来做"这件事，在会前就已经写好了。')]},
-      {t:'敲门进去，跟雯灏打个招呼', d:'项目经理', need:() => here('r4') && !f().r4Done, fx:{stress:4},
-        res:() => [C('雯灏', '哎来得正好！最近项目紧，大家都要有点主人翁意识哈。'), C('雯灏', '对了，周五要是有空，晚点走一会儿？都是一个大项目的嘛。'), OS('他笑得很和气。我说不上来哪里不对。')]},
-    ]},
-  boss:{name:'组长办公室', kind:'room', desc:() => here('boss') ? '老周在办公室里，门半开着，桌上摊着三台显示器。' : '老周不在。门上贴着便利贴："开会中"。',
-    acts:() => [
-      {t:'敲门，约老周聊聊', d: S.day < 4 ? '老周这周前半段都排满了，周四之后再来' : '1v1', need:() => here('boss') && S.day >= 4 && f().leaderDay !== S.day, to:'leader'},
-      {t:'跟老周聊聊最近的风声', d:'可获得 E10', need:() => here('boss') && has('E09') && !has('E10') && !S.expelled.r3, fx:{ev:'E10', stress:4},
-        res:() => [N('你提了一句茶水间的事。老周半开玩笑地把手机转过来给你看。'), C('玟颢 → 老周', '周哥，提醒一下哈，最近TA情绪有点大，跨组那边反馈挺不好合作的，您留意一下～'), N('老周说："我就是让你知道一下，别多想。"你问能不能截个图。他愣了一下，说可以。')]},
-    ]},
-  hrroom:{name:'HR 室', kind:'room', desc:() => here('hr') ? '许姐在整理一摞入职材料，抬头冲你笑了笑。' : 'HR 室没人，桌上摆着一盆长势很好的龟背竹。',
-    acts:() => [
-      {t:'跟许姐闲聊几句', d:'压力 -5', need:() => here('hr') && f().hrChat !== S.day, fx:{stress:-5}, act:() => S.flags.hrChat = S.day,
-        res:() => [C('许姐（HRBP）', '最近项目挺紧的吧？有什么不顺心的，可以随时来找我聊。'), OS('"随时"。我记下了。')]},
-      {t:'把证据分类归档（HR留档）', d:'证据 ≥5 件 · 解锁HR线', need:() => here('hr') && S.day >= 6 && S.ev.length >= 5 && !f().hrArchive, fx:{set:{hrArchive:true}, stress:-6, buff:'解锁【HR留档】'},
-        res:() => [N('你问许姐，如果要反映一些同事之间的问题，材料该怎么准备。她给了你一份模板。'), N('你按Rat分类，把每份证据标好日期、来源和佐证人。证据不会替你生气，但它会替你说话。')]},
-    ]},
-  desk:{name:'你的工位区', kind:'office', desc:() => slot() === 1 ? '午休了，工位区只剩空调声。你的绿萝又黄了一片叶子。' : slot() === 3 ? '傍晚的工位区。小林已经在收拾包了。' : '你的工位。小林在隔壁敲键盘，阿哲戴着降噪耳机。',
-    acts:() => [
-      {t:'埋头推进本职需求', d:'业务产出 +1 · 压力 +6', fx:{output:1, stress:6},
-        res:() => [N(['你戴上耳机，把积压的一个接口改造做完、自测、提了合并。','你把一个拖了两周的线上问题定位到根因，写了复盘文档。没人会为这种事点赞，但它会出现在你的绩效里。','你把重点需求的方案文档又过了一遍，补完了边界情况。这份方案，你已经写了快一个月。'][S.output % 3])]},
-      {t:'翻工单系统', d:'可获得 E01', special:true, need:() => !has('E01'), fx:{ev:'E01'},
-        res:() => [N('你在工单系统里按"提出人：闻灏"筛了一遍。十四张工单，需求描述写得洋洋洒洒，处理人一栏清一色是你们组的名字。他的名字只出现在"提出人"和"关注人"里。'), OS('原来不是我的错觉。')]},
-      {t:'翻历史私聊', d:'可获得 E03', special:true, need:() => !has('E03'), fx:{ev:'E03'},
-        res:() => [N('你往上翻和闻灏的私聊。三月那次联调，约好晚上七点一起看问题。'), C('闻灏', '[18:02] 我先撤了哈，有问题明天说'), N('那天你一个人查到十点。你截了图，存进一个新建的文件夹，命名为「rats」。')]},
-      {t:'找阿哲问问茶水间那天的事', d:'可获得 E09', need:() => here('zhe') && f().r3Probe && !has('E09'), fx:{ev:'E09', neutral:5},
-        res:() => [C('阿哲（同组）', '她确实那么说了，说你"配合度差""喜欢顶撞跨组同事"。我当时就觉得怪怪的，你那事明明是闻灏先越界的。'), C('阿哲（同组）', '要是需要，我可以跟组长说我听到的。')]},
-      {t:'比对闻灏和汶昊的口径', d:'可获得 E12', need:() => f().ally && !has('E12'), fx:{ev:'E12', stress:5},
-        res:() => [N('你把会议纪要、群聊、两人的私聊口径并排贴进一张表。闻灏说"AI流程汶昊组也认可"，汶昊上周却在评审会说"这个流程我们没参与"。'), OS('结盟的人，最怕的是对口供。')]},
-    ]},
-  tea:{name:'茶水间', kind:'tea', desc:() => present('tea').length ? '咖啡机在嗡嗡响，有人在小声聊天。' : '茶水间没人，冰箱上贴着"请及时取走过期食物"。',
-    acts:() => [{t:'接杯水，听听大家在聊什么', d:'可能会遇到点什么', to:'tea'}]},
-  next:{name:'隔壁组', kind:'office', desc:() => slot() === 3 ? '隔壁组的工位区。闻灏的位子已经空了，显示器上贴着一张便利贴："AI提效！！"' : here('r1') ? '隔壁组的工位区。闻灏在打电话，声音很大："这个我们周三会上推一下。"' : '隔壁组的工位区，比你们组安静。',
-    acts:() => [
-      {t:'看一眼闻灏空着的工位', d:'傍晚限定', need:() => slot() === 3 && !f().sawEmpty, fx:{stress:-4, set:{sawEmpty:true}},
-        res:() => [N('17:30，闻灏的椅子已经推进桌底，水杯也带走了。'), N(has('E02') ? '和考勤记录一模一样。' : '你想起行政那边能导出项目组考勤。也许值得去一趟。'), OS('加班两天，发三遍朋友圈。')]},
-      {t: S.love.man.st ? '去找陈蔓' : '和靠窗那个正在叹气的人搭话', d:'隔壁组的产品', special:true, need:() => loveOk('man') && S.love.man.st !== 1, to:'man', free:true},
-    ]},
-  admin:{name:'行政 · 打印间', kind:'room', desc:() => here('admin') ? '行政 Amy 在打印机边和卡纸搏斗。' : '打印机在午休，屏幕上写着"墨粉不足"。',
-    acts:() => [
-      {t:'找 Amy 导一份项目组考勤', d:'可获得 E02', special:true, need:() => here('admin') && !has('E02'), fx:{ev:'E02', stress:3},
-        res:() => [N('你以"核对跨组联调时间"为由，请 Amy 导了一份近一个月的项目组考勤摘要。'), N('22个工作日，闻灏19天准点或提前离岗。加班的那2天，正好是他在大群里发截图的那2天。')]},
-      {t:'帮 Amy 修好卡纸', d:'中立好感 +3', need:() => here('admin') && f().amy !== S.day, fx:{neutral:3}, act:() => S.flags.amy = S.day,
-        res:() => [C('行政 Amy', '救命，你是今天第一个愿意碰这台机器的人。以后打印找我，插队。')]},
-    ]},
-  stairs:{name:'楼梯间', kind:'dark', desc:() => '楼梯间的声控灯时亮时灭。这里信号不好，但总有人躲在这里打电话。',
-    acts:() => [
-      {t:'在台阶上坐一会儿', d:'可能会听到什么', special:() => stairsEvent() !== null, fx:{}, to:'stairs'},
-    ]},
-  lift:{name:'电梯 · 下班', kind:'lift', desc:() => slot() === 3 ? '电梯口挤满了准点下班的人。' : '电梯口很安静。现在走，算早退。',
-    acts:() => [{t: slot() === 3 ? '下班' : '今天就到这儿，提前走', d: S.ap > 1 ? '剩余时段作废' : '', to:'evening', free:true}]},
-  cafe:{name:'楼下咖啡店', kind:'cafe', desc:() => here('man') ? '楼下咖啡店。靠窗的位子上，隔壁组的陈蔓在发呆。' : '楼下咖啡店。换了新的季节限定。',
-    acts:() => [
-      {t:'买杯咖啡，发会儿呆', d:'压力 -10', fx:{stress:-10}, res:() => [N('你在楼下坐了十分钟。那十分钟里，没有人能在企业微信上找到你。')]},
-      {t: S.love.man.st ? '坐到陈蔓对面' : '和靠窗那个发呆的人拼个桌', d:'隔壁组的产品', special:true, need:() => { if(S.partner && S.partner !== 'man') return false; const L = S.love.man; return here('man') && L.st === 1 && L.last !== S.day; }, to:'man', free:true},
-    ]},
+  desk:{name:'我的工位', icon:'💻'},
+  tea:{name:'茶水间', icon:'☕'},
+  meeting:{name:'会议室', icon:'📊'},
+  bossroom:{name:'组长办公室', icon:'🚪'},
+  canteen:{name:'员工食堂', icon:'🍱', open:t => t >= 690 && t < 840, closedText:'11:30–14:00 开放'},
+  roof:{name:'天台', icon:'⛅'},
+  store:{name:'楼下便利店', icon:'🏪'},
+  wc:{name:'洗手间', icon:'🚻'},
 };
-const MAP = [['roof',1,1],['meet',2,1],['boss',3,1],['hrroom',4,1],['desk',1,2,2],['tea',3,2],['next',4,2],['admin',1,3],['stairs',2,3],['lift',3,3],['cafe',4,3]];
-
-function locActs(id){ return LOCS[id].acts().filter(a => !a.need || a.need()); }
-function hasSpecial(id){  // 按那个地点自己的视角判断（here() 读的是 S.loc）
-  const prev = S.loc; S.loc = id;
-  try { return locActs(id).some(a => typeof a.special === 'function' ? a.special() : a.special); } finally { S.loc = prev; }
-}
-
-SC.hub = () => {
-  if(S.ap <= 0) return {loc:'18:00 · 下班时间', blocks:[N('窗外天黑了。今天能做的事都做完了。')], choices:[{t:'下班', to:'evening', primary:true}]};
-  return {map:true, loc:SLOTS[slot()] + ' · 办公室', blocks:[], choices:[]};
-};
-
-SC.loc = () => {
-  const L = LOCS[S.loc];
-  const ppl = present(S.loc);
-  return {loc:SLOTS[slot()] + ' · ' + L.name, blocks:[
-    N(L.desc()),
-    ...(ppl.length ? [SYS('这里有：' + ppl.map(p => PEOPLE[p]).join('、'))] : []),
-  ], choices:[
-    ...locActs(S.loc).map(a => ({...a, ap:!a.free})),
-    {t:'回到地图', d:'走动不花时间', to:'hub'},
-  ]};
-};
-
-/* 楼梯间：偷听 */
-function stairsEvent(){
-  const fl = f();
-  if(S.day <= 3 && !fl.stairsR2) return 'r2call';
-  if(fl.ally && !has('E12') && !fl.stairsAlly) return 'allyTalk';
+const LUNCH = t => t >= 720 && t < 810;
+function where(id){
+  const t = S.time, d = S.day, L = LUNCH(t);
+  switch(id){
+    case 'lin': return L ? 'canteen' : (t >= 900 && t < 930) ? 'tea' : 'desk';
+    case 'zhe': return L ? 'store' : 'desk';
+    case 'boss': if(t >= 600 && t < 630) return 'meeting'; if(t >= 840 && t < 900) return 'meeting'; if(L) return 'canteen'; if(t >= 960 && t < 990) return 'desk'; return 'bossroom';
+    case 'jiang': if(t >= 630 && t < 690) return 'tea'; if(L) return 'roof'; if(t >= 1050) return 'roof'; return null;
+    case 'man': if(L) return 'canteen'; if(t >= 930 && t < 990) return 'tea'; if(t >= 1020 && t < 1065) return 'store'; return null;
+    case 'amy': if(t < 630) return 'tea'; if(L) return 'store'; return null;
+    case 'xu': return L ? 'canteen' : null;
+    case 'wh1': if(t >= 660 && t < 720) return 'tea'; if(t >= 840 && t < 900) return 'meeting'; return null;
+    case 'wh2': return (t >= 990 && t < 1050) ? 'tea' : null;
+    case 'wh3': if(t >= 900 && t < 960 && d >= 2) return 'tea'; if(L) return 'canteen'; return null;
+    case 'wh4': return (t >= 900 && t < 1080 && d !== 3) ? 'meeting' : null;
+  }
   return null;
 }
-SC.stairs = () => {
-  const e = stairsEvent();
-  if(e === 'r2call') return {loc:SLOTS[slot()] + ' · 楼梯间', blocks:[
-    N('你刚在台阶上坐下，楼上半层传来压低的声音。有人在打电话。'),
-    C('楼上的声音', '……放心，改个页眉的事。上次那个不也没人看出来吗？'),
-    C('楼上的声音', '嗯，评审前我拿过来就行。他们组写东西慢，我整理一下就是我的了。'),
-    N('脚步声往上走了。你从扶手缝里只看到一个背影，和一件熟悉的格子衬衫——隔壁组的汶昊。'),
-    OS('"改个页眉的事"。我得记住这句话。'),
-  ], choices:[{t:'悄悄离开', fx:{see:'r2', set:{stairsR2:true, knowR2History:true}, buff:'获得线索：汶昊有前科'}, to:'hub'}]};
-  if(e === 'allyTalk') return {loc:SLOTS[slot()] + ' · 楼梯间', blocks:[
-    N('楼梯间里有两个人在说话。你听出了闻灏和汶昊的声音。'),
-    C('闻灏', '周会上你就说你们组也认可，反正没人会去核实。'),
-    C('汶昊', '行，但评审那件事你也得帮我圆一下。'),
-    N('你打开了手机录音。'),
-  ], choices:[{t:'录完就走', fx:{ev:'E12', stress:-6, set:{stairsAlly:true}}, to:'hub'}]};
-  return {loc:SLOTS[slot()] + ' · 楼梯间', blocks:[N(['声控灯灭了。你在黑暗里坐了一会儿，没人来。','楼上有人在哭，很小声。你没有上去。','你听到两个实习生在讨论转正答辩。你想起了三年前的自己。'][S.day % 3])], choices:[{t:'回到地图', fx:{stress:-5}, to:'hub'}]};
+const cast = loc => Object.keys(CHARS).filter(id => id !== 'me' && where(id) === loc);
+
+/* =================== 任务 =================== */
+const TASKS = {
+  t1:{name:'把周报从 Word 粘到飞书，再粘回 Word', need:60, from:'boss'},
+  t2:{name:'整理上季度数据（Excel 有 37 个 Sheet）', need:120, from:'boss'},
+  t3:{name:'给老板的 PPT 试 7 种蓝色', need:90, from:'boss'},
+  t4:{name:'写需求文档 v3_final_最终版_改.docx', need:120, from:'boss'},
+  t5:{name:'回复 99+ 未读群消息', need:60, from:'boss'},
+  t6:{name:'修复一个只在周四出现的线上 bug', need:180, from:'boss'},
+  t7:{name:'写本周周报（显得很忙的那种）', need:60, from:'boss'},
+  t8:{name:'准备评审会材料', need:150, from:'boss'},
+  t9:{name:'整理"对齐会"的会议纪要的对齐纪要', need:60, from:'boss'},
+  t10:{name:'填团建报名表（要写三百字感想）', need:30, from:'amy'},
+  t11:{name:'写季度总结（要有方法论）', need:150, from:'boss'},
+  x1:{name:'帮隔壁组看个"很简单"的问题', need:120, from:'wh1'},
+  x2:{name:'AI 提效流程落地维护', need:180, from:'wh1'},
 };
+const DAY_TASKS = {1:[['t1',1],['t2',2]], 2:[['t3',2],['t4',3]], 3:[['t5',3]], 4:[['t6',4]], 5:[['t7',5]], 6:[['t8',7]], 7:[['t9',7]], 8:[['t10',8]], 9:[['t11',10]]};
+const DAYS = ['','W1 周一','W1 周二','W1 周三','W1 周四','W1 周五','W2 周一','W2 周二','W2 周三','W2 周四','W2 周五'];
+const LAST_DAY = 10;
 
-/* ---------- 恋情：江屿 ---------- */
-SC.jiang = () => {
-  const L = S.love.jiang, back = 'hub', a = {ap:true, to:back};
-  if(L.st === 0) return {loc:'天台 · 水箱边', blocks:[
-    N('水箱旁边坐着一个人，膝盖上架着平板，一边啃饭团一边在画什么。你瞄了一眼：是一排像素小图标。'),
-    C('江屿（设计组）', '……你也是来躲人的？'),
-    N('他把平板往旁边挪了挪，给你让出半个台阶。'),
-  ], choices:[
-    {...a, t: S.seen.r1 ? '"在躲一个叫 wén hào 的人。"' : '"在躲一些很会说话的人。"', d:'心动 +15', fx:{stress:-6}, act:loveStep('jiang', 15),
-      res:() => [N('他笑出了声，饭团差点掉了。'), C('江屿（设计组）', '那你来对地方了。这栋楼里，只有天台没有企业微信信号。'), OS('他画的那排小图标里，有一只戴领带的老鼠。')]},
-    {...a, t:'"透透气。"', d:'心动 +8', fx:{stress:-4}, act:loveStep('jiang', 8),
-      res:() => [C('江屿（设计组）', '嗯。这里风大，适合透气。'), N('你们并排坐着，谁也没说话。那种不用说话的安静，你很久没有过了。')]},
-    {t:'点点头，走开', to:'loc'},
-  ]};
-  if(L.st === 1) return {loc:'天台 · 水箱边', blocks:[
-    N('江屿今天没在画画。他盯着楼下发呆。'),
-    C('江屿（设计组）', '你知道吗，我去年做过一版登录页。评审会上，是隔壁组一个人讲的。'),
-    C('江屿（设计组）', '他叫汶昊。我的源文件，他改了个页眉。'),
-    C('江屿（设计组）', '我当时没说话。我觉得说了也没人信。'),
-  ], choices:[
-    {...a, t:'"下次再有，我帮你作证。"', d:'心动 +12', fx:{see:'r2', set:{knowR2History:true, jiangWitness:true}}, act:loveStep('jiang', 12),
-      res:() => [N('他转过头看了你很久。'), C('江屿（设计组）', '……那我也是。你要是需要证人，算我一个。'), SYS('江屿成为汶昊事件的潜在证人')]},
-    {...a, t:'"留着源文件的版本记录，别删。"', d:'心动 +8', fx:{see:'r2', set:{knowR2History:true}}, act:loveStep('jiang', 8),
-      res:() => [C('江屿（设计组）', '你说得对。我回去就把所有东西都备份一遍。'), N('他说"谢谢"的时候，声音有点哑。')]},
-  ]};
-  if(L.st === 2) return {loc:'傍晚 · 天台', blocks:[
-    N('傍晚的天台，江屿在收拾东西。他抬头看见你，犹豫了一下。'),
-    C('江屿（设计组）', '……要不要一起走到地铁站？我顺路。'),
-  ], choices:[
-    {...a, t:'"好。"', d:'心动 +15', fx:{stress:-10, set:{loveSeen:'jiang'}}, act:loveStep('jiang', 15),
-      res:() => [N('你们从侧门出去，沿着马路走了十二分钟。他讲他养的猫，你讲你的绿萝。'), N('走到地铁口的时候，他说："明天见。"'), N('你没注意到，公司大门口有人正好看见了你们。')]},
-    {...a, t:'"今天还有点事，改天吧。"', d:'心动 +3', act:loveStep('jiang', 3),
-      res:() => [C('江屿（设计组）', '好，改天。'), N('他笑了笑，先下楼了。')]},
-  ]};
-  return {loc:'W2 傍晚 · 天台', blocks:[
-    N('天台上只有你们两个人。江屿把平板递给你。'),
-    N('屏幕上是一张像素画：一个小人站在办公室中间，手里举着一个写着「证据」的文件夹，四周的老鼠在往门外跑。小人的发型，和你一模一样。'),
-    C('江屿（设计组）', '……这周画的。我想说，不管你最后留下还是走，我都想继续见到你。'),
-  ], choices:[
-    {...a, t:'"我也是。"', d:'在一起', fx:{stress:-15, buff:'❤ 和江屿在一起了'}, act:() => { loveStep('jiang', 20)(); S.partner = 'jiang'; },
-      res:() => [N('风很大，你们靠得很近。远处的写字楼一格一格亮起来。'), N('你突然觉得，这家公司里，也有不是老鼠的人。')]},
-    {...a, t:'"先做朋友，好吗？"', d:'结束这条线', act:() => { S.love.jiang.st = 4; S.love.jiang.last = S.day; },
-      res:() => [C('江屿（设计组）', '好。那这张画还是送你。'), N('他把图导出来发给了你。你设成了手机壁纸。')]},
-  ]};
-};
+/* =================== 状态 =================== */
+const fresh = () => ({v:2, day:1, time:570, loc:'desk', energy:80, mood:70, money:1200, perf:0,
+  rel:{lin:20, zhe:10, boss:30, jiang:0, man:0, amy:5, xu:10, wh1:0, wh2:0, wh3:0, wh4:0},
+  met:{lin:true, zhe:true, boss:true}, revealed:{}, tasks:[], focus:null, items:{coffee:0},
+  msgs:[], talked:{}, flags:{}, coffeeToday:0, ate:false, last:'', scene:'title', partner:null, overtimeMin:0, nightText:''});
+let S = null;
+const clamp = (v, a = 0, b = 100) => Math.max(a, Math.min(b, v));
+const fmt = t => `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+function save(){ try{ localStorage.setItem('grom2', JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const t = localStorage.getItem('grom2'); return t ? JSON.parse(t) : null; }catch(e){ return null; } }
+const topLover = () => S.partner || [...LOVERS].sort((a,b) => S.rel[b] - S.rel[a])[0];
 
-/* ---------- 恋情：陈蔓 ---------- */
-SC.man = () => {
-  const L = S.love.man, back = 'hub', a = {ap:true, to:back};
-  if(L.st === 0) return {loc:'隔壁组 · 靠窗的位子', blocks:[
-    N('靠窗的位子上，一个人对着屏幕叹了今天的第三口气。屏幕上是闻灏发来的需求文档。'),
-    C('陈蔓（隔壁组）', '……你就是那个没接闻灏活儿的人？'),
-    C('陈蔓（隔壁组）', '我叫陈蔓，他们组的产品。我们组每次都接，接到我都想辞职。'),
-  ], choices:[
-    {...a, t:'"不是不接，是要他写清楚。"', d:'心动 +15', act:loveStep('man', 15),
-      res:() => [N('她眼睛亮了一下，掏出本子记了一句。'), C('陈蔓（隔壁组）', '"写清楚"。好，我下次也这么说。'), C('陈蔓（隔壁组）', '中午我一般在楼下咖啡店，有空来坐坐？')]},
-    {...a, t:'"我也是被逼的。"', d:'心动 +8', act:loveStep('man', 8),
-      res:() => [C('陈蔓（隔壁组）', '哈，被逼的人联盟。中午楼下咖啡店，入会请喝美式。')]},
-  ]};
-  if(L.st === 1) return {loc:'午休 · 楼下咖啡店', blocks:[
-    N('陈蔓给你点了一杯美式，推到你面前。'),
-    C('陈蔓（隔壁组）', '我想了想，有个东西你可能用得上。'),
-    N('她把手机转过来。是去年闻灏给她们组塞活的聊天记录，一模一样的话术："你们熟悉""先跑起来再说"。'),
-  ], choices:[
-    {...a, t:'"谢谢。我欠你一杯咖啡。"', d:'心动 +12', fx:{ev:'E07'}, act:loveStep('man', 12),
-      res:() => [C('陈蔓（隔壁组）', '那就欠着。欠着才有下次。'), N('她说完自己先笑了。')]},
-    {...a, t:'"你为什么帮我？"', d:'心动 +10', fx:{ev:'E07'}, act:loveStep('man', 10),
-      res:() => [C('陈蔓（隔壁组）', '因为你是第一个说"不"的。'), C('陈蔓（隔壁组）', '……也因为你人挺好的。')]},
-  ]};
-  if(L.st === 2) return {loc:'傍晚 · 隔壁组', blocks:[
-    N('傍晚，隔壁组的人都走了，只有陈蔓还在改PRD。她桌上放着一个烤红薯。'),
-    C('陈蔓（隔壁组）', '还没走？分你一半。楼下大爷说今天最后一个了。'),
-  ], choices:[
-    {...a, t:'接过来，陪她把PRD改完', d:'心动 +15', fx:{stress:-8, set:{loveSeen:'man'}}, act:loveStep('man', 15),
-      res:() => [N('你们分着吃完了一个烤红薯，改完了一份PRD，聊完了各自的前任组长。'), N('走的时候，保安大叔冲你们笑得意味深长。'), N('第二天，茶水间里好像有人在讨论什么。')]},
-    {...a, t:'"我得先走了，你也早点回。"', d:'心动 +3', act:loveStep('man', 3),
-      res:() => [C('陈蔓（隔壁组）', '好，路上小心。')]},
-  ]};
-  return {loc:'W2 傍晚 · 隔壁组', blocks:[
-    N('陈蔓合上电脑，转过来看着你，像是准备了很久。'),
-    C('陈蔓（隔壁组）', '那个……下周末有个像素艺术展。'),
-    C('陈蔓（隔壁组）', '我买了两张票。不是工作，不用写需求文档，也不用对齐分工边界。'),
-  ], choices:[
-    {...a, t:'"那我负责买咖啡。"', d:'在一起', fx:{stress:-15, buff:'❤ 和陈蔓在一起了'}, act:() => { loveStep('man', 20)(); S.partner = 'man'; },
-      res:() => [N('她笑得眼睛都弯了。'), C('陈蔓（隔壁组）', '书面确认了啊。不许反悔。')]},
-    {...a, t:'"我们还是做战友吧。"', d:'结束这条线', act:() => { S.love.man.st = 4; S.love.man.last = S.day; },
-      res:() => [C('陈蔓（隔壁组）', '……行，战友。那票送你一张，你带别人去。'), N('后来你一个人去了那个展。展厅门口，她留了一杯美式给你。')]},
-  ]};
-};
+/* =================== 数值变化 =================== */
+function toast(text, cls = ''){
+  const el = document.createElement('div'); el.className = 'toast ' + cls; el.textContent = text;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+function fx(o = {}){
+  const sign = v => (v > 0 ? '+' : '') + v;
+  if(o.time) S.time += o.time;
+  if(o.energy){ S.energy = clamp(S.energy + o.energy); toast(`精力 ${sign(o.energy)}`, o.energy > 0 ? 'good' : 'bad'); }
+  if(o.mood){ S.mood = clamp(S.mood + o.mood); toast(`心情 ${sign(o.mood)}`, o.mood > 0 ? 'good' : 'bad'); }
+  if(o.money){ S.money += o.money; toast(`¥ ${sign(o.money)}`, 'gold'); }
+  if(o.perf){ S.perf += o.perf; toast(`绩效 ${sign(o.perf)}`, o.perf > 0 ? 'good' : 'bad'); }
+  if(o.rel) for(const k in o.rel){ S.rel[k] = clamp((S.rel[k] || 0) + o.rel[k]); S.met[k] = true; toast(`${CHARS[k].name} 好感 ${sign(o.rel[k])}`, o.rel[k] > 0 ? 'good' : 'bad'); }
+  if(o.item) for(const k in o.item) S.items[k] = (S.items[k] || 0) + o.item[k];
+  if(o.task) addTask(...o.task);
+  if(o.flag) Object.assign(S.flags, o.flag);
+}
+function addTask(key, due){
+  if(S.tasks.some(t => t.key === key)) return;
+  S.tasks.push({key, done:0, due, fin:false, late:false});
+  const cur = S.tasks.find(t => t.key === S.focus);
+  if(!cur || cur.fin) S.focus = key;
+  const n = TASKS[key].name;
+  toast('新待办：' + (n.length > 14 ? n.slice(0, 14) + '…' : n));
+}
+function msg(from, text){ S.msgs.unshift({from, text, when:`${DAYS[S.day]} ${fmt(S.time)}`, read:false}); }
 
-/* 恋情被看见 → 玟颢的新谣言 */
-SC.loveRumor = () => {
-  const k = f().loveSeen, name = LOVE[k].name;
-  return {loc:'茶水间', blocks:[
-    N('你推开茶水间的门，里面的声音停了半秒，又接上了。'),
-    C('玟颢', `……我也是听说的啊，有人看见TA跟${name}一起走的。难怪最近腰杆这么硬，原来是有人撑腰。`),
-    N('她看见你，笑容一点没变："哎呀说曹操曹操到～"'),
-  ], choices:[
-    {t:`"是走得挺近。有什么问题吗？"`, d:'大方承认', fx:{neutral:6, stress:-6, alert:{r3:10}, set:{loveRumorDone:true}},
-      res:() => [N('茶水间安静了。玟颢张了张嘴，没接上话。'), N('有人小声说了句"挺好的呀"。这条谣言，就这么没了下文。')]},
-    {t:'"别瞎说，就是同事。"', d:'压力 +8 · 心动 -10', fx:{stress:8, alert:{r3:6}, set:{loveRumorDone:true}}, act:() => { S.love[k].v = clamp(S.love[k].v - 10); },
-      res:() => [N('你否认得很快。玟颢意味深长地"哦"了一声。'), N(`那天晚上，${name}发来一条消息："今天听说了一些话。你还好吗？"`), OS('我否认的时候，TA也在听吗？')]},
-    {t:'装没听见，接完水就走', d:'谣言会扩散', fx:{stress:5, see:'r3', set:{loveRumorDone:true, rumorSpread:true}, buff:'Debuff【谣言扩散】'},
-      res:() => [OS('这一次，她拿来造谣的是我在乎的人。')]},
-  ]};
-};
-
-SC.night = () => ({loc:'晚上 · 回家路上', blocks:[
-  N(S.stress >= 75 ? '地铁上你一直在想白天的事，手机拿起来又放下。你知道这样不对，但脑子停不下来。' :
-    S.stress >= 45 ? '地铁很挤。你把耳机音量调大了一格。' : '你准点走出公司大门，晚风刚好。'),
-  SYS(`今日结算｜压力 ${S.stress}｜组长信任 ${S.trust}｜证据 ${S.ev.length} 件`),
-], choices:[{t:'第二天', to:'next', primary:true}]});
-
-/* ---------- 周三：同步会 ---------- */
-SC.meeting = () => ({loc:'15:00 · 跨组AI提效同步会', blocks:[
-  N('会议提醒弹了出来。你看了一眼参会名单：闻灏发起，你们组和他们组的人都在，组长老周"可选参加"。'),
-  OS('去了，大概率要当面对线；不去，他就能在会上随便描述"我们组会负责落地"。两边都不舒服。'),
-], choices:[
-  {t:'去开会', d:'公开场合，有旁观者，也有压力', to:'meetingIn', act:() => { S.flags.meetingDone = true; S.ap = Math.max(0, S.ap - 1); }},
-  {t:'不去，留在工位', d:'触发【闻灏｜私聊突袭支线】', to:'dmStart', act:() => { S.flags.meetingDone = true; S.ap = Math.max(0, S.ap - 1); }, star:true},
-]});
-
-SC.meetingIn = () => ({loc:'15:00 · 会议室 B2', blocks:[
-  N('投影上是一页写着"AI赋能·流程提效"的PPT，配色很用心。闻灏讲了二十分钟，前十八分钟是愿景，最后两分钟是分工。'),
-  C('闻灏', '落地这块，主要就是你们组维护、调试规则。我看你们平时下班都还算早，工作量应该可以挤出来，刚好趁这段时间落地掉。'),
-  N('会议室安静了两秒。几个人看向你。老周低头在看手机。'),
-], choices:[
-  {t:'"建议会后把分工、人力写清楚，两边组长对齐。"', d:'稳妥，留下会议纪要', fx:{trust:5, alert:{r1:8}, ev:'E04', stress:4, set:{meet:'calm'}},
-    res:() => [N('你说得很平静。闻灏笑了笑说"当然当然"，会议记录员把你那句话原样写进了纪要。'), OS('纪要是公开的。他刚才那句"你们组维护"，也在里面。')]},
-  {t:'当场摊开工单和打卡记录', d:'需要 E01 + E02', need:() => has('E01') && has('E02'), lock:'需要 E01 + E02', star:true,
-    fx:{trust:8, neutral:12, alert:{r1:25}, ev:'E04', stress:-14, set:{meet:'evidence', b4:true}},
-    reply:'AI提效我认可。但过去一年你提的十四个需求，落地都在我们组；考勤里你22天有19天准点走。用"下班早"判断我们的工作量，不太客观。分工建议会后两边组长书面对齐。',
-    res:() => [N('会议室这次安静了很久。老周把手机放下了。'), C('闻灏', '……这个我们会后再对一下。'), N('散会时，隔壁组的陈蔓在门口多看了你一眼。')]},
-  {t:'沉默，会后再说', d:'不想当众冲突', fx:{stress:12, set:{meet:'silent', nag:true}, buff:'获得 Debuff【闻灏持续催办】'},
-    res:() => [N('你没说话。闻灏把你的沉默理解成了同意，会议纪要里写着："落地：xx组（待评估）"。'), OS('"待评估"三个字，接下来会变成每天早上的一条私聊。')]},
-  {t:'当场怼回去', d:'高风险，爽一下', fx:{stress:-20, trust:-10, alert:{r1:20}, set:{meet:'angry', b3:true}},
-    reply:'你自己就加了两天班，凭什么来安排我们组的流程改造？你没有权限分配我们的工作。',
-    res:() => [N('话一出口，你就感觉到会议室的空气变了。'), C('闻灏', '没必要这么激动吧，大家只是一起沟通提效。'), N('他的语气很温和，温和到你像是那个不讲理的人。老周皱了一下眉。')]},
-], next:'hub'});
-
-/* ---------- 闻灏｜私聊突袭支线 ---------- */
-SC.dmStart = () => ({loc:'15:42 · 企业微信 · 私聊', blocks:[
-  N('你没去开会。本以为能躲开这茬，四十分钟后，私聊窗口亮了。'),
-  C('闻灏', '哈喽，刚刚同步会我提了一个AI提效的流程，会上大家简单聊了下，觉得挺适合咱们组落地。'),
-  C('闻灏', '主要就是你们这边维护、调试规则，跑通之后长期大家都省力。'),
-  C('闻灏', '我看你们平时下班都还算早，这块的工作量应该可以挤出来，刚好趁这段时间落地掉。'),
-  OS('他直接追到私聊来了。还是那套逻辑：他想出点子，所有脏活落地扔给你们，拿"下班早"当成你工作量不饱和的证据。\n\n他很聪明，避开了多人在场的公开场景。私聊没有旁观者，没有领导在场作证。就算你反驳，最后也很容易变成两个人之间的口角，变成"你不愿意配合创新"的一面之词。\n\n你可以慢慢周旋套话、留聊天记录，也可以直接回绝，或是去找组长同步这件事。'),
-  SYS('当前背包：' + (['E01','E02','E03'].filter(has).map(e => e+' '+EV[e].name).join('、') || '（空）你还没有收集任何闻灏相关证据')),
-], choices:[
-  {t:'委婉拖字诀，先套话，悄悄留痕', d:'侦查向，稳妥长线', fx:{stress:-5, alert:{r1:6}, ev:'E05', set:{b1:true}},
-    reply:'AI提效这个方向我理解，不过我这边手上积压需求比较多，暂时不好评估额外改造的工作量。方便简单写一下这个流程需要我们承接的范围、排期预期吗？我整理好排期之后同步给组长对齐。',
-    res:() => [N('闻灏回消息的速度慢了一点。他本来想口头说服你，不想留下白纸黑字的范围承诺。'), C('闻灏', '也不用写很细，就是一些适配调试，不是很重的活，先跑起来再说嘛。'), ME('那大概需要我们投入几个人天？你们组这边负责哪部分？'), C('闻灏', '哎呀这个跑起来就知道了，主要还是你们熟悉嘛～'), N('他继续模糊话术，回避界定工作量，也回避他自己是否承担配套工作。你把这段对话完整截了图。')]},
-  {t:'温和划清边界，不拿出证据', d:'中庸路线', fx:{stress:-10, alert:{r1:10}, set:{b2:true}},
-    reply:'跨组新增落地任务，需要两边组长对齐确认分工才好安排。咱们平级，我这边没办法直接承接额外的组内任务。另外单纯用下班时间判断工作量其实不太客观，每个人需求节奏不一样。如果要推进，建议你先和两边负责人同步评估人力。',
-    res:() => [N('闻灏的语气冷了一点，不再继续劝说你。'), C('闻灏', '行吧，那我回头找组长沟通看看。'), N('他嘴上答应，但转头就去找了你的组长。话术换了版本：不会提是他想派活，只会说"想推动AI提效，但是那边配合意愿比较低"。')]},
-  {t:'直接情绪爆发对线', d:'高风险爽一下，代价大', fx:{stress:-22, alert:{r1:20}, set:{b3:true}, buff:'埋下负面印象伏笔'},
-    reply:'一直以来你的需求落地都是给到我们组，你自己大多准时下班，就加两天班，就来安排我们额外的流程改造？你没有权限分配我们组的工作。',
-    res:() => [N('消息发出去之后，对话框安静了很久。'), C('闻灏', '没必要这么激动，就是一起沟通提效而已。'), N('私聊没有第三方，没有任何人看到完整对话。在旁人视角里，之后他对外只会说：你情绪敏感，不好沟通。')]},
-  {t:'【证据高光】有理有据，逐条摆出', d:'需要同时持有 E01 + E02', need:() => has('E01') && has('E02'), lock:'需要同时持有 E01 + E02（先去翻工单、导考勤）', star:true,
-    fx:{stress:-16, trust:8, neutral:10, alert:{r1:28}, ev:'E06', set:{b4:true}},
-    reply:'AI提效的价值我认可，但有两点需要说清楚。\n第一，跨组落地任务需要双方负责人对齐分工，我们平级不适合直接安排；\n第二，从过往工单记录来看，之前你的需求落地基本都是我们承接；打卡记录也能看到，大部分时间你都是准点离岗。\n我们不是抗拒优化，只是当前需求已经排满，新增的维护调试工作量需要提前评估人力，而不是以下班时间作为工作量判断依据。\n如果要推进，建议把分工、工作量一起同步给两边组长评估。相关记录我这边都有留存。',
-    res:() => [N('闻灏看到这段话之后很久没有回复。'), N('过了十几分钟，他只回了简短的一句：'), C('闻灏', '我知道了，我找组长对齐。'), N('他不再继续向你施压。这条私聊被你完整归档。'), OS('"相关记录我这边都有留存"——这句话我想了很久要不要加。加了。')]},
-  {t:'暂时顺从，先稳住', d:'隐忍路线，长线埋雷', fx:{stress:28, set:{b5:true, nag:true}, buff:'获得 Debuff【闻灏持续催办】'},
-    reply:'收到，我后面抽空评估一下工作量。',
-    res:() => [N('闻灏的语气立刻轻松下来。'), C('闻灏', '好嘞！其实不难的，你们熟悉这块，很快就能弄完😄'), C('闻灏', '我先把需求文档拉个群哈，你们直接在里面同步进度就行'), N('你看着那个新建的群，群名叫「AI提效落地（xx组）」。你们组的名字，被写在了括号里。')]},
-], next:'hub'});
-
-/* ---------- 周四：连锁剧情 ---------- */
-SC.d4chain = () => {
-  const fl = f(); S.flags.d4Done = true;
-  if(fl.b4){
-    const scr = fl.meet === 'evidence' ? '上周的会议' : '那段私聊';
-    return {loc:'周四上午 · 隐藏线索解锁', blocks:[
-      N('周四上午，一个你不太熟的头像发来私聊。是隔壁组的陈蔓。'),
-      C('陈蔓（隔壁组）', `听说了${scr}的事。说实话挺解气的。`),
-      C('陈蔓（隔壁组）', '[图片][图片][图片] 这是去年他给我们组塞活的记录，一模一样的话术，"你们熟悉""先跑起来再说"。你留着吧，也许用得上。'),
-      N('下午，老周在组周会上说了一句："以后所有跨组任务，必须书面对齐分工边界，没写清楚的一律不接。"他没有点名，但闻灏这周再也没有私聊过你。'),
-      OS('他赖以得逞的，从来就是"平级之间口头随便派"这个漏洞。漏洞堵上了，他的手段就失效了。'),
-    ], choices:[{t:'收下截图，继续工作', fx:{ev:'E07', trust:5, expel:'r1', buff:'长期Buff【跨组任务须书面对齐】'}, to:'hub'}]};
+/* =================== 对话引擎 =================== */
+let DQ = null;
+function talk(conv){
+  DQ = {lines:[...(conv.lines || [])], choices:conv.choices || null, end:conv.end || null};
+  stepDlg();
+}
+function stepDlg(){
+  if(!DQ) return;
+  if(DQ.lines.length){ const [who, text] = DQ.lines.shift(); drawDlg(who, typeof text === 'function' ? text() : text, null); return; }
+  if(DQ.choices){
+    const ch = DQ.choices.filter(c => !c.need || c.need()); DQ.choices = null;
+    if(ch.length){ drawDlg(DQ.lastWho || 'sys', DQ.lastText || '', ch); return; }
   }
-  if(fl.b2) return {loc:'周四上午 · 组长单独约谈支线', blocks:[
-    N('周四上午十点，老周在企业微信上发来一句："有空吗？来小会议室聊两句。"'),
-    N('你一进门，他就开门见山。'),
-    C('老周（组长）', '闻灏跟我说，他想推AI提效，但你这边配合意愿比较低。我想听听你自己怎么看。'),
-    OS('果然。他把"派活被拒"包装成了"创新受阻"。接下来我说的每一句话，都会被老周拿去和闻灏的版本对比。'),
-  ], choices:[{t:'坐下来说', to:'leader', act:() => { S.flags.summon = true; }}]};
-  if(fl.b3 || fl.meet === 'angry') return {loc:'周四 · 风声', blocks:[
-    N('周四上午，你在走廊碰到老周。他停下来，语气很随意。'),
-    C('老周（组长）', '听说你跟闻灏有点不愉快？年轻人有话好好说嘛，都是为了项目。'),
-    N('你没来得及解释，他已经走了。你打开私聊翻到那天的对话——闻灏后来没再找过你一次。他开始只走"找领导"这条曲线。'),
-    OS('他不会再在私聊里给我留把柄了。之后要抓他，只能靠更早的东西，或者靠别人。'),
-  ], choices:[{t:'记下这笔账', fx:{trust:-5, stress:6, buff:'闻灏转入"只找领导"模式，直接取证变难'}, to:'hub'}]};
-  if(fl.b1) return {loc:'周四 · 逐个攻破支线', blocks:[
-    N('周四上午，同组的小林端着杯子凑过来，压低声音。'),
-    C('小林（同组）', '闻灏刚私聊我了，说你已经"在评估"了，让我先帮忙搭个框架，"反正迟早是你们组的"。'),
-    OS('他开始绕过我，一个一个找。下一个可能是阿哲，然后是新来的实习生。'),
-  ], choices:[
-    {t:'把E05私聊记录给小林看，组内统一口径', d:'中立好感 +10', fx:{neutral:10, alert:{r1:6}, set:{teamUnited:true}, stress:-4},
-      res:() => [N('小林看完截图，"啧"了一声。'), C('小林（同组）', '他跟我说的是"已经谈好了"。行，我知道怎么回了。'), N('当天下午，你们组在小群里约定：所有跨组需求，统一回复"请走组长书面对齐"。')]},
-    {t:'让小林自己判断', d:'不想把同事卷进来', fx:{neutral:-3, stress:6},
-      res:() => [N('小林犹豫了半天，最后还是给闻灏搭了个框架。'), N('那个框架后来出了问题，闻灏在群里说："这块是xx组在跟的。"')]},
-  ]};
-  if(fl.nag) return {loc:'周四 · 持续催办', blocks:[
-    N('从昨天下午到现在，闻灏在私聊里发了七条消息。'),
-    C('闻灏', '怎么样了？'),
-    C('闻灏', '我跟组长说了你们在推进哈'),
-    C('闻灏', '[语音 0:47]'),
-    OS('"你们在推进"——我一个字都没答应过推进。'),
-  ], choices:[
-    {t:'继续拖着，一边假装评估一边攒证据', d:'蓄力打法，压力持续上涨', fx:{stress:6, ev:'E05'},
-      res:() => [N('你回了一句"在看了"，然后把这七条消息连同那条"我跟组长说了你们在推进"一起截图归档。'), OS('他说得越多，留下的就越多。')]},
-    {t:'拿出态度：要求书面分工', d:'解除催办 Debuff', fx:{stress:-8, alert:{r1:12}, set:{nag:false}, buff:'解除 Debuff【闻灏持续催办】'},
-      reply:'我这边一直没确认承接。如果要推进，请把范围和分工写成书面需求，两边组长对齐后再排期。在这之前我们组不会投入人力。',
-      res:() => [N('闻灏没回。半小时后，他在大群里发了一条"AI提效方案暂缓，后续再议"。')]},
-  ]};
-  return {loc:'周四 · 平静的一天', blocks:[
-    N(fl.meet === 'calm' ? '会议纪要发出来了。老周回复了一句："分工部分会后对一下。"然后就没有然后了。' : '周三的事好像就这样过去了。'),
-    OS('事情没有结束，只是换了个形状。'),
-  ], choices:[{t:'继续工作', to:'hub', fx:{trust:2}}]};
-};
-
-/* ---------- 组长 1v1 ---------- */
-SC.leader = () => {
-  S.flags.leaderDay = S.day;
-  const fl = f(), summon = fl.summon;
-  const tr = S.trust;
-  const mood = tr >= 70 ? '老周给你倒了杯水，看起来是真的想听你说。' : tr >= 45 ? '老周一边回消息一边说"你说"。' : '老周靠在椅背上，表情有点疲惫，像是已经预设了这是一次"调解"。';
-  const back = summon ? 'morning' : 'hub';
-  return {loc:'小会议室 · 组长 1v1', blocks:[
-    summon ? N('门关上了。') : N('你约了老周十五分钟。'),
-    N(mood),
-    SYS(`老周是务实的中间派：扎实产出 + 清晰证据，他会帮你建规则；频繁无证据的情绪化，他会倾向息事宁人。`),
-  ], choices:[
-    {t:'吐槽一通', d:'压力 -8 · 组长信任 -6', fx:{stress:-8, trust:-6, set:{summon:false}}, to:back,
-      reply:'他就是这样，自己什么都不干，点子一堆，最后全是我们收拾。我真的受够了。',
-      res:() => [C('老周（组长）', '我理解你的情绪。但闻灏也是想做点事情嘛，你多包容一点，有具体问题再说。'), OS('他没听进去。没有证据的委屈，在他那里只是"情绪"。')]},
-    {t:'客观陈述来龙去脉', d:'不出示证据', fx:{trust: S.output >= 2 ? 6 : 3, set:{summon:false}}, to:back,
-      reply:'我不反对AI提效。只是跨组任务应该由两边组长对齐分工，平级之间直接派不太合适。我们组现在需求是满的。',
-      res:() => [C('老周（组长）', S.output >= 2 ? '嗯，你们最近交付确实挺扎实的。这个我心里有数。' : '嗯……我知道了，我再看看。')]},
-    {t:'出示闻灏相关证据', d:'需要 2 件闻灏相关证据', need:() => r1Count() >= 2 && !fl.r1Reported, lock:'需要至少 2 件闻灏相关证据（E01-E07）', star:true,
-      fx:{trust:10, alert:{r1:10}, stress:-6, set:{r1Reported:true, summon:false}}, to:back,
-      reply:'这是过去一年的工单分配和相关记录。我想说明的不是谁对谁错，而是：现在跨组任务没有书面认领流程，谁都可以口头派活。',
-      res:() => [N('老周一页一页翻完，沉默了一会儿。'), C('老周（组长）', '这些我之前确实没注意到。闻灏那边我会去对一下。以后他再直接找你派活，你让他来找我。')]},
-    {t:'出示玟颢造谣的证据', d:'需要 E09 + E10', rat:'r3', need:() => has('E09') && has('E10') && !S.expelled.r3, lock:'需要 E09 + E10',
-      fx:{trust:6, expel:'r3', alert:{r3:30}, stress:-10, set:{rumorSpread:false, summon:false}}, to:back,
-      reply:'我不想计较一句闲话，但这件事已经影响到别人对我的判断了。这是在场同事的证言，以及她发给您的那条消息。',
-      res:() => [N('老周看了很久，叹了口气。'), C('老周（组长）', '我会单独跟她聊。以后背后说人的事，我这里不会再接。'), N('那周之后，茶水间里关于你的话，就再也没有新版本了。')]},
-    {t:'提交雯灏口头派活的录音', d:'需要 E11（录音）', rat:'r4', need:() => has('E11') && fl.r4Rec && !S.expelled.r4, lock:'需要 E11 录音',
-      fx:{trust:6, expel:'r4', alert:{r4:25}, set:{summon:false}}, to:back,
-      reply:'雯灏让我兜底的那些活，没有一张工单。这是当时的录音。我想以后这类任务，也都按书面任务单来。',
-      res:() => [C('老周（组长）', '……行，我跟他说。没工单的活，以后你可以直接不接。')]},
-    {t:'【隐藏】提议落地书面跨组任务认领流程', d:'治本结局前置条件', need:() => S.trust >= 65 && S.ev.length >= 4 && !fl.ruleProposed, lock:'隐藏选项：需要组长信任 ≥ 65 且证据 ≥ 4 件', star:true,
-      fx:{trust:12, stress:-12, set:{ruleProposed:true, summon:false}, buff:'解锁【治本结局】前置', expel:(fl.r1Reported || fl.b4) ? 'r1' : null}, to:back,
-      reply:'我想提一个流程：所有跨组任务必须在系统里建单，写清楚提出方、承接方、工作量和验收人，两边组长确认后才生效。没有单子的，一律不接。这样不针对任何人，但谁也没法再口头派活。',
-      res:() => [N('老周坐直了。'), C('老周（组长）', '这个可以。你写个草案，我下周带到经理会上去。'), N('你走出会议室的时候，觉得这一周半，终于有一件事是往根上去的。')]},
-    {t:'算了，先不聊了', to:back, act:() => { S.flags.summon = false; }},
-  ]};
-};
-
-/* ---------- 茶水间 ---------- */
-SC.tea = () => {
-  const fl = f();
-  if(S.day >= 3 && fl.meetingDone && !fl.r3Done && slot() === 1){
-    return {loc:'茶水间', blocks:[
-      N('你推开茶水间的门，正听见玟颢在和两个同事闲聊。她背对着门，没看见你。'),
-      C('玟颢', '……我也不是说TA不好啊，就是配合度确实差一点，跨组那边推个东西，TA第一反应就是顶回去。闻灏人多好啊，加班加成那样。'),
-      N('另外两个同事"嗯嗯"地应着。其中一个是阿哲，他看见了你，表情有点尴尬。'),
-      OS('她把我的边界维权，歪曲成了"难合作"。半句真话掺半句假话，最难拆。'),
-    ], choices:[
-      {t:'当场停下，平静加入对话拆解', d: r1Count() >= 2 ? '你手里有证据，底气足一点' : '风险高：容易被说成"抓着别人不放"',
-        fx: r1Count() >= 2 ? {stress:-10, neutral:8, alert:{r3:15}, set:{r3Done:true}} : {stress:-6, trust:-5, alert:{r3:18}, set:{r3Done:true, rumorSpread:true}},
-        reply:'我不是不配合，是跨组任务需要两边组长对齐分工。闻灏过去的需求落地基本都在我们组，这个工单系统里都查得到。',
-        res:() => r1Count() >= 2 ? [N('玟颢的笑容僵了一下。"哎呀我就随口一说。"阿哲在旁边点了点头："工单我也看过，确实。"')] : [N('玟颢笑着摆手："哎呀你别多想，我就随口一说。"'), N('第二天，茶水间流传的新版本是：TA连别人闲聊都要冲进来解释，确实挺敏感的。')]},
-      {t:'安静离开，回头私下求证', d:'解锁行动：找听到对话的同事求证', fx:{stress:5, set:{r3Done:true, r3Probe:true}, see:'r3'},
-        res:() => [N('你接了杯热水，转身走了。阿哲看你的眼神里有点歉意。'), OS('阿哲听到了全部。我需要的不是当场赢，是一份可以复述的证言。')]},
-      {t:'不取证，不理会', d:'谣言会慢慢扩散', fx:{stress:8, set:{r3Done:true, rumorSpread:true}, see:'r3', buff:'Debuff【谣言扩散】每天组长信任 -3'},
-        res:() => [N('你假装什么都没听到。'), OS('清者自清——这句话在茶水间里，从来没灵过。')]},
-    ]};
+  const end = DQ.end; DQ = null;
+  document.getElementById('dlg').hidden = true;
+  if(end) end(); else afterAction();
+}
+function drawDlg(who, text, choices){
+  DQ.lastWho = who; DQ.lastText = text;
+  const el = document.getElementById('dlg'), narr = who === 'sys', c = CHARS[who];
+  el.className = 'dlg' + (narr ? ' narr' : '');
+  el.innerHTML = `<div class="box">${narr ? '' : `<div class="face">${avatar(who)}</div>`}
+    <div class="name">${narr ? '旁白' : c.name}${!narr && c.role ? `<small>${c.role}</small>` : ''}${!narr && S.revealed[who] ? '<span class="ratchip">wén hào</span>' : ''}</div>
+    <div class="text">${text}</div>
+    ${choices ? `<div class="choices">${choices.map((ch, i) => `<button class="ch ${ch.main ? 'main' : ''}" data-i="${i}">${ch.t}${ch.d ? `<small>${ch.d}</small>` : ''}</button>`).join('')}</div>` : '<span class="next">点击继续 ▾</span>'}</div>`;
+  el.hidden = false;
+  if(choices){
+    el.onclick = null;
+    el.querySelectorAll('.ch').forEach(b => b.onclick = e => { e.stopPropagation(); const c2 = choices[+b.dataset.i];
+      if(c2.act) c2.act(); if(c2.fx) fx(c2.fx);
+      DQ.lines = [...(c2.lines || [])]; DQ.choices = c2.choices || null; if(c2.end) DQ.end = c2.end;
+      renderHud(); stepDlg(); });
+  } else {
+    el.onclick = () => stepDlg();
   }
-  if(fl.loveSeen && !fl.loveRumorDone && !S.expelled.r3 && slot() === 1) return SC.loveRumor();
-  if(fl.r2Done && !fl.teaRumor){
-    return {loc:'茶水间 · 流言支线', blocks:[
-      N('评审会之后，茶水间里有了两种说法。'),
-      C('同事甲', '听说汶昊之前在老项目就干过一模一样的事，把外包同学的方案直接拿去汇报了。'),
-      C('同事乙', '可我听汶昊说，那个方案本来是他和TA一起讨论出来的啊？'),
-      OS('一真一假。真的那条，需要有人愿意作证；假的那条，是汶昊自己放出来的。'),
-    ], choices:[
-      {t:'把文档版本历史发到项目群', d: has('E08') ? '你有 E08，一锤定音' : '需要 E08', need:() => has('E08'), lock:'需要 E08 文档版本历史',
-        fx:{neutral:10, trust:4, alert:{r2:10}, stress:-8, set:{teaRumor:true}},
-        res:() => [N('你没有解释，只在群里发了一张版本历史截图，附一句"方案历史版本供大家参考"。'), N('假流言当天就没人再提了。')]},
-      {t:'请同事甲把老项目的事告诉组长', d:'中立好感 +6', fx:{neutral:6, trust:3, set:{teaRumor:true}},
-        res:() => [N('同事甲犹豫了一下，说："行，要是老周问起来，我照实说。"')]},
-      {t:'听听就算了', fx:{stress:-3, set:{teaRumor:true}}, res:() => [N('你笑了笑，接完水就走了。流言自有它的寿命。')]},
-    ]};
+}
+document.addEventListener('keydown', e => {
+  const d = document.getElementById('dlg');
+  if(!d.hidden && (e.key === 'Enter' || e.key === ' ') && !d.querySelector('.ch')){ e.preventDefault(); stepDlg(); }
+  if(e.key === 'Escape') closeSheet();
+});
+
+/* =================== 行动 =================== */
+function workEff(){ return (S.energy < 20 ? .5 : S.energy < 45 ? .8 : 1) * (S.mood < 25 ? .7 : 1); }
+function doWork(min){
+  const t = S.tasks.find(x => x.key === S.focus && !x.fin) || S.tasks.find(x => !x.fin);
+  if(!t){ S.last = '手头没有待办了。你把桌面整理了一遍，又整理了一遍。'; fx({time:min, mood:3}); return; }
+  const gain = Math.round(min * workEff()), T = TASKS[t.key];
+  t.done = Math.min(T.need, t.done + gain);
+  fx({time:min, energy:-Math.round(min / 6), mood:-Math.round(min / 20)});
+  if(t.done >= T.need){
+    t.fin = true;
+    const late = S.day > t.due;
+    S.perf += late ? 3 : 10; toast(`完成！绩效 +${late ? 3 : 10}`, 'good');
+    S.last = `搞定了「${T.name}」。`;
+    const nx = S.tasks.find(x => !x.fin); S.focus = nx ? nx.key : null;
+  } else {
+    S.last = `「${T.name}」推进到 ${Math.round(t.done / T.need * 100)}%。` + (workEff() < 1 ? '（状态不好，效率打折了）' : '');
   }
-  const lines = [
-    [N('茶水间里有人在聊团建去哪。你接了杯水，听了一会儿，没什么有用的。'), N('倒是有一句话飘进你耳朵："汶昊那人，你小心点，他以前在老项目就拿过别人的方案去汇报。"')],
-    [N('咖啡机坏了，几个人围着它研究。你顺手帮忙修好了。大家对你笑了笑。')],
-    [N('茶水间没人。你一个人站在窗边看了五分钟楼下的车流。')],
+}
+function bossCatch(){
+  const near = ['desk','bossroom'].includes(where('boss')) && !LUNCH(S.time);
+  if(near && Math.random() < .3){
+    S.flags.caught = (S.flags.caught || 0) + 1;
+    talk({lines:[['sys','你正刷到第三个猫猫视频，背后传来一声咳嗽。'], ['boss','……在研究竞品？'], ['me','对……对，竞品的……猫。']], end:() => { fx({rel:{boss:-4}, perf:-3, mood:-6}); afterAction(); }});
+    return true;
+  }
+  return false;
+}
+
+function actsFor(loc){
+  const t = S.time, a = [];
+  if(loc === 'desk'){
+    a.push({ic:'⌨️', t:'认真干活', d:'1 小时 · 推进待办', run:() => doWork(60)});
+    a.push({ic:'🔥', t:'冲刺模式', d:'2 小时 · 很累', run:() => doWork(120)});
+    a.push({ic:'📱', t:'摸鱼刷手机', d:'30 分钟 · 心情 +', run:() => { fx({time:30, mood:8, energy:2}); S.last = ['你看完了一个讲怎么摸鱼的视频。','你在购物车里加了 6 件东西，删了 5 件。','你给一个陌生人的猫点了 12 个赞。'][S.day % 3]; return bossCatch(); }});
+    if(S.flags.tidy !== S.day) a.push({ic:'🪴', t:'浇浇绿萝', d:'15 分钟 · 心情 +', run:() => { S.flags.tidy = S.day; fx({time:15, mood:4}); S.last = '绿萝喝饱了水，看起来比你精神。'; }});
+  }
+  if(loc === 'tea'){
+    a.push({ic:'☕', t:'冲杯咖啡', d: S.coffeeToday >= 2 ? '今天喝太多了' : '15 分钟 · 精力 +15', run:() => { S.coffeeToday++; const over = S.coffeeToday > 2; fx({time:15, energy: over ? 3 : 15, mood: over ? -3 : 2}); S.last = over ? '第三杯了，你的手有点抖。' : '咖啡机嗡嗡响，世界慢慢清晰起来。'; }});
+    a.push({ic:'🍪', t:'翻零食柜', d:'10 分钟 · 心情 +', run:() => { fx({time:10, mood:5}); S.last = 'Amy 补的新零食：海苔、小饼干，还有一包没人敢吃的榴莲干。'; }});
+  }
+  if(loc === 'roof') a.push({ic:'🌬️', t:'吹风发呆', d:'30 分钟 · 心情 +10', run:() => { fx({time:30, mood:10, energy:4}); S.last = '风把烦恼吹散了一点点。楼下的车像玩具。'; }});
+  if(loc === 'canteen' && LOCS.canteen.open(t)){
+    if(!S.ate){
+      a.push({ic:'🍅', t:'食堂套餐', d:'¥15 · 精力 +25', run:() => eat(15, 25, 3, '番茄炒蛋配米饭，稳定发挥。')});
+      a.push({ic:'🌶️', t:'麻辣烫', d:'¥28 · 精力 +20 心情 +10', run:() => eat(28, 20, 10, '加了两份宽粉，下午可能会困，但值得。')});
+      a.push({ic:'🥗', t:'轻食沙拉', d:'¥38 · 精力 +15 心情 +5', run:() => eat(38, 15, 5, '你吃得很健康。两点的时候你开始想念麻辣烫。')});
+    } else a.push({ic:'🍵', t:'坐着消食', d:'20 分钟', run:() => { fx({time:20, energy:3}); S.last = '饭后犯困是人类的本能。'; }});
+  }
+  if(loc === 'store'){
+    a.push({ic:'🧋', t:'买杯咖啡送人', d:'¥18 · 可以送给同事', run:() => { fx({time:15, money:-18, item:{coffee:1}}); S.last = `你拎着咖啡。现在有 ${S.items.coffee} 杯可以送人，点同事就能送。`; }});
+    a.push({ic:'🍙', t:'买个饭团', d:'¥8 · 精力 +10', run:() => { fx({time:10, money:-8, energy:10}); if(LUNCH(S.time)) S.ate = true; S.last = '金枪鱼饭团，永远的神。'; }});
+    a.push({ic:'🍫', t:'囤点零食', d:'¥12 · 心情 +6', run:() => { fx({time:10, money:-12, mood:6}); S.last = '抽屉里的快乐储备 +1。'; }});
+  }
+  if(loc === 'wc'){
+    a.push({ic:'🚽', t:'带薪如厕', d:'20 分钟 · 心情 +6', run:() => { fx({time:20, mood:6}); S.last = ['你在隔间里看完了一集短剧。','你在隔间里回完了所有消息。真讽刺。','你在隔间里思考了人生。没想明白。'][S.day % 3]; }});
+    a.push({ic:'🪞', t:'洗把脸', d:'5 分钟 · 精力 +5', run:() => { fx({time:5, energy:5}); S.last = '镜子里的人看起来还能再撑一会儿。'; }});
+  }
+  if(loc === 'bossroom' && where('boss') === 'bossroom' && S.flags.report !== S.day){
+    a.push({ic:'📈', t:'找老周汇报进度', d:'30 分钟', run:() => { S.flags.report = S.day; const good = !S.tasks.some(x => !x.fin && S.day >= x.due);
+      talk({lines: good ? [['boss','嗯，进度挺好。你最近状态不错。'], ['sys','老周在本子上写了点什么。']] : [['boss','那个……之前那个任务怎么样了？'], ['me','在、在推进了。'], ['boss','抓紧一点哈。']],
+        end:() => { fx({time:30, rel:{boss: good ? 5 : -3}, perf: good ? 3 : 0}); afterAction(); }}); return true; }});
+  }
+  if(loc === 'meeting' && !cast('meeting').length){
+    a.push({ic:'😴', t:'躲在空会议室眯一会儿', d:'30 分钟 · 精力 +15', run:() => { fx({time:30, energy:15}); S.last = '你趴在会议桌上睡了半小时，脸上压出了桌子的纹路。'; }});
+  }
+  return a;
+}
+function eat(price, en, md, text){
+  S.ate = true;
+  const mate = cast('canteen').filter(k => k !== 'xu' && !RATS.includes(k));
+  fx({time:40, money:-price, energy:en, mood:md}); S.last = text;
+  if(mate.length){ const k = mate[(S.day + S.time) % mate.length]; fx({rel:{[k]:4}}); S.last += `${CHARS[k].name}端着餐盘坐到了你对面。`; }
+}
+
+/* =================== 和同事聊天 =================== */
+const CHAT = {
+  lin:['你听说没，楼下新开了一家麻辣烫，第二份半价。','我今天的需求改了第四版了，我想静静。','下班一起走？我知道一部不用排队的电梯。'],
+  zhe:['（摘下一边耳机）……嗯？','我的猫今天把键盘踩出了一行代码，居然能跑。','我不是不说话，是在省电。'],
+  boss:['最近辛苦了，有什么困难随时跟我说。','我老板又改需求了。我也很无奈。','你手上那个任务，周五前能给我吗？'],
+  jiang:['你也来躲人？','我在画这层楼的平面图，你的工位我画了一盆绿萝。','风很大，适合什么都不想。'],
+  man:['今天第三次有人跟我说"这个需求很简单"。','你喝美式还是拿铁？我记一下。','我在写一本《需求吐槽大全》，你要不要投稿？'],
+  amy:['下午茶今天是蛋挞，三点准时开抢！','打印机又卡纸了，它今天第九次背叛我。','你生日快到了吧？我有记哦。'],
+  xu:['最近还适应吗？有什么不顺心可以来找我。','我面试你的时候，你紧张到把简历拿反了。','好好吃饭，身体是自己的。'],
+  wh1:['哎，你们组最近挺闲的吧？','我最近在想一个提效方案，回头拉你们一起落地。','我前两天加班到九点，真的累。'],
+  wh2:['你那个方案写得不错啊，发我参考一下？','评审会的事，我们可以一起讨论。','（迅速切换了屏幕）啊，你好你好。'],
+  wh3:['哎你知道吗……算了算了，不说了。','你最近和谁走得比较近呀？','我也是听别人说的哈。'],
+  wh4:['最近项目紧，大家都要有主人翁意识哈。','年轻人多扛扛，以后都是你的。','周末有空吗？没别的意思，就问问。'],
+};
+function chatWith(id){
+  const c = CHARS[id], first = !S.met[id];
+  S.met[id] = true;
+  const lines = [];
+  if(first) lines.push(['sys', `你认识了${c.name}（${c.role}）。`]);
+  const pool = CHAT[id];
+  lines.push([id, pool[(S.day + Math.floor(S.time / 60)) % pool.length]]);
+  const already = S.talked[id] === S.day;
+  const choices = [
+    {t:'随便聊两句', d: already ? '今天已经聊过了 · 15 分钟' : '15 分钟 · 好感 +', act:() => { fx({time:15}); if(!already){ S.talked[id] = S.day; fx({rel:{[id]: c.love ? 6 : 4}, mood:3}); } },
+      lines:[[id, () => relLine(id)]]},
   ];
-  const i = fl.knowR2History ? 1 + (S.day % 2) : 0;
-  return {loc:'茶水间', blocks:lines[i], choices:[{t:'回工位', to:'hub', fx: i === 0 ? {stress:-4, set:{knowR2History:true}, see:'r2', buff:'获得线索：汶昊有前科'} : {stress:-6, neutral: i === 1 ? 3 : 0}}]};
-};
+  if(S.items.coffee > 0 && !RATS.includes(id)) choices.push({t:'送 TA 一杯咖啡', d:'好感 ++', act:() => { S.items.coffee--; fx({time:5, rel:{[id]: c.love ? 12 : 8}}); }, lines:[[id, c.love ? '……给我的？谢谢。我会记住你喜欢喝什么的。' : '哇，谢谢！你人真好！']]});
+  if(c.love && S.rel[id] >= 30 && S.time < 720 && !S.flags.lunchDate) choices.push({t:'中午一起吃饭？', d:'约午饭 · 12:00 去食堂', act:() => { S.flags.lunchDate = id; fx({time:5}); }, lines:[[id, '好啊。十二点，食堂见？']]});
+  if(c.love && S.rel[id] >= 50 && S.time >= 1050 && S.flags.walkHome !== S.day) choices.push({t:'下班一起走？', d:'好感 +10', act:() => { S.flags.walkHome = S.day; S.flags.walkWith = id; fx({rel:{[id]:10}, mood:8}); },
+    lines:[['sys', `你们一起走到了地铁站。${id === 'jiang' ? '他讲他养的猫，你讲你的绿萝。' : '她讲她写的需求吐槽，你笑出了眼泪。'}`], [id, '明天见。']]});
+  choices.push({t:'先不打扰了'});
+  talk({lines, choices});
+}
+function relLine(id){
+  const c = CHARS[id];
+  if(RATS.includes(id)) return S.revealed[id] ? '（胡子抖了一下）……你今天怎么怪怪的。' : '嗯嗯，有空多交流～';
+  const r = S.rel[id], lv = r >= 60 ? 2 : r >= 40 ? 1 : r >= 20 ? 0 : -1;
+  const known = S.flags['fact_' + id] || 0;
+  if(lv >= 0 && known < lv + 1){ S.flags['fact_' + id] = known + 1; toast(`解锁了${c.name}的小秘密`, 'gold'); return '跟你说个秘密：' + c.facts[known]; }
+  return ['哈哈，是吧。','嗯，下次再聊！','你今天看起来不错哦。'][Math.floor(S.time / 15) % 3];
+}
 
-/* ---------- 汶昊：交付成果的移花接木 ---------- */
-SC.r2eve = () => ({loc:'晚上 21:40 · 评审会前一晚', blocks:[
-  N('明天上午是你那个重点需求的交付评审。你打开共享文档，想最后过一遍。'),
-  N('评审目录里多了一个文件。「重点需求技术方案_汶昊.docx」。'),
-  N('你点开。核心架构、数据流、边界处理——一字不差，是你的东西。页眉换成了汶昊的名字，修订记录被清空了，创建时间是今天下午五点。'),
-  N('评审议程上，汇报人一栏写着：汶昊。'),
-  OS('他手上没有拿得出手的产出，所以盯上了我的。明天他会站在台上，讲我写了一个月的东西。'),
-], choices:[
-  {t:'连夜导出文档版本历史、草稿、提交时间戳', d:'证据爽线', star:true, fx:{ev:'E08', stress:8, see:'r2', set:{r2Done:true, r2Pending:true, r2c:'export'}},
-    res:() => [N('你导出了原文档的全部 47 个历史版本，最早的一版是 34 天前。每一版的作者都是你。你还翻出了自己发给组长的周报，里面三次提到这个方案的进度。'), N('凌晨一点，你把这些整理成一页 PDF，命名为「方案溯源」。')]},
-  {t:'私聊汶昊，警告他', d: f().knowR2History ? '你知道他的前科，可以点一下' : '看他是收手，还是狗急跳墙', fx:{see:'r2', set:{r2Done:true, r2Pending:true, r2c: f().knowR2History ? 'warnStrong' : 'warn'}, alert:{r2:15}},
-    reply: f().knowR2History ? '评审目录里那份文档我看到了。老项目的事我也听说过。明天你要是上台讲，我会当场把版本历史投出来。' : '评审目录里那份方案是我写的，你明天准备怎么讲？',
-    res:() => f().knowR2History ? [N('已读。二十分钟后，那个文件从评审目录里消失了。'), C('汶昊', '误会误会，我就是想帮你整理一下格式～')] : [N('已读不回。'), N('半小时后，你在另一个群里看到汶昊发的消息："这个方案其实是我们之前一起讨论出来的，我这边帮忙整理了一版。"')]},
-  {t:'不干预，看领导能不能自己发现', d:'赌运气路线', fx:{see:'r2', stress:10, set:{r2Done:true, r2Pending:true, r2c:'gamble'}},
-    res:() => [N('你关掉了电脑。'), OS('也许老周会问到一个只有作者才答得上来的问题。也许不会。')]},
-  {t:'连夜把原始文档同步给小林，争取证人', d:'中立好感 +10', fx:{neutral:10, see:'r2', set:{r2Done:true, r2Pending:true, r2c:'witness'}},
-    res:() => [N('你把原始文档链接和几张草图发给小林。'), C('小林（同组）', '卧槽，这不是你上个月给我讲过的那版吗？？明天我在。')]},
-], next:'evening'});
+/* =================== 剧情事件 =================== */
+const EVENTS = [
+  {id:'d1_wh1', when:() => S.day === 1 && S.time >= 630, run:() => { S.met.wh1 = true; talk({lines:[
+      ['sys','手机震了一下。隔壁组的闻灏发来私聊。'],
+      ['wh1','哈喽～我们组有个小问题，很简单的，你帮忙看一下呗？'],
+      ['wh1','反正你们组平时下班都挺早的嘛😊']],
+    choices:[
+      {t:'"好吧，我看看。"', d:'多一个待办', fx:{task:['x1',2], mood:-4}, lines:[['wh1','爱你！我就知道你最靠谱～']]},
+      {t:'"麻烦把需求写清楚，走组长对齐一下？"', d:'守住边界', main:true, fx:{rel:{boss:2}}, act:() => S.flags.wh1No = true, lines:[['wh1','……啊，这么正式啊。行吧。'], ['sys','他没再回消息。']]},
+    ]}); }},
+  {id:'d2_bday', when:() => S.day === 2 && S.time >= 900 && S.loc === 'tea', run:() => talk({lines:[
+      ['amy','surprise～今天是小林生日！蛋糕切好了，每人一块！'], ['lin','（眼眶有点红）你们怎么知道的……'], ['amy','我知道全公司每个人的生日哦。']],
+    choices:[
+      {t:'带头唱生日歌', d:'好感 + 心情 +', fx:{rel:{lin:10, amy:5}, mood:10, time:20}, lines:[['lin','……谢谢你们。这是我在这家公司过得最好的一个生日。']]},
+      {t:'默默吃蛋糕', d:'心情 + 精力 +', fx:{mood:8, energy:6, time:15}, lines:[['sys','奶油很甜。你多拿了一块草莓。']]},
+    ]})},
+  {id:'d2_bday_hint', when:() => S.day === 2 && S.time >= 840, run:() => { msg('amy','15:00 茶水间有惊喜，别告诉小林！'); toast('Amy：15:00 茶水间有惊喜'); afterAction(); }},
+  {id:'d3_notice', when:() => S.day === 3, run:() => { msg('boss','今天 14:00 跨组周会，会议室，记得来。'); toast('新消息：14:00 跨组周会'); afterAction(); }},
+  {id:'d3_meeting', when:() => S.day === 3 && S.time >= 840 && S.time < 900 && S.loc === 'meeting', run:() => { S.met.wh1 = true; talk({lines:[
+      ['sys','投屏上是一页「AI 赋能 · 流程提效」的 PPT，配色很用心。闻灏讲了二十分钟，前十八分钟是愿景。'],
+      ['wh1','落地这块，主要就是你们组来维护、调试规则。我看你们平时下班都挺早的，工作量应该挤得出来。'],
+      ['sys','会议室安静了两秒。所有人都看向你。']],
+    choices:[
+      {t:'"跨组任务，麻烦先跟两边组长书面对齐分工。"', d:'有理有据', main:true, fx:{rel:{boss:6}, mood:6, perf:3, time:60}, act:() => reveal('wh1'),
+        lines:[['boss','嗯，这个流程没问题。会后把分工写清楚，两边组长签字。'], ['wh1','……当然当然。']]},
+      {t:'沉默', d:'多一个大待办', fx:{task:['x2',5], mood:-10, time:60}, lines:[['sys','你没说话。会议纪要里写着："落地：你们组（待评估）"。']]},
+    ]}); }},
+  {id:'d3_missed', when:() => S.day === 3 && S.time >= 900 && !S.flags.ev_d3_meeting, run:() => { S.flags.ev_d3_meeting = true; msg('boss','周会你没来？闻灏说他的方案你们组来落地，我先答应了哈。'); toast('老周发来一条消息'); fx({task:['x2',5], rel:{boss:-3}}); afterAction(); }},
+  {id:'d4_outage', when:() => S.day === 4, run:() => talk({lines:[
+      ['sys','09:31。你刚坐下，群里炸了。'], ['boss','线上出问题了！谁有空看一下？'], ['zhe','（摘下两边耳机）……是周四的那个 bug。它又来了。']],
+    choices:[{t:'"我来。"', d:'今天的重点：修 bug', main:true, fx:{rel:{boss:4, zhe:4}}}]})},
+  {id:'d5_wh4', when:() => S.day === 5 && S.time >= 1035, run:() => { S.met.wh4 = true; talk({lines:[
+      ['sys','周五傍晚，项目经理雯灏端着保温杯走到你身边。'],
+      ['wh4','哎，周末有空吗？项目下周一节点，大家都在扛。'],
+      ['wh4','都是一个大项目的，别分这么清楚嘛。上线了我请大家吃饭。']],
+    choices:[
+      {t:'"可以，你在系统里建个单，写清楚范围和验收人？"', d:'把人情变成书面', main:true, act:() => reveal('wh4'), fx:{mood:6},
+        lines:[['wh4','……这么小的事还建单啊。'], ['sys','他嘟囔着走了。那张单子，最终没有被建出来。']]},
+      {t:'"好吧……"', d:'周末要来加班', act:() => S.flags.weekendWork = true, fx:{mood:-10}, lines:[['wh4','好嘞！就知道你最有团队精神！']]},
+      {t:'"周末我有安排了。"', d:'直接拒绝', fx:{mood:4}, lines:[['wh4','现在的年轻人啊……']]},
+    ]}); }},
+  {id:'d7_notice', when:() => S.day === 7, run:() => { msg('boss','10:00–12:00 评审会，会议室。评审材料是你准备的，你来讲。'); toast('新消息：10:00 评审会'); afterAction(); }},
+  {id:'d7_review', when:() => S.day === 7 && S.time >= 600 && S.time < 720 && S.loc === 'meeting', run:() => { S.met.wh2 = true; const mine = S.tasks.some(t => t.key === 't8' && t.fin);
+    talk(mine ? {lines:[['sys','评审会。投屏上的汇报人一栏写着：汶昊。'], ['wh2','这个方案是我们这边整理的，大家可以看一下第三页……'], ['sys','那是你熬夜写的材料。页眉改了，作者也改了。']],
+      choices:[
+        {t:'"补充一下，这份文档的版本历史在这里，作者是我。"', d:'拿出证据', main:true, act:() => reveal('wh2'), fx:{perf:8, rel:{boss:8}, mood:10, time:60},
+          lines:[['wh2','……这个是团队一起讨论的结果。'], ['boss','会后你们俩来我办公室一下。']]},
+        {t:'算了', d:'心情 --', fx:{mood:-15, time:60}, lines:[['boss','汶昊这次挺有想法的。'], ['sys','你低头看着自己的手。']]},
+      ]} : {lines:[['sys','评审会开始了。你的材料还没准备完。'], ['wh2','没关系没关系，我这边整理了一版，我先讲吧。'], ['sys','他讲的东西，有一半是你草稿里的。'], ['boss','汶昊准备得很充分嘛。']], end:() => { fx({mood:-12, perf:-4, time:60}); afterAction(); }}); }},
+  {id:'wh3_gossip', when:() => S.day >= 4 && S.loc === 'tea' && where('wh3') === 'tea', run:() => { S.met.wh3 = true; const k = S.partner || S.flags.walkWith;
+    talk({lines:[
+      ['sys','你推开茶水间的门，正听见玟颢在和人闲聊。'],
+      ['wh3', k ? `……我也是听说的啊，有人看见TA跟${CHARS[k].name}一起下班。啧啧。` : '……我也不是说TA不好，就是配合度差一点，跨组推个东西，第一反应就是顶回去。'],
+      ['wh3','哎呀，说曹操曹操到～']],
+    choices:[
+      {t:'"有什么想知道的，可以直接问我。"', d:'不卑不亢', main:true, act:() => reveal('wh3'), fx:{mood:6}, lines:[['sys','茶水间安静了。有人小声说了句"就是"。玟颢张了张嘴，没接上话。']]},
+      {t:'装没听见', d:'心情 -8', fx:{mood:-8}, lines:[['sys','你接完水就走了。背后传来一阵笑声。']]},
+    ]}); }},
+  {id:'d8_teambuild', when:() => S.day === 8 && S.time >= 900, run:() => { const opts = ['lin','zhe','jiang','man','amy'].filter(k => S.met[k]);
+    talk({lines:[['amy','团建时间到！今天下午的项目是——密室逃脱！'], ['amy','两人一组，自己选搭档哦～']],
+      choices:opts.map(k => ({t:`和${CHARS[k].name}一组`, d: CHARS[k].love ? '💗' : '', fx:{rel:{[k]: CHARS[k].love ? 18 : 10}, mood:12},
+        lines: CHARS[k].love ? [['sys','密室里很黑。最后一道机关需要两个人同时按住。'], [k, k === 'jiang' ? '……你的手好冰。' : '……你别笑，我真的有点怕黑。'], ['sys','你们是最后一组出来的。']] : [['sys','你们配合默契，第一个逃出了密室。'], [k,'我们简直是天作之合！（工作意义上的）']]})),
+      end:() => { S.time = Math.max(S.time, 1080); S.loc = 'desk'; S.last = '团建结束了。你的手机里多了很多张糊掉的合照。'; afterAction(); }}); }},
+  {id:'d9_boss_hint', when:() => S.day === 9, run:() => { msg('boss','下午四点来我办公室一趟，聊聊。'); toast('老周：下午四点来我办公室'); afterAction(); }},
+  {id:'d9_boss', when:() => S.day === 9 && S.time >= 960 && S.loc === 'bossroom', run:() => talk({lines:[
+      ['boss','来得正好，坐。'], ['boss', S.perf >= 80 ? '这两周你表现很好。下季度的晋升名单，我准备报你。' : S.perf >= 45 ? '这两周还行，继续保持。有什么想法可以跟我说。' : '最近……是不是状态不太好？任务有点拖。']],
+    choices:[
+      {t:'"谢谢老周，我会继续努力。"', fx:{rel:{boss:5}}},
+      {t:'"其实我想聊聊跨组任务的分工规则。"', d:'从根上解决问题', need:() => Object.keys(S.revealed).length >= 2, main:true, fx:{rel:{boss:8}, perf:5}, act:() => S.flags.rule = true,
+        lines:[['boss','你说的这个，我也想了很久。你写个草案，我带去经理会。']]},
+    ]})},
+  {id:'lunch_date', when:() => S.flags.lunchDate && S.loc === 'canteen' && LUNCH(S.time), run:() => { const k = S.flags.lunchDate; S.flags.lunchDate = null;
+    talk({lines:[[k, k === 'jiang' ? '我帮你占了靠窗的位子。' : '我点了两份番茄炒蛋，你不爱吃葱对吧？'], ['sys','你们聊了很久，饭都凉了。']], end:() => { S.ate = true; fx({time:50, energy:20, rel:{[k]:10}, mood:8}); afterAction(); }}); }},
+  {id:'lunch_miss', when:() => S.flags.lunchDate && S.time >= 810, run:() => { const k = S.flags.lunchDate; S.flags.lunchDate = null; msg(k, '……你今天中午是不是忘了？没事。'); fx({rel:{[k]:-6}}); afterAction(); }},
+  {id:'d10_confess', when:() => S.day === 10 && S.time >= 1050 && !S.partner && LOVERS.some(k => S.rel[k] >= 65 && where(k) === S.loc), run:() => { const k = LOVERS.find(k => S.rel[k] >= 65 && where(k) === S.loc);
+    talk({lines: k === 'jiang' ? [['sys','傍晚的天台，江屿把平板递给你。'], ['sys','屏幕上是一张画：一个小人站在办公室中间，四周的老鼠在往门外跑。小人的发型和你一模一样。'], ['jiang','……我想说，下班之后，也想继续见到你。']]
+      : [['sys','陈蔓在便利店门口等你，手里捏着两张票。'], ['man','下周末有个像素艺术展。不是工作，不用写需求文档，也不用对齐分工边界。'], ['man','……你来吗？']],
+      choices:[
+        {t: k === 'jiang' ? '"我也是。"' : '"那我负责买咖啡。"', d:'在一起', main:true, act:() => { S.partner = k; }, fx:{mood:20, rel:{[k]:15}}, lines:[[k, k === 'jiang' ? '……那，明天见。不对，今晚见？' : '书面确认了啊，不许反悔。']]},
+        {t:'"我们还是做朋友吧。"', fx:{mood:-4}, lines:[[k, '……嗯，好。']]},
+      ]}); }},
+];
+['lunch_miss','lunch_date'].forEach(id => EVENTS.find(e => e.id === id).repeat = true);
+function reveal(id){
+  if(S.revealed[id]) return;
+  S.revealed[id] = true; S.met[id] = true;
+  S.pendingReveal = id;
+}
 
-SC.r2review = () => {
-  S.flags.r2Reviewed = true;
-  const c = f().r2c;
-  const base = {loc:'上午 10:00 · 交付评审会'};
-  if(c === 'export') return {...base, blocks:[
-    N('汶昊讲到第三页时，你举了手。'),
-    ME('补充一下背景：这个方案是我从上个月开始写的，这是原文档的版本历史，一共47版。我想请汶昊讲一下第4节的降级策略为什么这么设计？'),
-    N('汶昊停住了。第4节是你凌晨三点改的，他大概只看过一遍。'),
-    C('汶昊', '这个……这个是团队共同讨论的结果。'),
-    N('老周看了看投屏上的时间戳，又看了看汶昊。"会后你们俩来我办公室一下。"'),
-  ], choices:[{t:'评审结束', to:'morning', fx:{trust:10, neutral:8, alert:{r2:30}, stress:-15, output:1, expel:'r2'}}]};
-  if(c === 'warnStrong') return {...base, blocks:[
-    N('评审会上，汇报人改回了你的名字。汶昊坐在角落，全程没有说话。'),
-    OS('他收手了。没有公开对质，但"移花接木"这招，在我这里不会再用了。'),
-  ], choices:[{t:'评审结束', to:'morning', fx:{trust:5, stress:-8, output:1, expel:'r2'}}]};
-  if(c === 'warn') return {...base, blocks:[
-    N('汶昊照常上台。讲到一半，他说："这个方案的初版是我和TA一起讨论出来的，我这边做了系统化整理。"'),
-    N('你想反驳，手里却没有可以投屏的东西。老周说："那你们俩协作得不错。"'),
-    OS('他狗急跳墙，反咬了一口。没有版本历史，我连"抄袭"两个字都说不出口。'),
-  ], choices:[{t:'评审结束', to:'morning', fx:{trust:-6, stress:18, alert:{r2:10}}}]};
-  if(c === 'witness') return {...base, blocks:[
-    N('汶昊讲到第二页，小林开口了。'),
-    C('小林（同组）', '这个方案我上个月听TA讲过，当时还没有汶昊那边的参与吧？'),
-    N('会议室安静了。老周翻了翻周报记录，里面三次提到你在推进这个方案。'),
-    C('老周（组长）', '汶昊，会后你来解释一下。'),
-  ], choices:[{t:'评审结束', to:'morning', fx:{trust:6, neutral:5, alert:{r2:20}, stress:-10, output:1, expel:'r2'}}]};
-  // gamble
-  const lucky = S.trust >= 60;
-  return {...base, blocks: lucky ? [
-    N('汶昊讲得很流畅。最后，老周问了一个问题："这个降级方案，和我们上个月线上事故的处理有什么关系？"'),
-    N('汶昊答不上来。老周转头看你："这块你之前跟我提过，你说说？"'),
-    N('你讲了五分钟。讲完，老周没再看汶昊。'),
-    OS('赌赢了。因为老周平时就信得过我的产出。'),
-  ] : [
-    N('汶昊讲得很流畅。老周点头，说"不错，汶昊这次挺有想法"。'),
-    N('没有人问那个只有作者才答得上来的问题。'),
-    OS('赌输了。我写了一个月的东西，变成了别人的"挺有想法"。'),
-  ], choices:[{t:'评审结束', to:'morning', fx: lucky ? {trust:6, stress:-6, output:1, alert:{r2:15}} : {stress:20, trust:-4}}]};
-};
-
-/* ---------- 周五傍晚：留不留下来（雯灏唯一触发点） ---------- */
-SC.friday = () => ({loc:'周五 18:00 · 工位', blocks:[
-  N('周五傍晚六点。按理说这个点，办公室该空一半了。'),
-  N('今天没有。项目节点在下周一，几排工位都还亮着，有人在点外卖，有人在打电话，键盘声比平时密。'),
-  N('你手头的事已经做完了。包就在脚边。'),
-  OS('走，还是再待一会儿？'),
-], choices:[
-  {t:'准点下班，周末就是周末', d:'压力 -6', fx:{stress:-6, set:{r4Done:true}}, to:'night',
-    res:() => [N('你拎包起身，没回头。电梯里只有你一个人。'), N('后来你听说，那天晚上有人在工位间转了一圈，挨个"请大家帮个忙"。你不在，所以不知道是谁。')]},
-  {t:'留下来，把收尾再过一遍', d:'业务产出 +1 · 压力 +4', fx:{output:1, stress:4}, to:'r4',
-    res:() => [N('你又打开了文档。七点，外卖到了一波，办公室里飘着麻辣烫的味道。'), N('有人端着保温杯，朝你这边走过来。')]},
-]});
-
-/* ---------- 雯灏：人情裹挟的无偿加班 ---------- */
-SC.r4 = () => ({loc:'周五 19:05 · 项目节点前夜', blocks:[
-  N('项目节点是下周一。周五晚上七点，大部分人还在。雯灏端着保温杯走到你工位边，拉了把椅子坐下。'),
-  C('雯灏', '哎，还没走呢？辛苦辛苦。'),
-  C('雯灏', '那个联调兜底的活儿，你顺手帮忙看一下呗。大家都在为这个项目扛，你早点走不太合适吧？'),
-  C('雯灏', '都是一个大项目的，别分这么清楚嘛。等上线了，我请大家吃饭。'),
-  OS('他不会建工单，不会写任务，全靠口头人情。干完了，功劳是"大家一起扛"；出了事，锅是"你负责的那块"。'),
-], choices:[
-  {t:'笑着应付，手机悄悄录音', d:'取证向，但今晚还是要干点活', fx:{ev:'E11', stress:10, see:'r4', set:{r4Done:true, r4Rec:true}},
-    reply:'这块具体要我负责到什么程度？出问题算谁的？',
-    res:() => [C('雯灏', '哎呀你看你，什么谁的，都是大家的嘛。你就先看着，有问题再说，我还能害你不成？'), N('你录下了完整的四分钟。'), OS('"有问题再说"——这句话，是他所有甩锅的起点。')]},
-  {t:'委婉要书面任务单', d:'让他的手段失效', star:true, fx:{trust:5, stress:-8, alert:{r4:20}, see:'r4', set:{r4Done:true}, expel:'r4', ev:'E11'},
-    reply:'可以啊，你在系统里建个单，写一下范围、截止时间和验收人，我排一下。',
-    res:() => [N('雯灏的笑容停了半秒。'), C('雯灏', '……这么小的事还建单啊。'), ME('小事建单也快，五分钟。不然出问题说不清。'), N('他嘟囔着走了。那张单子最终没有被建出来，那个"兜底的活"，也没有再出现在你身上。'), OS('他的武器是"没有书面"。我只是要求书面。')]},
-  {t:'当众直接拒绝', d:'爽，但有"不团结"风险', fx:{stress:-15, neutral:-5, trust:-3, alert:{r4:25}, see:'r4', set:{r4Done:true}},
-    reply:'这不是我的工作范围，我今天的需求已经交付了。我先走了。',
-    res:() => [N('你拎包起身。身后传来雯灏不大不小的声音："现在的年轻人啊，团队意识……"'), N('几个还在加班的同事抬头看了看你。')]},
-  {t:'默默扛下来', d:'压力 +25', fx:{stress:25, output:1, see:'r4', set:{r4Done:true}},
-    res:() => [N('你加班到十一点半。'), N('周一上线后，雯灏在大群里发："感谢所有同学这个周末的辛苦付出🎉"。你的名字不在他@的人里。')]},
-], next:'evening'});
-
-/* ---------- 蛀虫联动 ---------- */
-SC.ally = () => { S.flags.linkDone = true; return {loc:'周一 · 蛀虫结盟', blocks:[
-  N('周一的周会上，闻灏又提起了AI提效。这一次，汶昊接了话。'),
-  C('汶昊', '我觉得闻灏这个方向挺好的，我们组之前也想做。就是有些同学可能比较排斥协作，推起来有阻力。'),
-  N('两个人一唱一和。"排斥协作""阻碍创新"，这两个词在会上出现了四次。老周看了你一眼。'),
-  OS('他们结盟了。两只Rat互相佐证，我的话就成了"一面之词"。要破这个局，得找到他们利益同盟的破绽。'),
-], choices:[{t:'回去整理两人的说法', fx:{trust:-8, stress:12, alert:{r1:5, r2:10}, set:{ally:true}, buff:'难度上升：解锁行动「比对闻灏和汶昊的口径」'}, to:'morning'}]}; };
-
-SC.feud = () => { S.flags.linkDone = true; return {loc:'周一 · 蛀虫内讧（隔岸观火）', blocks:[
-  N('在你这里碰了壁之后，闻灏转头想把AI流程的维护甩给汶昊的组。'),
-  N('汶昊不想接。'),
-  N('周一上午，你在一个十几人的项目群里看到了这样的对话：'),
-  C('汶昊', '这个流程我们组从来没确认过要接吧？是谁在到处说我们组已经同意了？'),
-  C('闻灏', '上周你在评审会上不是还说挺好的吗？而且你那个方案的事，大家心里也有数。'),
-  C('汶昊', '那你加两天班截图发三遍的事，大家心里也有数。'),
-  OS('他们开始互相拆台了。我什么都不用做，只要……把群聊截下来。'),
-], choices:[
-  {t:'悄悄截图，坐收渔利', d:'躺赢分支', star:true, fx:{ev:'E13', stress:-12, alert:{r1:5, r2:5}},
-    res:() => [N('你把整段对话截了下来，存进「rats」文件夹，然后去楼下买了杯咖啡。'), OS('躺赢的感觉，原来是这样的。')]},
-  {t:'劝和', d:'中立好感 +5', fx:{neutral:5}, reply:'大家先别吵了，有问题找组长对齐吧。',
-    res:() => [N('两人都没再说话。群里的消息很快被别的事刷了下去。')]},
-  {t:'火上浇油', d:'很爽，也很危险', fx:{stress:-8, trust:-6, alert:{r1:15, r2:15}}, reply:'所以这个流程到底谁负责？上周不是说我们组负责吗？',
-    res:() => [N('两人同时停了下来，然后同时把矛头对准了你。'), N('老周在群里说了一句："都别在群里吵。"')]},
-]}; };
-
-/* ---------- 失控 ---------- */
-SC.meltdown = () => ({loc:'？？？ · 压力值 100', blocks:[
-  N('那天下午，你盯着屏幕上的一条普通消息，突然什么都看不进去了。'),
-  N('心跳很快。你意识到自己已经很久没有好好睡过一觉。'),
-  OS('我撑不住了。'),
-], choices:[
-  {t:'在部门大群发一篇长文，把所有事都说出来', d:'情绪失控', fx:{trust:-20, neutral:-10}, act:() => { S.stress = 55; S.flags.melt = (S.flags.melt||0)+1; },
-    res:() => [N('长文发出去之后，群里安静了整整一个下午。然后有人私聊你："你还好吗？"'), N('老周找你谈话，第一句是："你最近状态是不是不太对？"'), OS('我说的每一件事都是真的。但没有人在讨论那些事，大家只在讨论我的情绪。')], to:s => s.pendingTo || 'hub'},
-  {t:'请一天假，什么都不想', d:'业务产出 -1', fx:{output:-1, trust:-5}, act:() => { S.stress = 50; S.flags.melt = (S.flags.melt||0)+1; S.ap = 0; },
-    res:() => [N('你关掉了企业微信，睡了十四个小时。醒来的时候，天是灰的。'), N('你突然很想知道，那几只Rat，有没有哪一天这样累过。')], to:s => s.pendingTo === 'hub' ? 'evening' : (s.pendingTo || 'evening')},
-]});
-
-/* ---------- 终局 ---------- */
-SC.finale = () => {
-  const fl = f();
-  const blocks = [N('周三傍晚六点。你看着窗外，十天前那个"AI提效"的群聊已经很久没有新消息了。'), SYS(`最终状态｜压力 ${S.stress}｜组长信任 ${S.trust}｜中立好感 ${S.neutral}｜证据 ${S.ev.length} 件｜已驱逐 ${Object.keys(S.expelled).length}/4`)];
-  if(fl.ruleProposed && S.trust >= 70){
-    return {loc:'终局', blocks:[...blocks, N('经理会上，你写的《跨组任务书面认领流程》草案过了。老周在群里发通知的时候，@了你。')], choices:[{t:'看结局', to:'end', act:() => S.ending = 'root', primary:true}]};
+/* =================== 时间流转 =================== */
+function afterAction(){
+  if(DQ) return;
+  if(S.pendingReveal){ const id = S.pendingReveal; S.pendingReveal = null; showReveal(id); return; }
+  for(const e of EVENTS){
+    if(!S.flags['ev_' + e.id] && e.when()){ if(!e.repeat) S.flags['ev_' + e.id] = true; e.run(); return; }
   }
-  const ch = [];
-  if(fl.offer) ch.push({t:'接受外部 offer，提离职', d:'进入离职面谈', to:'exitTalk', star:true});
-  if(fl.hrArchive) ch.push({t:'走正式投诉流程', d:`提交 ${S.ev.length} 件证据，HR介入核查`, to:'hrFormal'});
-  ch.push({t: fl.offer || fl.hrArchive ? '什么都不做，留下来' : '日子还要过下去', to:'end', act:() => S.ending = 'stay'});
-  if(fl.offer) blocks.push(C('猎头 Grace', 'offer 已经发你邮箱啦，薪资涨了25%，周五前给答复就行～'));
-  if(fl.hrArchive) blocks.push(N('你的加密文件夹里，四个子目录，按Rat分类，每份都标好了日期和佐证人。'));
-  if(!fl.offer && !fl.hrArchive) blocks.push(OS('我没有攒够离开的底气，也没有攒够投诉的证据。'));
-  return {loc:'终局 · 选择', blocks, choices:ch};
-};
-
-SC.hrFormal = () => {
-  const strong = S.ev.length >= 7;
-  return {loc:'HR 会议室', blocks:[
-    N('HRBP 许姐把你提交的材料打印了出来，厚厚一沓，用长尾夹夹着。'),
-    C('许姐（HRBP）', strong ? '材料很完整。时间线、原始记录、证人都有，这种我们处理起来很快。' : '材料我看了，有些部分还缺佐证，我们会先约谈相关同事了解情况。'),
-  ], choices:[{t:'等待结果', to:'end', act:() => {
-    S.ending = strong ? 'hrWin' : 'hrPartial';
-    if(strong){ if(r1Count() >= 2) S.expelled.r1 = true; if(has('E08')) S.expelled.r2 = true; if(has('E09') || has('E10')) S.expelled.r3 = true; if(has('E11')) S.expelled.r4 = true; }
-  }, primary:true}]};
-};
-
-SC.exitTalk = () => ({loc:'离职面谈 · 最后一天', blocks:[
-  N('离职面谈约在周五下午四点，小会议室，就是老周第一次找你"聊两句"的那间。'),
-  N('许姐给你倒了一杯水，例行公事地问了几个问题：为什么离开，对团队有什么建议，对公司有什么反馈。'),
-  C('许姐（HRBP）', '这是最后一个问题了。有什么是你在职期间不方便说，但现在愿意告诉公司的吗？'),
-  N('你的电脑包里，有一个 U 盘。里面是十天来的全部记录。'),
-  OS('我已经要走了。说了，对我没有任何好处；不说，他们会继续在这里，对下一个人做同样的事。'),
-], choices:[
-  {t:'把 U 盘推过去', d: S.ev.length >= 4 ? '完整同步全部证据' : `只有 ${S.ev.length} 件证据，分量有限`, to:'end', star: S.ev.length >= 4, act:() => {
-    S.ending = S.ev.length >= 4 ? 'exitStrike' : 'exitThin';
-    if(S.ev.length >= 4){ if(r1Count() >= 2) S.expelled.r1 = true; if(has('E08')) S.expelled.r2 = true; if(has('E09')) S.expelled.r3 = true; if(has('E11')) S.expelled.r4 = true; }
-  }},
-  {t:'"没有了，谢谢。"', d:'体面告别', to:'end', act:() => S.ending = 'exitQuiet'},
-]});
-
-const ENDINGS = {
-  root:{tag:'ENDING · 治本', title:'规则就是驱鼠药', text:[
-    '流程上线的第一周，闻灏在系统里建了一张单子：「AI提效流程落地」，承接方一栏，他犹豫了很久，最后填了自己组。',
-    '那张单子到现在还是"待处理"。',
-    '你没有赢下任何一场对线。你只是让"口头派活"这件事，在这家公司里变成了不可能。这比赢下一百场对线都有用。',
-  ]},
-  hrWin:{tag:'ENDING · 在职维权', title:'实锤落地', text:[
-    '两周后，HR的核查结果出来了。越界派活、方案剽窃、背后造谣，分别被定性，相关同事收到了内部警示。',
-    '没有通报，没有处分大会，一切都很安静。但茶水间的风向变了：大家开始知道，你是那个"会留记录的人"。',
-    '这是一种奇怪的安全感。',
-  ]},
-  hrPartial:{tag:'ENDING · 在职维权（部分）', title:'未完待续', text:[
-    'HR约谈了几个人，结论是"存在沟通问题，建议加强协作"。',
-    '你不算赢，也不算输。至少，从这天起，有人知道这些事发生过。',
-    '下次，你会把证据攒得更完整一点。',
-  ]},
-  exitStrike:{tag:'ENDING · 抽身反击', title:'最后一份交付', text:[
-    '许姐看了很久。她抬起头，第一次没有用例行公事的语气说话："谢谢你愿意说。"',
-    '你走出大楼的时候是下午五点十分，比平时早了五十分钟。阳光斜斜地照在旋转门上。',
-    '你不知道那些文件最后会被怎么处理。但你知道，这一次，你没有替他们保守秘密。',
-    '这是你在这家公司的最后一份交付。版本历史完整，作者是你。',
-  ]},
-  exitThin:{tag:'ENDING · 抽身', title:'不够重的U盘', text:[
-    '许姐翻了翻，客气地说会"转给相关部门参考"。',
-    '你知道这些材料不够。但你还是放下了它。也许下一个人会接着攒。',
-    '旋转门转了一圈，把你送了出去。',
-  ]},
-  exitQuiet:{tag:'ENDING · 体面告别', title:'谢谢，再见', text:[
-    '你笑着说没有了，和许姐握了手。',
-    '回工位收拾东西的时候，闻灏路过，说"以后常联系啊"。你说好。',
-    '你们都知道不会再联系了。U 盘在包里，一直没拿出来。',
-  ]},
-  stay:{tag:'ENDING · 鼠患照旧', title:'明天还要上班', text:[
-    '日子还在继续。闻灏又在群里发了加班截图，雯灏又在问"谁能帮忙兜个底"。',
-    '你学会了一些东西：留记录、要书面、不在私聊里吵架。',
-    '它们还在。但你已经知道它们靠什么得逞了。下一次，你会更早动手。',
-  ]},
-  burnout:{tag:'ENDING · 失控', title:'工位清空', text:[
-    '第二次失控之后，你递交了病假申请。',
-    '复工那天，你的工位换了位置，那个「AI提效落地」的群里，括号里还是你们组的名字。',
-    '你终于明白：和Rat硬碰硬，最先被消耗掉的是你自己。重新开始吧，这次先攒证据。',
-  ]},
-};
-
-SC.end = () => {
-  const e = ENDINGS[S.ending] || ENDINGS.stay;
-  const nOut = Object.keys(S.expelled).length;
-  return {loc:'结局', ending:true, blocks:[
-    {raw:`<div class="ending-tag">${e.tag}</div>`},
-    {raw:`<h2>${e.title}</h2>`},
-    ...e.text.map(N),
-    ...(S.partner ? [N(({jiang:{exit:'离职那天，江屿在楼下等你。他说："走吧，我请你吃饭团。"你回头看了一眼那栋楼。天台上的风，大概还在吹。', stay:'下班的时候，你的手机亮了一下。江屿发来一张新画：两个小人坐在天台上，旁边写着「明天见」。'},
-      man:{exit:'你离职那天，陈蔓在你工位上留了一杯美式，杯套上写着：「战友退伍快乐。下周末的展，别迟到。」', stay:'周五傍晚，陈蔓在隔壁组冲你晃了晃两张展票。办公室里还有老鼠，但至少，你不是一个人在抓。'}})[S.partner][/^exit/.test(S.ending) ? 'exit' : 'stay'])] : []),
-    {raw:`<div class="verdict">${Object.entries(RATS).map(([k,r]) => S.seen[k] ? `<div class="${S.expelled[k]?'y':''}">${img(k, r.name)}<b>${r.name}</b><em>${S.expelled[k]?'已驱逐':'在逃'}</em></div>` : `<div>${img('unknown')}<b>？？？</b><em>未发现</em></div>`).join('')}</div>`},
-    SYS(`看穿 ${Object.keys(S.seen).length} 只｜驱逐 ${nOut} 只｜证据 ${S.ev.length} 件｜组长信任 ${S.trust}｜压力 ${S.stress}`),
-    ...(Object.keys(S.seen).length < 4 ? [OS('总觉得……这家公司里，还有我没看穿的人。')] : []),
-  ], choices:[{t:'重新上班（重开）', to:'__restart', primary:true}]};
-};
-
-SC.title = () => ({loc:'', titleScreen:true, blocks:[], choices:[]});
-
-/* ============ 流程 ============ */
-function go(id){
-  if(id === '__restart'){ S = fresh(); S.scene = 'intro'; save(); render(); return; }
-  if(id === 'next'){ S.day++; S.ap = SLOT_N; S.loc = 'desk'; S.morning = morningMessages(); id = 'dayStart'; }
-  if((id === 'hub' && S.ap <= 2 || id === 'evening') && S.day === 3 && !S.flags.meetingDone) id = 'meeting';
-  if(id === 'morning') id = morningRoute();
-  if(id === 'evening') id = eveningRoute();
-  if(S.stress >= 100 && !['meltdown','end','__out'].includes(id)){
-    if((S.flags.melt||0) >= 1){ S.ending = 'burnout'; id = 'end'; }
-    else { S.pendingTo = id; id = 'meltdown'; }
-  }
-  S.scene = id; S.out = null;
+  if(!S.flags['tasks' + S.day] && DAY_TASKS[S.day]){ S.flags['tasks' + S.day] = true; DAY_TASKS[S.day].forEach(([k,d]) => addTask(k, d)); msg('boss', '今天的活：' + DAY_TASKS[S.day].map(([k]) => TASKS[k].name).join('；')); }
+  if(S.time >= 690 && !S.flags['lunchMsg' + S.day] && !S.flags.lunchDate){ S.flags['lunchMsg' + S.day] = true; msg('lin','饭？'); toast('小林：饭？'); }
+  if(S.energy <= 0 && S.flags.sleepy !== S.day){ S.flags.sleepy = S.day; talk({lines:[['sys','你的眼皮打架打赢了。你在工位上睡着了四十分钟。'], ['zhe','（轻轻推你）……老周往这边走了。']], end:() => { S.loc = 'desk'; fx({time:40, energy:25}); afterAction(); }}); return; }
+  if(S.mood <= 0 && S.flags.emo !== S.day){ S.flags.emo = S.day; talk({lines:[['sys','你盯着屏幕，突然什么都看不进去了。'], ['sys','你去天台站了很久。']], end:() => { S.loc = 'roof'; fx({time:45, mood:30}); afterAction(); }}); return; }
+  if(S.time >= 1080 && S.flags.off !== S.day){ S.flags.off = S.day; offWork(); return; }
   save(); render();
 }
-
-function pick(c){
-  if(c.ap) S.ap--;
-  if(c.act) c.act(S);
-  const chips = c.fx ? applyFx(c.fx) : [];
-  let to = typeof c.to === 'function' ? c.to(S) : c.to;
-  if(!to) to = curScene().next || 'hub';
-  const res = c.res ? c.res() : [];
-  if(c.reply || res.length || chips.length){
-    S.out = {loc:curScene().loc, blocks:[...(c.reply ? [ME(c.reply)] : []), ...res], chips, to};
-    S.scene = '__out';
-    save(); render();
-  } else go(to);
+function offWork(){
+  const due = S.tasks.filter(t => !t.fin && t.due <= S.day);
+  talk({lines:[['sys', `18:00 到了。${due.length ? `「${TASKS[due[0].key].name}」今天截止，还没做完。` : '今天的活都在掌控之中。'}`]],
+    choices:[
+      {t:'准点下班！', d:'人间清醒', main:!due.length, end:() => goHome()},
+      {t:'加班 1 小时', d:'推进待办 · 精力 -10 心情 -9', main:!!due.length, end:() => { doWork(60); fx({mood:-6}); S.overtimeMin += 60;
+        talk({lines:[['sys', S.last]], choices:[{t:'下班', end:() => goHome()}, {t:'再加 1 小时', d:'真的要吗', end:() => { doWork(60); fx({mood:-8}); S.overtimeMin += 60; talk({lines:[['sys', S.last + ' 窗外的天已经黑透了。']], end:() => goHome()}); }}]}); }},
+    ]});
+}
+function goHome(){
+  S.tasks.forEach(t => { if(!t.fin && t.due <= S.day && !t.late){ t.late = true; S.perf -= 5; S.rel.boss = clamp(S.rel.boss - 3); msg('boss', `「${TASKS[t.key].name}」怎么样了？尽快给我。`); } });
+  S.scene = 'home'; save(); render();
+}
+function night(choice){
+  const o = {
+    rest:{energy:60, mood:5, text:'你十点就上床了。这是这个月第一次。'},
+    drama:{energy:40, mood:15, text:'你追完了三集剧。"就最后一集"这句话你说了三次。'},
+    study:{energy:35, mood:-3, perf:3, text:'你看了两小时课程。第二天你会忘掉一半，但另一半是你的。'},
+    love:{energy:40, mood:14, text:''},
+  }[choice];
+  if(choice === 'love'){ const k = topLover(); o.text = `你和${CHARS[k].name}聊到了十二点。${k === 'jiang' ? '他发来一张画：你的绿萝开了一朵花。' : '她说她的《需求吐槽大全》第一章是写你的。'}`; S.rel[k] = clamp(S.rel[k] + 5); }
+  S.energy = clamp(S.energy + o.energy); S.mood = clamp(S.mood + o.mood); if(o.perf) S.perf += o.perf;
+  S.nightText = o.text;
+  if(S.day === LAST_DAY){ S.scene = 'ending'; save(); render(); return; }
+  if(S.day === 5){ S.scene = 'weekend'; save(); render(); return; }
+  nextDay();
+}
+function nextDay(){
+  S.day++; S.time = 570; S.loc = 'desk'; S.coffeeToday = 0; S.ate = false; S.last = '';
+  S.scene = 'morning'; save(); render();
 }
 
-let _cur = null;
-function curScene(){ return _cur || {}; }
-
-/* ============ 像素精灵 ============ */
-const RAT_BASE = [
-  '.KK......KK.',
-  'KPPK....KPPK',
-  'KPPKKKKKKPPK',
-  '.KGGGGGGGGK.',
-  '.KGWBGGWBGK.',
-  '.KGGGGGGGGK.',
-  'KGGGGNNGGGGK',
-  '.KGGGGGGGGK.',
-  '..KGGGGGGK..',
-  '...KKGGKK...',
-  '....KGGK....',
-  '.....KK.....',
-];
-const HUMAN_BASE = [
-  '...KKKKKK...',
-  '..KHHHHHHK..',
-  '.KHHHHHHHHK.',
-  '.KHSSSSSSHK.',
-  '.KSSBSSBSSK.',
-  '.KSSSSSSSSK.',
-  '..KSSKKSSK..',
-  '...KSSSSK...',
-  '..KCCCCCCK..',
-  '.KCCCCCCCCK.',
-  '.KCCCWWCCCK.',
-  '.KKKKKKKKKK.',
-];
-const BASECOL = {K:'#1a1c2c', W:'#f4f4f4', B:'#1a1c2c', P:'#ef7d57', N:'#b13e53', S:'#f2c7a0'};
-// over: [行, 起始列, 像素串]，像素串中的 . 表示不覆盖
-const SPRITES = {
-  r1:{base:RAT_BASE, col:{G:'#94b0c2'}, over:[[9,5,'RR'],[10,5,'RR'],[11,5,'RR']], extra:{R:'#b13e53'}},           // 闻灏：红领带
-  r2:{base:RAT_BASE, col:{G:'#c28552'}, over:[[4,2,'KKKKKKKK'],[4,3,'W']]},                                          // 汶昊：墨镜
-  r3:{base:RAT_BASE, col:{G:'#b48ead'}, over:[[4,3,'BW..BW'],[5,2,'P......P']]},                                       // 玟颢：斜眼 + 腮红
-  r4:{base:RAT_BASE, col:{G:'#d9a066'}, over:[[4,2,'KWBKKWBK'],[3,2,'KK....KK']]},       // 雯灏：圆眼镜
-  me:{base:HUMAN_BASE, col:{H:'#333c57', C:'#41a6f6'}},
-  jiang:{base:HUMAN_BASE, col:{H:'#29366f', C:'#73eff7'}},
-  boss:{base:HUMAN_BASE, col:{H:'#94b0c2', C:'#29366f'}, over:[[4,3,'KBKKBK']]},
-  lin:{base:HUMAN_BASE, col:{H:'#5d275d', C:'#38b764'}},
-  zhe:{base:HUMAN_BASE, col:{H:'#566c86', C:'#ef7d57'}},
-  man:{base:HUMAN_BASE, col:{H:'#b13e53', C:'#ffcd75'}},
-  hr:{base:HUMAN_BASE, col:{H:'#333c57', C:'#f4f4f4'}, over:[[10,5,'NN']]},
-  hunt:{base:HUMAN_BASE, col:{H:'#ffcd75', C:'#5d275d'}},
-  npc:{base:HUMAN_BASE, col:{H:'#566c86', C:'#94b0c2'}},
-  d1:{base:HUMAN_BASE, col:{H:'#94b0c2', C:'#f4f4f4'}, over:[[8,5,'RR'],[9,5,'RR'],[10,5,'RR']], extra:{R:'#b13e53'}},  // 闻灏伪装：灰发 + 红领带
-  d2:{base:HUMAN_BASE, col:{H:'#c28552', C:'#566c86'}, over:[[2,3,'KKKKKK'],[2,4,'W']]},                                    // 汶昊伪装：棕发 + 墨镜架头顶
-  d3:{base:HUMAN_BASE, col:{H:'#b48ead', C:'#5d275d'}, over:[[4,4,'BW.BW'],[5,2,'P......P']]},                                // 玟颢伪装：紫发 + 斜眼
-  d4:{base:HUMAN_BASE, col:{H:'#d9a066', C:'#257179'}, over:[[4,2,'KWBKKWBK']]},                                             // 雯灏伪装：黄发 + 眼镜
-  unknown:{base:RAT_BASE, col:{G:'#333c57', P:'#333c57', N:'#333c57', W:'#333c57', B:'#333c57', K:'#566c86'}},
-};
-const _spr = {};
-function sprite(id){
-  if(_spr[id]) return _spr[id];
-  const d = SPRITES[id] || SPRITES.npc;
-  const grid = d.base.map(r => r.split(''));
-  (d.over || []).forEach(([r,c,str]) => str.split('').forEach((ch,i) => { if(ch !== '.') grid[r][c+i] = ch; }));
-  const col = {...BASECOL, ...(d.extra||{}), ...d.col};
-  const cv = document.createElement('canvas'); cv.width = 12; cv.height = 12;
-  const x = cv.getContext('2d');
-  grid.forEach((row,y) => row.forEach((ch,i) => { if(ch !== '.' && col[ch]){ x.fillStyle = col[ch]; x.fillRect(i,y,1,1); } }));
-  return (_spr[id] = cv.toDataURL());
-}
-const img = (id, alt='') => `<img class="px" src="${sprite(id)}" alt="${esc(alt)}">`;
-function speakerSprite(who){
-  if(who === '你') return 'me';
-  for(const k in RATS) if(who.startsWith(RATS[k].name)) return S.seen[k] ? k : 'd' + k.slice(1);
-  const map = [['老周','boss'],['小林','lin'],['阿哲','zhe'],['陈蔓','man'],['许姐','hr'],['猎头','hunt'],['江屿','jiang']];
-  for(const [n,id] of map) if(who.startsWith(n)) return id;
-  return 'npc';
-}
-
-/* ============ 渲染 ============ */
-const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-const nl = s => esc(s).replace(/\n/g,'<br>');
-
-function dlg(who, text, me){
-  const id = speakerSprite(who), isRat = id in RATS;  // 未看穿前是人类头像、普通名牌
-  return `<div class="dlg ${me?'me':''} ${isRat?'rat':''}"><div class="face">${img(id, who)}</div><div class="box"><span class="nm">${esc(who)}</span><div>${nl(text)}</div></div></div>`;
-}
-function blockHTML(b){
-  if(b.raw) return b.raw;
-  if(b.n) return `<p class="narr">${nl(b.n)}</p>`;
-  if(b.os) return `<div class="os"><span class="tag">内心</span>${b.os.split('\n\n').map(p => `<p>${nl(p)}</p>`).join('')}</div>`;
-  if(b.sys) return `<p class="sys">${nl(b.sys)}</p>`;
-  if(b.h) return `<div class="h3">— ${esc(b.h)} —</div>`;
-  if(b.me) return dlg('你', b.me, true);
-  if(b.c) return dlg(b.c, b.t, false);
-  return '';
-}
-function chipHTML(c){
-  let cls = '';
-  if(c.ev) cls = 'ev'; else if(c.expel) cls = 'expel'; else if(c.buff) cls = 'buff';
-  else if(c.k === 'stress') cls = c.v < 0 ? 'good' : 'bad';
-  else if(c.k === 'alert') cls = 'bad';
-  else cls = c.v > 0 ? 'good' : 'bad';
-  const txt = c.v ? `${c.label} ${c.v>0?'+':''}${c.v}` : c.label;
-  return `<span class="chip ${cls}">${esc(txt)}</span>`;
-}
-
-let choiceList = [];
-function render(){
-  const el = document.getElementById('scene');
-  let sc;
-  if(S.scene === '__out' && S.out){
-    sc = {loc:S.out.loc, blocks:S.out.blocks, chips:S.out.chips, choices:[{t:'继续', to:S.out.to, primary:true}]};
-  } else {
-    sc = (SC[S.scene] || SC.hub)();
-  }
-  _cur = sc;
-  choiceList = sc.choices;
-
-  if(sc.titleScreen){
-    const saved = load();
-    const canResume = saved && saved.scene && saved.scene !== 'title' && saved.scene !== 'end';
-    el.innerHTML = `<div class="title-screen fade">
-      <h1 class="big">GET <span>RATS</span> OUT<br>MY WORLD</h1>
-      <p class="cn">一款职场文字冒险。办公室里藏着一些东西，它们长着普通同事的脸，说着体面的话。收集证据，看穿伪装，把它们赶出你的世界。</p>
-      <div class="lurk">${img('npc')}${img('npc')}<span class="sus">${img('unknown')}<i>?</i></span>${img('npc')}</div>
-      <div class="choices">
-        <button class="choice primary" data-i="new"><span class="cur">▶</span><span class="k"></span><span class="t">开始上班</span><span class="d">新游戏 · 约 15 分钟 · 多结局</span></button>
-        ${canResume ? `<button class="choice" data-i="resume"><span class="cur">▶</span><span class="k"></span><span class="t">继续存档</span><span class="d">${DAYS[saved.day]||''} · 证据 ${saved.ev.length} 件</span></button>` : ''}
-      </div>
-      <div class="press">PRESS 1 OR ENTER TO START</div></div>`;
-    el.querySelector('[data-i="new"]').onclick = () => { S = fresh(); S.scene = 'intro'; save(); render(); };
-    const r = el.querySelector('[data-i="resume"]'); if(r) r.onclick = () => { S = Object.assign(fresh(), saved); render(); };
-    el.querySelector('[data-i="new"]').focus({preventScroll:true});
-    renderSide(); renderClock(); return;
-  }
-
-  if(sc.map){
-    const s = slot();
-    el.innerHTML = `<div class="fade"><div class="scene-head"><span><b>${DAYS[S.day]}</b>　${esc(sc.loc)}</span><span>[ 自由行动 ]</span></div>
-      <div class="scene-body"><p class="narr">${['早上的办公室，键盘声此起彼伏。','午休了，一半人去吃饭，一半人趴在桌上。','下午最难熬，空调和会议一样多。','天快黑了，有人开始收拾包。'][s]}</p>
-      <p class="sys">点一个地方走过去。走动不花时间；在那里做事会用掉一个时段。✦ 表示那里好像有什么。</p>
-      <div class="map" data-slot="${s}">${MAP.map(([id,c,r,span]) => {
-        const L = LOCS[id], ppl = present(id), cur = S.loc === id, sp = hasSpecial(id);
-        return `<button class="tile k-${L.kind} ${cur?'here':''}" data-loc="${id}" style="grid-column:${c} / span ${span||1};grid-row:${r}"><span class="tn">${L.name}${sp?'<i class="spark">✦</i>':''}</span><span class="ppl">${ppl.map(p => img(peopleSprite(p), PEOPLE[p])).join('')}${cur ? `<span class="you">${img('me','你')}</span>` : ''}</span></button>`;
-      }).join('')}</div></div></div>`;
-    el.querySelectorAll('[data-loc]').forEach(b => b.onclick = () => { S.loc = b.dataset.loc; go('loc'); });
-    window.scrollTo({top:0});
-    renderSide(); renderClock(); showReveal(); return;
-  }
-  const head = `<div class="scene-head"><span><b>${esc(sc.title || DAYS[S.day])}</b>　${esc(sc.loc||'')}</span><span>${S.scene === 'hub' ? '[ 选择行动 ]' : ''}</span></div>`;
-  const dayCard = S.scene === 'dayStart' ? `<div class="daycard"><b>DAY ${S.day}</b><span>${DAYS[S.day]}<br>剩余 ${LAST_DAY - S.day} 天</span></div>` : '';
-  const body = dayCard + sc.blocks.map(blockHTML).join('') + (sc.chips && sc.chips.length ? `<div class="h3">— 数值变动 —</div><div class="chips">${sc.chips.map(chipHTML).join('')}</div>` : '');
-  let n = 0;
-  const ch = sc.choices.map((c,i) => {
-    const ok = !c.need || c.need();
-    if(!ok && (!c.lock || (c.rat && !S.seen[c.rat]))) return '';
-    const num = ok ? ++n : '';
-    const cls = ['choice', c.primary?'primary':'', c.star && ok?'star':'', !ok?'locked':''].join(' ');
-    const desc = !ok ? '锁 ' + c.lock : c.d;
-    return `<button class="${cls}" data-i="${i}" ${ok ? `data-n="${num}"` : 'aria-disabled="true"'}><span class="cur">▶</span><span class="k">${ok ? num + '.' : '✕'}</span><span class="t">${esc(c.t)}</span>${desc ? `<span class="d">${esc(desc)}</span>` : ''}</button>`;
-  }).join('');
-  el.innerHTML = `<div class="fade">${head}<div class="scene-body">${body}</div><div class="choices">${ch}</div></div>`;
-  el.querySelectorAll('.choice').forEach(b => b.onclick = () => {
-    const c = choiceList[+b.dataset.i]; if(!c || (c.need && !c.need())) return;
-    pick(c);
-  });
-  window.scrollTo({top:0});
-  renderSide(); renderClock(); showReveal();
-}
-
-let _hudPrev = {};
+/* =================== 渲染 =================== */
+const IN_GAME = ['office','todo','people','phone'];
 function renderHud(){
-  const el = document.getElementById('hud');
-  if(S.scene === 'title'){ el.innerHTML = ''; return; }
-  const st = (k, label, v, col) => `<div class="${_hudPrev[k] !== undefined && _hudPrev[k] !== v ? 'bump' : ''}"><span>${label}</span><i><b style="width:${v}%;background:${col}"></b></i><em>${v}</em></div>`;
-  el.innerHTML = `<div class="hud-row"><span class="day">${DAYS[S.day]}</span><span>${S.ap > 0 ? SLOTS[slot()].split(' ')[0] : '18:00'}</span><span class="pips">${[0,1,2,3].map(i => `<i class="${i < S.ap ? 'on':''}"></i>`).join('')}</span>
-    <span class="hud-btns"><button data-sheet="rats">图鉴 <span class="n">${Object.keys(S.seen).length}</span></button><button data-sheet="ev">证据 <span class="n">${S.ev.length}</span></button><button id="hudMenu">菜单</button></span></div>
-    <div class="hud-stats">${st('stress','压力',S.stress,S.stress >= 75 ? 'var(--red)' : 'var(--rat)')}${st('trust','信任',S.trust,'var(--green)')}${st('neutral','好感',S.neutral,'var(--gold)')}</div>`;
-  _hudPrev = {stress:S.stress, trust:S.trust, neutral:S.neutral};
-  el.querySelectorAll('[data-sheet]').forEach(b => b.onclick = () => openSheet(b.dataset.sheet));
-  document.getElementById('hudMenu').onclick = () => { closeSheet(); S.scene = 'title'; render(); };
+  const h = document.getElementById('hud');
+  if(!IN_GAME.includes(S.scene)){ h.hidden = true; return; }
+  h.hidden = false;
+  const m = (label, v, cls) => `<div class="meter"><div class="top"><span>${label}</span><b>${v}</b></div><div class="bar ${cls} ${v < 25 ? 'low' : ''}"><i style="width:${clamp(v)}%"></i></div></div>`;
+  h.innerHTML = `<div class="hud-top"><span class="date">${DAYS[S.day]}</span><span class="clock">${fmt(S.time)}</span><span class="money">¥${S.money}</span></div>
+    <div class="meters">${m('⚡ 精力',S.energy,'energy')}${m('💗 心情',S.mood,'mood')}${m('⭐ 绩效',S.perf,'perf')}</div>`;
 }
-function openSheet(tab){ S.tab = tab; renderSide(); document.body.classList.add('sheet'); document.getElementById('side').scrollTop = 0; }
-function closeSheet(){ document.body.classList.remove('sheet'); }
-document.getElementById('scrim').onclick = closeSheet;
-
-function renderClock(){
-  const el = document.getElementById('clock');
-  document.body.classList.toggle('ingame', S.scene !== 'title');
-  renderHud();
-  if(S.scene === 'title'){ el.innerHTML = ''; return; }
-  el.innerHTML = `<span class="day">${DAYS[S.day]}</span><span>${S.ap > 0 ? SLOTS[slot()] : '18:00 下班'}</span><span class="pips" title="今日剩余时段">${[0,1,2,3].map(i => `<i class="${i < S.ap ? 'on':''}"></i>`).join('')}</span><button class="iconbtn" id="toTitle">MENU</button>`;
-  document.getElementById('toTitle').onclick = () => { S.scene = 'title'; render(); };
+function renderTabs(){
+  const t = document.getElementById('tabbar');
+  if(!IN_GAME.includes(S.scene)){ t.hidden = true; return; }
+  t.hidden = false;
+  const unread = S.msgs.filter(m => !m.read).length, open = S.tasks.filter(x => !x.fin).length;
+  const tab = (id, i, label, badge) => `<button role="tab" aria-selected="${S.scene === id}" data-tab="${id}"><span class="i">${i}</span>${label}${badge ? `<span class="badge">${badge}</span>` : ''}</button>`;
+  t.innerHTML = `<div class="in" role="tablist">${tab('office','🏢','办公室')}${tab('todo','📋','待办',open)}${tab('people','👥','同事')}${tab('phone','💬','消息',unread)}</div>`;
+  t.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.scene = b.dataset.tab; render(); if(S.scene === 'phone'){ S.msgs.forEach(m => m.read = true); save(); setTimeout(renderTabs, 600); } });
 }
-
-const seg = (v, cls) => `<div class="seg ${cls}">${Array.from({length:10}, (_,i) => `<i class="${i < Math.round(v/10) ? 'on':''}"></i>`).join('')}</div>`;
-let evSel = null;
-function renderSide(){
-  const el = document.getElementById('side');
-  const row = (label, v, cls) => `<div class="stat"><span>${label}</span>${seg(v, cls)}<span class="v">${v}</span></div>`;
-  const debuffs = [];
-  if(f().nag && !S.expelled.r1) debuffs.push('<span class="chip bad">闻灏持续催办</span>');
-  if(f().rumorSpread && !S.expelled.r3) debuffs.push('<span class="chip bad">谣言扩散</span>');
-  if(f().b4) debuffs.push('<span class="chip good">跨组须书面对齐</span>');
-  if(f().ruleProposed) debuffs.push('<span class="chip good">认领流程草案</span>');
-  if(f().hrArchive) debuffs.push('<span class="chip ev">HR留档</span>');
-  const tab = S.tab || 'rats';
-  let content = '';
-  if(tab === 'rats'){
-    const found = Object.entries(RATS).filter(([k]) => S.seen[k]);
-    const more = found.length < 4 ? `<div class="rat unseen">${img('unknown')}<div><div class="nm">？？？</div><div class="tg">${found.length ? '办公室里，也许还有别的……' : '还没有看穿任何人。'}</div></div></div>` : '';
-    content = `<div class="rats">${found.map(([k,r]) => {
-      const seen = S.seen[k], out = S.expelled[k];
-      return `<button class="rat ${seen?'':'unseen'} ${out?'out':''}" data-rat="${k}">
-        ${img(seen ? k : 'unknown')}
-        <div><div class="nm">${seen ? r.name : '？？？'}${seen ? `<em>${out?'已驱逐':'活跃'}</em>` : ''}</div>
-        <div class="tg">${seen ? r.tag : '尚未现身'}</div>
-        <div class="stat" style="margin:0"><span>戒备</span>${seg(seen ? S.alert[k] : 0, 'alert')}<span class="v">${seen ? S.alert[k] : '--'}</span></div></div></button>`;
-    }).join('')}${more}</div>`;
-  } else if(tab === 'ev'){
-    const sel = evSel && has(evSel) ? evSel : null;
-    content = `<div class="evlist">${Object.keys(EV).filter(has).map(k => `<button class="evi got" data-ev="${k}" title="${esc(EV[k].name)}"><span class="ico"></span>${k}</button>`).join('')}<div class="evi"><span class="ico"></span>?</div></div>
-      <div class="evdesc">${sel ? `<b>${sel}｜${EV[sel].name}</b><br>${EV[sel].desc}` : S.ev.length ? `已收集 ${S.ev.length} 件。点格子查看详情。` : '还没有任何证据。证据藏在工单、考勤、聊天记录和人心里。'}</div>`;
-  } else {
-    content = S.log.length ? `<div class="log">${S.log.map(l => `<div>${esc(l)}</div>`).join('')}</div>` : '<p class="empty">还没有发生任何事。</p>';
-  }
-  el.innerHTML = `<button class="sheet-close" id="sheetClose">关闭 ✕</button>
-    <section class="panel win"><span class="win-title">STATUS</span>
-      ${row('压力值', S.stress, 'stress' + (S.stress >= 75 ? ' hot' : ''))}${row('组长信任', S.trust, 'trust')}${row('中立好感', S.neutral, 'neutral')}
-      <div class="stat"><span>业务产出</span><div class="outdots">${[0,1,2,3,4].map(i => `<i class="${i<S.output?'on':''}"></i>`).join('')}</div><span class="v">${S.output}</span></div>
-      ${Object.entries(LOVE).filter(([k]) => S.love[k].st > 0).map(([k,l]) => `<div class="stat"><span>♥ ${l.name}</span>${seg(S.love[k].v, 'love')}<span class="v">${S.partner === k ? '❤' : S.love[k].v}</span></div>`).join('')}
-      ${debuffs.length ? `<div class="debuffs">${debuffs.join('')}</div>` : ''}
-    </section>
-    <section class="panel win"><span class="win-title">${tab === 'rats' ? 'RAT 图鉴' : tab === 'ev' ? 'ITEMS 证据库' : 'LOG 日志'}</span>
-      <div class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="${tab==='rats'}" data-tab="rats">图鉴 ${Object.keys(S.seen).length}</button>
-        <button class="tab" role="tab" aria-selected="${tab==='ev'}" data-tab="ev">证据 ${S.ev.length}</button>
-        <button class="tab" role="tab" aria-selected="${tab==='log'}" data-tab="log">日志</button>
-      </div>${content}
-    </section>`;
-  el.querySelector('#sheetClose').onclick = closeSheet;
-  el.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; save(); renderSide(); });
-  el.querySelectorAll('[data-rat]').forEach(b => b.onclick = () => openRat(b.dataset.rat));
-  el.querySelectorAll('[data-ev]').forEach(b => b.onclick = () => { if(has(b.dataset.ev)){ evSel = b.dataset.ev; renderSide(); } });
+function render(){
+  renderHud(); renderTabs();
+  const v = document.getElementById('view');
+  ({title:renderTitle, morning:renderMorning, home:renderHome, weekend:renderWeekend, ending:renderEnding, todo:renderTodo, people:renderPeople, phone:renderPhone}[S.scene] || renderOffice)(v);
+  window.scrollTo({top:0});
 }
 
-function openRat(k){
-  const r = RATS[k], m = document.getElementById('modal');
-  if(!S.seen[k]){ m.innerHTML = `<div class="card win"><span class="win-title">？？？</span><div class="hd">${img('unknown')}<div class="nm">？？？</div></div><p class="narr">这只Rat还没有现身。剧情是条件触发的，去接触它所在的场景吧。</p><div class="choices"><button class="choice primary" id="mclose"><span class="cur">▶</span><span class="k"></span><span class="t">关闭</span></button></div></div>`; }
-  else m.innerHTML = `<div class="card win"><span class="win-title">RAT FILE · ${RAT_TEMPLATE.tag}</span>
-    <div class="hd">${img(k, r.name)}<div><div class="nm">${r.name}</div><div class="sys" style="margin-top:6px">${S.expelled[k]?'已驱逐':'活跃中'} · 戒备 ${S.alert[k]}</div></div></div>
-    <p class="narr">${r.story}</p>
-    <dl><dt>Rat Tag</dt><dd>${RAT_TEMPLATE.tag}</dd><dt>类型</dt><dd>${r.tag}</dd><dt>核心特质</dt><dd>${RAT_TEMPLATE.trait}</dd><dt>驱逐目标</dt><dd>${RAT_TEMPLATE.goal}</dd><dt>突破口</dt><dd>${r.how}</dd></dl>
-    <div class="choices"><button class="choice primary" id="mclose"><span class="cur">▶</span><span class="k"></span><span class="t">关闭</span></button></div></div>`;
-  m.hidden = false;
-  m.querySelector('#mclose').focus();
-  m.querySelector('#mclose').onclick = () => m.hidden = true;
-  m.onclick = e => { if(e.target === m) m.hidden = true; };
+function renderOffice(v){
+  const L = LOCS[S.loc], who = cast(S.loc), acts = actsFor(S.loc);
+  v.innerHTML = `
+    <div class="place-head"><h1>${L.icon} ${L.name}</h1><button class="move" id="moveBtn">换个地方 ›</button></div>
+    <div class="stage"><svg class="bgart" viewBox="0 0 360 190" aria-hidden="true">${ART[S.loc]}</svg>
+      <div class="cast ${who.length > 4 ? 'crowd' : ''}">${who.map(id => `<button class="person" data-p="${id}" aria-label="和${S.met[id] ? CHARS[id].name : '陌生同事'}说话">${avatar(id)}<span class="tag ${S.met[id] ? '' : 'new'}">${S.met[id] ? CHARS[id].name : '新面孔'}</span></button>`).join('')}</div></div>
+    ${S.last ? `<div class="recent"><span>💭</span><span><b>刚刚：</b>${S.last}</span></div>` : ''}
+    <div class="acts">${acts.map((a,i) => `<button class="act" data-a="${i}"><span class="ic">${a.ic}</span><span class="tx"><span class="t">${a.t}</span><span class="d">${a.d}</span></span></button>`).join('')}
+      ${who.length ? `<div class="act wide off"><span class="ic">👆</span><span class="tx"><span class="t">点画面里的人可以聊天</span><span class="d">${who.map(id => S.met[id] ? CHARS[id].name : '一个新面孔').join('、')}在这里</span></span></div>` : ''}
+      ${!acts.length && !who.length ? `<div class="act wide off"><span class="ic">🍃</span><span class="tx"><span class="t">这里现在没什么可做的</span><span class="d">换个地方看看？</span></span></div>` : ''}
+    </div>`;
+  v.querySelector('#moveBtn').onclick = openMap;
+  v.querySelectorAll('[data-p]').forEach(b => b.onclick = () => chatWith(b.dataset.p));
+  v.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { const busy = acts[+b.dataset.a].run(); if(!busy) afterAction(); else renderHud(); });
+}
+function openMap(){
+  const el = document.getElementById('sheet');
+  el.innerHTML = `<div class="in"><h2>去哪儿？<button id="closeSheet">关闭</button></h2><div class="locs">${Object.entries(LOCS).map(([id,L]) => {
+    const closed = L.open && !L.open(S.time), who = cast(id);
+    return `<button class="loc ${S.loc === id ? 'here' : ''}" data-l="${id}" ${closed ? 'disabled' : ''}><span class="t"><span>${L.icon}</span>${L.name}</span>
+      <span class="who">${who.map(p => avatar(p, S.met[p] ? {} : {ghost:true})).join('')}</span><small>${closed ? L.closedText : S.loc === id ? '你在这里' : (who.length ? who.length + ' 人在' : '没人') + ' · 走过去 5 分钟'}</small></button>`; }).join('')}</div></div>`;
+  el.hidden = false;
+  el.onclick = e => { if(e.target === el) closeSheet(); };
+  el.querySelector('#closeSheet').onclick = closeSheet;
+  el.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { if(b.dataset.l !== S.loc){ S.loc = b.dataset.l; S.time += 5; S.last = ''; } closeSheet(); S.scene = 'office'; afterAction(); });
+}
+function closeSheet(){ document.getElementById('sheet').hidden = true; }
+
+function renderTodo(v){
+  const list = [...S.tasks].sort((a,b) => a.fin - b.fin || a.due - b.due);
+  v.innerHTML = `<h2 class="sec-title">待办清单</h2>
+    ${list.length ? list.map(t => { const T = TASKS[t.key], p = Math.round(t.done / T.need * 100);
+      const dueTxt = t.fin ? '已完成' : t.due < S.day ? '已逾期' : t.due === S.day ? '今天截止' : `${DAYS[t.due]}截止`;
+      return `<div class="card task ${t.fin ? 'done' : ''} ${S.focus === t.key && !t.fin ? 'focus' : ''}"><div class="row"><span class="nm">${T.name}</span><span class="pill ${t.fin ? 'ok' : t.due <= S.day ? 'due' : ''}">${dueTxt}</span></div>
+        <div class="bar"><i style="width:${p}%"></i></div><div class="meta"><span>${p}% · 还要约 ${Math.max(0, Math.round((T.need - t.done) / 6) / 10)} 小时 · 来自${CHARS[T.from].name}</span>${t.fin ? '' : S.focus === t.key ? '<span class="focusbtn">正在做</span>' : `<button class="focusbtn" data-f="${t.key}">先做这个</button>`}</div></div>`; }).join('') : '<p class="empty">暂时没有待办。享受这短暂的平静吧。</p>'}
+    <p class="empty" style="padding:4px 0 12px">在工位点「认真干活」，会推进蓝框的那一项。</p>`;
+  v.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { S.focus = b.dataset.f; save(); render(); });
+}
+function renderPeople(v){
+  const ids = Object.keys(CHARS).filter(k => k !== 'me');
+  const nr = Object.keys(S.revealed).length;
+  v.innerHTML = `<h2 class="sec-title">同事图鉴 <small style="font-family:var(--f-body);font-size:13px;color:var(--muted)">已认识 ${ids.filter(k => S.met[k]).length}/${ids.length}</small></h2>
+    <div class="people">${ids.map(k => { const c = CHARS[k];
+      if(!S.met[k]) return `<div class="pc">${avatar(k, {ghost:true})}<b>？？？</b><small>还没认识</small></div>`;
+      const h = Math.min(5, Math.round(S.rel[k] / 20));
+      return `<button class="pc ${S.revealed[k] ? 'rat' : ''}" data-c="${k}">${avatar(k)}<b>${c.name}${S.partner === k ? ' ❤' : ''}</b><small>${c.role}</small>${S.revealed[k] ? `<span class="ratchip">wén hào</span>` : `<span class="hearts">${'♥'.repeat(h)}${'♡'.repeat(5 - h)}</span>`}</button>`; }).join('')}</div>
+    <p class="empty" style="padding:4px 0 12px">${nr ? `你已经看穿了 ${nr} 个 wén hào。` : '有些同事，好像不太对劲……'}</p>`;
+  v.querySelectorAll('[data-c]').forEach(b => b.onclick = () => personCard(b.dataset.c));
+}
+function personCard(k){
+  const c = CHARS[k], el = document.getElementById('sheet');
+  const facts = RATS.includes(k) ? (S.revealed[k] ? c.facts : []) : c.facts.slice(0, S.flags['fact_' + k] || 0);
+  el.innerHTML = `<div class="in"><h2>${c.name}<button id="closeSheet">关闭</button></h2>
+    <div class="card" style="display:flex;gap:14px;align-items:center"><div style="width:84px;flex:none">${avatar(k)}</div><div><b>${c.role}</b><br><small style="color:var(--muted)">好感 ${S.rel[k]} / 100</small>${S.revealed[k] ? `<br><span class="ratchip">wén hào · ${c.rat}</span>` : ''}</div></div>
+    <div class="card" style="margin-top:10px"><b>小秘密</b>${facts.length ? `<ul style="margin:6px 0 0;padding-left:18px">${facts.map(x => `<li>${x}</li>`).join('')}</ul>` : `<p style="margin:6px 0 0;color:var(--muted);font-size:14px">${RATS.includes(k) ? '你总觉得 TA 哪里不对，但说不上来。' : '好感到 20 / 40 / 60 时，多聊几次，TA 会告诉你的。'}</p>`}</div></div>`;
+  el.hidden = false; el.onclick = e => { if(e.target === el) closeSheet(); };
+  el.querySelector('#closeSheet').onclick = closeSheet;
+}
+function renderPhone(v){
+  v.innerHTML = `<h2 class="sec-title">消息</h2>${S.msgs.length ? S.msgs.map(m => `<div class="msg ${m.read ? '' : 'unread'}">${avatar(m.from)}<div style="min-width:0"><div class="who">${CHARS[m.from].name} · ${m.when}</div><div class="bd">${m.text}</div></div></div>`).join('') : '<p class="empty">没有新消息。难得。</p>'}`;
 }
 
-/* 看穿伪装：图鉴更新 */
-function showReveal(){
-  const m = document.getElementById('modal');
-  if(!S.reveal || !S.reveal.length || !m.hidden) return;
-  const k = S.reveal[0], r = RATS[k], n = Object.keys(S.seen).length;
-  const line = n === 1
-    ? '披着普通同事外壳的东西，终于露出了尾巴。<br>你给它起了一个名字：<b>文浩系蛀虫</b>。'
-    : n === 2 ? '又是一只。<br>你盯着这个名字看了很久——<b>wén hào</b>。同一个读音。<br>同根蛀虫，不同伪装。'
-    : '又是 <b>wén hào</b>。<br>你已经不觉得这是巧合了。';
-  m.innerHTML = `<div class="card win reveal"><span class="win-title">！ 图鉴更新</span>
-    <div class="morph"><img class="px a" src="${sprite('d' + k.slice(1))}" alt=""><img class="px b" src="${sprite(k)}" alt="${esc(r.name)}"></div>
-    <div class="rv-no">RAT #${n}</div>
-    <div class="nm">${r.name}</div>
-    <div class="rv-tag">${r.tag}</div>
-    <p class="narr">${line}</p>
-    <div class="choices"><button class="choice primary" id="mclose"><span class="cur">▶</span><span class="k"></span><span class="t">记下来</span></button></div></div>`;
-  m.hidden = false;
-  const close = () => { m.hidden = true; S.reveal.shift(); save(); renderSide(); setTimeout(showReveal, 120); };
-  m.querySelector('#mclose').focus();
-  m.querySelector('#mclose').onclick = close;
-  m.onclick = e => { if(e.target === m) close(); };
+function renderTitle(v){
+  const saved = load(), can = saved && saved.v === 2 && !['title','ending'].includes(saved.scene);
+  v.innerHTML = `<div class="big card" style="margin-top:28px">
+    <div class="row">${['lin','jiang','me','man','boss'].map(k => avatar(k)).join('')}</div>
+    <h1>Get <em>Rats</em> Out<br>My World</h1>
+    <p>一个打工人的两周。干活、摸鱼、吃饭、八卦、心动，以及那几个说不上哪里不对劲的同事。</p>
+    <button class="btn" id="newGame">开始上班</button>
+    ${can ? `<button class="btn ghost" id="resume">继续 · ${DAYS[saved.day]}</button>` : ''}
+  </div>`;
+  v.querySelector('#newGame').onclick = () => { S = fresh(); S.scene = 'morning'; save(); render(); };
+  const r = v.querySelector('#resume'); if(r) r.onclick = () => { S = Object.assign(fresh(), saved); render(); };
 }
-
-/* 键盘：数字键直选，↑↓ 移动光标，Enter 确认 */
-document.addEventListener('keydown', e => {
-  const m = document.getElementById('modal');
-  if(e.key === 'Escape') closeSheet();
-  if(e.key === 'Escape'){ if(!m.hidden && m.querySelector('.reveal')) m.querySelector('#mclose').click(); else m.hidden = true; return; }
-  if(!m.hidden || e.metaKey || e.ctrlKey || e.altKey) return;
-  const btns = [...document.querySelectorAll('#scene .choice:not(.locked)')];
-  if(!btns.length) return;
-  if(/^[1-9]$/.test(e.key)){
-    const b = btns.find(x => x.dataset.n === e.key) || (e.key === '1' ? btns[0] : null);
-    if(b){ e.preventDefault(); b.click(); }
-  } else if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
-    e.preventDefault();
-    const i = btns.indexOf(document.activeElement);
-    const j = i < 0 ? 0 : (i + (e.key === 'ArrowDown' ? 1 : -1) + btns.length) % btns.length;
-    btns[j].focus();
-  } else if(e.key === 'Enter' && !btns.includes(document.activeElement) && document.activeElement?.closest?.('#side') == null){
-    e.preventDefault(); btns[0].click();
-  }
-});
+function renderMorning(v){
+  const line = {1:'闹钟响了第三遍。今天是周一，新的一周，和上周一模一样。',2:'地铁上有人吃韭菜盒子。你屏住呼吸三站。',3:'今天下午有个跨组周会。你有种不祥的预感。',4:'天气预报说今天是"适合摸鱼"的阴天。',5:'周五！空气里都是周末的味道。',6:'周一。周末过得太快了，像被谁偷走了一天。',7:'早上在电梯里遇到老周，他冲你点了点头。',8:'今天下午团建。Amy 在群里发了十个感叹号。',9:'倒数第二天。你开始想发工资那天要吃什么。',10:'发薪日！今天连空调都格外温柔。'}[S.day];
+  const hi = {5:['周五','快乐！'],10:['发工资','啦！']}[S.day] || ['早安，','打工人'];
+  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">${DAYS[S.day]}</div><h1>${hi[0]}<em>${hi[1]}</em></h1>
+    <div style="width:110px">${avatar('me', {sad:S.mood < 30})}</div>
+    ${S.nightText ? `<p style="font-size:14px;color:var(--muted)">昨晚：${S.nightText}</p>` : ''}<p>${line}</p>
+    <div class="stats"><div>⚡ 精力<b>${S.energy}</b></div><div>💗 心情<b>${S.mood}</b></div></div>
+    <button class="btn" id="go">09:30 打卡上班</button></div>`;
+  v.querySelector('#go').onclick = () => { S.scene = 'office'; S.nightText = ''; afterAction(); };
+}
+function renderHome(v){
+  const canLove = S.partner || LOVERS.some(k => S.rel[k] >= 50), late = S.overtimeMin;
+  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">${DAYS[S.day]} · ${fmt(1080 + late)} 到家</div><h1>下班<em>啦</em></h1>
+    <div style="width:110px">${avatar('me', {sad:S.mood < 30})}</div>
+    <p>${late ? '你加了班。到家的时候，楼下的烧烤摊都开始收了。' : '你准点走出大门。晚风刚好，天还没黑透。'}今晚想做点什么？</p>
+    <div class="acts" style="width:100%">
+      <button class="act" data-s="rest"><span class="ic">🛏️</span><span class="tx"><span class="t">早早睡觉</span><span class="d">精力 +60</span></span></button>
+      <button class="act" data-s="drama"><span class="ic">📺</span><span class="tx"><span class="t">追剧打游戏</span><span class="d">精力 +40 心情 +15</span></span></button>
+      <button class="act" data-s="study"><span class="ic">📚</span><span class="tx"><span class="t">学习充电</span><span class="d">精力 +35 绩效 +3</span></span></button>
+      ${canLove ? `<button class="act hot" data-s="love"><span class="ic">💌</span><span class="tx"><span class="t">和${CHARS[topLover()].name}聊天</span><span class="d">心情 +14 好感 +5</span></span></button>` : ''}
+    </div></div>`;
+  S.overtimeMin = 0;
+  v.querySelectorAll('[data-s]').forEach(b => b.onclick = () => night(b.dataset.s));
+}
+function renderWeekend(v){
+  const k = topLover(), canDate = S.partner || S.rel[k] >= 45;
+  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">周末</div><h1>两天<em>自由</em></h1>
+    <p>${S.flags.weekendWork ? '你答应了雯灏周末来加班。周六的办公室里，只有你和饮水机。' : '你关掉了工作群的消息提醒。这个周末怎么过？'}</p>
+    <div class="acts" style="width:100%">${S.flags.weekendWork ? `<button class="act wide" data-w="work"><span class="ic">🏢</span><span class="tx"><span class="t">去加班</span><span class="d">精力 -10 心情 -20 · 没有加班费</span></span></button>` : `
+      <button class="act" data-w="home"><span class="ic">🛋️</span><span class="tx"><span class="t">宅家睡到自然醒</span><span class="d">精力满 心情 +10</span></span></button>
+      <button class="act" data-w="out"><span class="ic">🎡</span><span class="tx"><span class="t">出门玩</span><span class="d">¥-300 心情 +30</span></span></button>
+      ${canDate ? `<button class="act hot wide" data-w="date"><span class="ic">🌸</span><span class="tx"><span class="t">约${CHARS[k].name}出去逛逛</span><span class="d">¥-200 心情 +25 好感 +12</span></span></button>` : ''}`}</div></div>`;
+  v.querySelectorAll('[data-w]').forEach(b => b.onclick = () => { const w = b.dataset.w;
+    if(w === 'work'){ S.energy = clamp(S.energy - 10); S.mood = clamp(S.mood - 20); S.nightText = '你周末加了班。雯灏在群里发了个"辛苦了🎉"，没有@你。'; }
+    if(w === 'home'){ S.energy = 100; S.mood = clamp(S.mood + 10); S.nightText = '你睡了两个十二小时。醒来的时候阳光很好。'; }
+    if(w === 'out'){ S.money -= 300; S.energy = clamp(S.energy + 40); S.mood = clamp(S.mood + 30); S.nightText = '你去了海边。手机一整天都没看。'; }
+    if(w === 'date'){ S.money -= 200; S.energy = clamp(S.energy + 50); S.mood = clamp(S.mood + 25); S.rel[k] = clamp(S.rel[k] + 12); S.nightText = k === 'jiang' ? '你们去了猫咖。他画了一整页你和猫。' : '你们逛了一下午书店。她买了一本《如何优雅地拒绝别人》，送给了你。'; }
+    nextDay(); });
+}
+function renderEnding(v){
+  const p = S.perf, md = S.mood, grade = p >= 120 ? 'S' : p >= 90 ? 'A' : p >= 55 ? 'B' : 'C';
+  const good = grade === 'S' || grade === 'A';
+  const [title, text] = S.flags.rule ? ['规则制定者','你没有赢下每一场对线，但你让"口头派活"这件事，在这家公司里变得不可能。']
+    : good && md >= 60 ? ['人间清醒打工人','活干完了，班准点下了，心情也没丢。这大概就是打工的最优解。']
+    : good ? ['卷王','绩效很好看。黑眼圈也是。记得休息。']
+    : md >= 60 ? ['摸鱼宗师','你把摸鱼修炼成了一门艺术。老周看你的眼神很复杂。']
+    : ['打工人，辛苦了','这两周不容易。但工资还是到账了。'];
+  const best = Object.keys(S.rel).filter(k => !RATS.includes(k) && k !== 'boss' && S.met[k]).sort((a,b) => S.rel[b] - S.rel[a])[0];
+  const nr = Object.keys(S.revealed).length;
+  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">W2 周五 · 发薪日</div>
+    <div class="grade">${grade}</div><h1>${title}</h1><p>${text}</p>
+    <div class="stats"><div>💰 工资到账<b>¥9800</b></div><div>⭐ 绩效分<b>${p}</b></div><div>💗 最终心情<b>${md}</b></div><div>🐭 看穿 wén hào<b>${nr} / 4</b></div></div>
+    <div class="row">${RATS.map(k => S.revealed[k] ? avatar(k) : avatar(k, {ghost:true})).join('')}</div>
+    ${S.partner ? `<p>💌 ${S.partner === 'jiang' ? '下班的时候，江屿在楼下等你。他说："发工资了，我请你吃饭团。"' : '陈蔓在你工位上留了一杯美式，杯套上写着：「发工资快乐。周末的展，别迟到。」'}</p>`
+      : best ? `<p>这两周和你最要好的，是${CHARS[best].name}。</p>` : ''}
+    ${nr < 4 ? '<p style="font-size:13px;color:var(--muted)">办公室里，好像还有你没看穿的人……</p>' : ''}
+    <button class="btn" id="again">再打一次工</button></div>`;
+  v.querySelector('#again').onclick = () => { S = fresh(); save(); render(); };
+}
+function showReveal(id){
+  const c = CHARS[id], el = document.getElementById('sheet'), n = Object.keys(S.revealed).length;
+  el.innerHTML = `<div class="in"><div class="big reveal"><div class="date">看穿了！</div><div style="width:120px">${avatar(id)}</div>
+    <h1>${c.name}<br><em>是只 wén hào</em></h1><p>${n === 1 ? '披着普通同事外壳的东西，终于露出了耳朵和胡子。' : n === 2 ? '又是一只。同一个读音：wén hào。你开始觉得这不是巧合。' : '又是 wén hào。你已经见怪不怪了。'}</p>
+    <span class="ratchip" style="font-size:12px;padding:2px 10px">${c.rat}</span><button class="btn" id="okReveal">记下来</button></div></div>`;
+  el.hidden = false; el.onclick = null;
+  el.querySelector('#okReveal').onclick = () => { closeSheet(); afterAction(); };
+}
 
 /* 热更新时保留进度 */
 window.claude?.hot?.snapshot?.(() => S);
-const start = d => { if(d && d.scene) S = Object.assign(fresh(), d); render(); };
-window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? null);
+const boot = d => { S = d && d.v === 2 ? Object.assign(fresh(), d) : fresh(); render(); };
+window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? null);
 </script>

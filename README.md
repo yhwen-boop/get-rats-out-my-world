@@ -1,9 +1,9 @@
 # Get Rats Out My World
 
-像素复古风职场文字冒险：收集证据、看穿伪装，把藏在办公室里的蛀虫赶出你的世界。
+一个打工人的两周：干活、摸鱼、吃饭、八卦、心动，以及那几个说不上哪里不对劲的同事。卡通风上班日常模拟小游戏，手机优先。
 
 在线游玩：https://yhwen-boop.github.io/get-rats-out-my-world/
 
 - `get-rats-out.html`：游戏源文件
 - `build.sh`：生成部署用的 `index.html`（改完源文件后运行一次）
-- `fonts/`：Fusion Pixel 像素字体（SIL OFL 1.1，见 `fonts/OFL.txt`）
+- `icon.png`：添加到主屏幕的图标
