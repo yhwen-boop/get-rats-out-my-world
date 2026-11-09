@@ -196,6 +196,27 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .reveal .narr{font-size:var(--fs);color:var(--ink);text-align:center;margin:10px auto 0}
 .reveal .narr b{color:var(--rat);font-weight:400}
 
+/* ---------- 办公室地图 ---------- */
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:8px;background:#11121f;border:3px solid var(--frame-in);position:relative}
+.map::after{content:"";position:absolute;inset:0;pointer-events:none}
+.map[data-slot="1"]::after{background:rgba(255,205,117,.05)}
+.map[data-slot="3"]::after{background:rgba(239,125,87,.14)}
+.tile{--fl:#3b4466;position:relative;min-height:100px;min-width:0;padding:6px 6px 4px;display:flex;flex-direction:column;justify-content:space-between;gap:4px;text-align:left;cursor:pointer;border:2px solid #0d0e1a;
+  background-color:var(--fl);background-image:linear-gradient(rgba(0,0,0,.2) 2px,transparent 2px),linear-gradient(90deg,rgba(0,0,0,.2) 2px,transparent 2px);background-size:16px 16px}
+.tile.k-sky{--fl:#257179}.tile.k-room{--fl:#29366f}.tile.k-tea{--fl:#5d275d}.tile.k-dark{--fl:#1f2133}.tile.k-lift{--fl:#566c86}.tile.k-cafe{--fl:#2f6a46}
+.tile .tn{font-size:var(--fs-s);background:rgba(13,14,26,.78);padding:0 5px;align-self:flex-start;line-height:1.6;max-width:100%}
+.tile .spark{font-style:normal;color:var(--gold);margin-left:4px;animation:blink 1s steps(1) infinite}
+.tile .ppl{display:flex;flex-wrap:wrap;gap:2px;align-items:flex-end;min-height:26px}
+.tile .ppl img{width:26px;height:26px}
+.tile .you{margin-left:auto}
+.tile .you img{width:30px;height:30px}
+.tile.here{border-color:var(--gold);box-shadow:inset 0 0 0 2px var(--gold)}
+.tile:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+.tile:active{filter:brightness(1.25)}
+@media (hover:hover){.tile:hover{border-color:var(--ink)}}
+@media (max-width:520px){.map{gap:4px;padding:5px}.tile{min-height:86px;padding:4px}.tile .ppl img{width:18px;height:18px}.tile .you img{width:22px;height:22px}.tile .tn{padding:0 3px}}
+.seg.love i.on{background:#f5a3c7}
+
 /* ---------- 手机：顶部固定状态栏 + 底部抽屉 ---------- */
 .hud,.scrim,.sheet-close{display:none}
 @media (max-width:880px){
@@ -297,13 +318,14 @@ const EV = {
   E11:{name:'口头派活录音 / 书面任务单', desc:'雯灏靠人情话术让你无偿兜底的完整记录。'},
   E12:{name:'双鼠口径对照表', desc:'闻灏和汶昊在不同场合说法前后矛盾的逐条对照。'},
   E13:{name:'蛀虫互撕截图', desc:'闻灏与汶昊互相甩锅、互爆黑料的聊天记录。'},
+  E14:{name:'会议室白板照片', desc:'同步会前，闻灏就在白板上写好了"落地：xx组维护（他们下班早，有余量）"。'},
 };
-const R1_EV = ['E01','E02','E03','E04','E05','E06','E07'];
+const R1_EV = ['E01','E02','E03','E04','E05','E06','E07','E14'];
 const DAYS = ['','W1 周一','W1 周二','W1 周三','W1 周四','W1 周五','W2 周一','W2 周二','W2 周三'];
 const LAST_DAY = 8;
 
 /* ============ 状态 ============ */
-const fresh = () => ({day:1, ap:3, stress:30, trust:50, neutral:50, output:0,
+const fresh = () => ({day:1, ap:4, loc:'desk', love:{jiang:{v:0,st:0,last:0}, man:{v:0,st:0,last:0}}, partner:null, stress:30, trust:50, neutral:50, output:0,
   alert:{r1:10,r2:5,r3:5,r4:5}, ev:[], flags:{}, seen:{}, expelled:{}, log:[], scene:'title', reveal:[],
   morning:[], out:null, pendingTo:null, ending:null, tab:'rats'});
 let S = fresh();
@@ -344,7 +366,8 @@ SC.intro = () => ({loc:'入职第三年 · 你的工位', blocks:[
   N('你说不清那是什么。你只是越来越确定：有些同事，不太对劲。'),
   OS('先别急着动手。没有证据的愤怒，在职场里只会变成"你情绪不稳定"。我得先看清楚，是谁，靠什么得逞。'),
   H('玩法'),
-  N('每天有 3 次行动（右上角黄点）。你可以收集证据、推进本职需求、去茶水间、或者找组长。有些东西，只有你主动去接触，才会露出真面目。压力值到 100 会失控。'),
+  N('每天分上午、午休、下午、傍晚四个时段（右上角黄点）。办公室地图上可以自由走动，走动不花时间；在某个地方做事，会用掉一个时段。不同时段，不同的人在不同的地方。'),
+  N('有些东西，只有你自己摸过去才会发现。有些人，只有你主动接近才会露出真面目。压力值到 100 会失控。'),
 ], choices:[{t:'周一早上九点，打开电脑', to:'dayStart', primary:true, act:() => { S.morning = morningMessages(); }}]});
 
 SC.dayStart = () => {
@@ -365,7 +388,7 @@ function morningMessages(){
     m.push(OS('周三下午的同步会，他一定会把那个"AI提效"扔出来。我还有今天和明天上午，可以先把手里的东西准备好。'));
   } else if(S.day === 3){
     m.push(SYS('日程提醒：今天 15:00「跨组AI提效同步会」｜发起人：闻灏'));
-    m.push(N('上午你处理了几件杂事。日程提醒一直挂在屏幕右下角，像一颗没拆的雷。'));
+    m.push(N('日程提醒一直挂在屏幕右下角，像一颗没拆的雷。上午和午休，你还能自由活动。'));
   } else if(S.day === LAST_DAY){
     m.push(N('最后一个周三。一周半过去了，你的待办列表、你的证据文件夹、还有你的心态，都和十天前不太一样了。'));
     if(S.output >= 3){ m.push(C('猎头 Grace', '在吗？上次聊的那家，二面反馈很好，offer 今天下午能发。你考虑一下～')); S.flags.offer = true; }
@@ -387,7 +410,6 @@ function morningMessages(){
 /* 早间强制事件队列 */
 function morningRoute(){
   const fl = f();
-  if(S.day === 3 && !fl.meetingDone) return 'meeting';
   if(S.day === 4 && !fl.d4Done) return 'd4chain';
   if(fl.r2Pending && !fl.r2Reviewed) return 'r2review';
   if(S.day >= 6 && !fl.linkDone){
@@ -406,37 +428,260 @@ function eveningRoute(){
   return 'night';
 }
 
-/* ---------- Hub ---------- */
-const ACTIONS = [
-  {t:'埋头推进本职需求', d:'业务产出 +1 · 压力 +6｜扎实产出是组长信任你的底气', fx:{output:1, stress:6},
-    res:() => [N(['你戴上耳机，把积压的一个接口改造做完、自测、提了合并。屏幕右下角的消息你一条都没回。','你把一个拖了两周的线上问题定位到根因，写了复盘文档。没人会为这种事点赞，但它会出现在你的绩效里。','你把重点需求的方案文档又过了一遍，补完了边界情况。这份方案，你已经写了快一个月。'][S.output % 3])]},
-  {t:'下楼买杯咖啡', d:'压力 -10', fx:{stress:-10}, res:() => [N('你在楼下站了十分钟。风有点大，咖啡有点苦，但那十分钟里，没有人能在企业微信上找到你。')]},
-  {t:'翻工单系统', d:'可获得 E01', need:() => !has('E01'), fx:{ev:'E01'},
-    res:() => [N('你在工单系统里按"提出人：闻灏"筛了一遍。十四张工单，需求描述写得洋洋洒洒，处理人一栏清一色是你们组的名字。他的名字只出现在"提出人"和"关注人"里。'), OS('原来不是我的错觉。')]},
-  {t:'导出考勤摘要', d:'可获得 E02', need:() => !has('E02'), fx:{ev:'E02', stress:3},
-    res:() => [N('你以"核对跨组联调时间"为由，找行政导了一份近一个月的项目组考勤摘要。'), N('22个工作日，闻灏19天准点或提前离岗。加班的那2天，正好是他在大群里发截图的那2天。')]},
-  {t:'翻历史私聊', d:'可获得 E03', need:() => !has('E03'),  fx:{ev:'E03'},
-    res:() => [N('你往上翻和闻灏的私聊。三月那次联调，约好晚上七点一起看问题。'), C('闻灏', '[18:02] 我先撤了哈，有问题明天说'), N('那天你一个人查到十点。你截了图，存进一个新建的文件夹，命名为「rats」。')]},
-  {t:'去茶水间', d:'可能会遇到点什么', to:'tea'},
-  {t:'约组长 1v1', d:'今天还没找过组长', need:() => S.day >= 4 && f().leaderDay !== S.day, to:'leader'},
-  {t:'找听到对话的同事求证', d:'可获得 E09', need:() => f().r3Probe && !has('E09'), fx:{ev:'E09', neutral:5},
-    res:() => [N('你约了当时在场的阿哲去楼下便利店。他犹豫了一下，还是说了实话。'), C('阿哲', '她确实那么说了，说你"配合度差""喜欢顶撞跨组同事"。我当时就觉得怪怪的，你那事明明是闻灏先越界的。'), C('阿哲', '要是需要，我可以跟组长说我听到的。')]},
-  {t:'留意玟颢的小动作', d:'可获得 E10', need:() => has('E09') && !has('E10') && !S.expelled.r3, fx:{ev:'E10', stress:4},
-    res:() => [N('你没有去盯她，你只是留意。周二下午，组长老周把你叫过去，半开玩笑地给你看了一条消息。'), C('玟颢 → 老周', '周哥，提醒一下哈，最近TA情绪有点大，跨组那边反馈挺不好合作的，您留意一下～'), N('老周说："我就是让你知道一下，别多想。"你问能不能截个图。他愣了一下，说可以。')]},
-  {t:'比对闻灏和汶昊的口径', d:'可获得 E12', need:() => f().ally && !has('E12'), fx:{ev:'E12', stress:5},
-    res:() => [N('你把会议纪要、群聊、两人的私聊口径并排贴进一张表。闻灏说"AI流程汶昊组也认可"，汶昊上周却在评审会说"这个流程我们没参与"。'), OS('结盟的人，最怕的是对口供。')]},
-  {t:'把证据分类归档（HR留档）', d:'证据 ≥5 件 · 解锁HR线', need:() => S.day >= 6 && S.ev.length >= 5 && !f().hrArchive, fx:{set:{hrArchive:true}, stress:-6, buff:'解锁【HR留档】'},
-    res:() => [N('你建了一个加密文件夹，按Rat分类：闻灏、汶昊、玟颢、雯灏。每份证据标注日期、来源、可以佐证的人。'), N('做完这件事，你突然没那么焦虑了。证据不会替你生气，但它会替你说话。')]},
-];
+/* ---------- 时间与地图 ---------- */
+const SLOTS = ['09:30 上午','12:00 午休','14:30 下午','17:30 傍晚'];
+const SLOT_N = 4;
+const slot = () => Math.min(SLOT_N - 1, SLOT_N - S.ap);
+const PEOPLE = {lin:'小林（同组）', zhe:'阿哲（同组）', boss:'老周（组长）', hr:'许姐（HRBP）', man:'陈蔓（隔壁组）', jiang:'江屿（设计组）', admin:'行政 Amy', r1:'闻灏', r2:'汶昊', r3:'玟颢', r4:'雯灏'};
+const peopleSprite = id => id in RATS ? (S.seen[id] ? id : 'd' + id.slice(1)) : (id === 'admin' ? 'npc' : id);
+
+function present(loc){
+  const s = slot(), d = S.day, p = [];
+  if(loc === 'desk' && s !== 1) p.push('lin','zhe');
+  if(loc === 'tea'){ if(s === 1) p.push('r3','zhe'); else if(s === 2) p.push('lin'); }
+  if(loc === 'next'){ if(s !== 3) p.push('r1'); if(s === 0 || s === 2) p.push('r2'); if(s !== 1) p.push('man'); }
+  if(loc === 'meet' && s === 2 && d !== 3) p.push('r4');
+  if(loc === 'boss' && (s === 0 || s === 2)) p.push('boss');
+  if(loc === 'hrroom' && (s === 0 || s === 2)) p.push('hr');
+  if(loc === 'roof' && (s === 1 || s === 3)) p.push('jiang');
+  if(loc === 'cafe' && s === 1) p.push('man');
+  if(loc === 'admin' && s !== 1) p.push('admin');
+  return p;
+}
+const here = id => present(S.loc).includes(id);
+
+/* 恋爱：江屿（天台）/ 陈蔓（隔壁组 · 咖啡店） */
+const LOVE = {jiang:{name:'江屿', where:'roof'}, man:{name:'陈蔓', where:'next'}};
+const loveOk = k => {
+  const L = S.love[k];
+  if(S.partner && S.partner !== k) return false;
+  if(L.st >= 4 || L.last === S.day) return false;
+  if(L.st === 2 && slot() !== 3) return false;           // 第三次见面只在傍晚
+  if(L.st === 3 && (S.day < 6 || slot() !== 3 || L.v < 35)) return false;  // 告白：W2 傍晚，心动够了
+  return here(k);
+};
+const loveStep = (k, v, extra = {}) => () => { const L = S.love[k]; L.v = clamp(L.v + v); L.st++; L.last = S.day; Object.assign(S.flags, extra); };
+
+const LOCS = {
+  roof:{name:'天台', kind:'sky', desc:() => slot() === 3 ? '傍晚的天台。远处的写字楼一格一格亮起来，风很大。' : slot() === 1 ? '午休时间的天台，晾着几把没人收的伞。有人坐在水箱旁边吃饭团。' : '天台的门没锁。风吹得通风管嗡嗡响。',
+    acts:() => [
+      {t:'靠着栏杆吹会儿风', d:'压力 -8', fx:{stress:-8}, res:() => [N('你在栏杆边站了一会儿。楼下的车像一串移动的像素点。')]},
+      {t: S.love.jiang.st ? '去找江屿' : '和水箱边那个人搭话', d:'设计组的人', special:true, need:() => loveOk('jiang'), to:'jiang', free:true},
+    ]},
+  meet:{name:'会议室 B2', kind:'room', desc:() => here('r4') ? '雯灏在会议室里对着投屏排期，甘特图密密麻麻，最后一列全是红色。' : '会议室空着。白板上留着一些没擦干净的字。',
+    acts:() => [
+      {t:'看看白板上没擦掉的字', d:'可能有发现', special:true, need:() => !has('E14') && !f().meetingDone && !here('r4'), fx:{ev:'E14'},
+        res:() => [N('白板角落里有一块没擦干净。你凑近了看，是闻灏的字迹：'), SYS('AI提效 · 落地：xx组维护（他们下班早，有余量）'), N('你拍了张照片。原来"你们组来做"这件事，在会前就已经写好了。')]},
+      {t:'敲门进去，跟雯灏打个招呼', d:'项目经理', need:() => here('r4') && !f().r4Done, fx:{stress:4},
+        res:() => [C('雯灏', '哎来得正好！最近项目紧，大家都要有点主人翁意识哈。'), C('雯灏', '对了，周五要是有空，晚点走一会儿？都是一个大项目的嘛。'), OS('他笑得很和气。我说不上来哪里不对。')]},
+    ]},
+  boss:{name:'组长办公室', kind:'room', desc:() => here('boss') ? '老周在办公室里，门半开着，桌上摊着三台显示器。' : '老周不在。门上贴着便利贴："开会中"。',
+    acts:() => [
+      {t:'敲门，约老周聊聊', d: S.day < 4 ? '老周这周前半段都排满了，周四之后再来' : '1v1', need:() => here('boss') && S.day >= 4 && f().leaderDay !== S.day, to:'leader'},
+      {t:'跟老周聊聊最近的风声', d:'可获得 E10', need:() => here('boss') && has('E09') && !has('E10') && !S.expelled.r3, fx:{ev:'E10', stress:4},
+        res:() => [N('你提了一句茶水间的事。老周半开玩笑地把手机转过来给你看。'), C('玟颢 → 老周', '周哥，提醒一下哈，最近TA情绪有点大，跨组那边反馈挺不好合作的，您留意一下～'), N('老周说："我就是让你知道一下，别多想。"你问能不能截个图。他愣了一下，说可以。')]},
+    ]},
+  hrroom:{name:'HR 室', kind:'room', desc:() => here('hr') ? '许姐在整理一摞入职材料，抬头冲你笑了笑。' : 'HR 室没人，桌上摆着一盆长势很好的龟背竹。',
+    acts:() => [
+      {t:'跟许姐闲聊几句', d:'压力 -5', need:() => here('hr') && f().hrChat !== S.day, fx:{stress:-5}, act:() => S.flags.hrChat = S.day,
+        res:() => [C('许姐（HRBP）', '最近项目挺紧的吧？有什么不顺心的，可以随时来找我聊。'), OS('"随时"。我记下了。')]},
+      {t:'把证据分类归档（HR留档）', d:'证据 ≥5 件 · 解锁HR线', need:() => here('hr') && S.day >= 6 && S.ev.length >= 5 && !f().hrArchive, fx:{set:{hrArchive:true}, stress:-6, buff:'解锁【HR留档】'},
+        res:() => [N('你问许姐，如果要反映一些同事之间的问题，材料该怎么准备。她给了你一份模板。'), N('你按Rat分类，把每份证据标好日期、来源和佐证人。证据不会替你生气，但它会替你说话。')]},
+    ]},
+  desk:{name:'你的工位区', kind:'office', desc:() => slot() === 1 ? '午休了，工位区只剩空调声。你的绿萝又黄了一片叶子。' : slot() === 3 ? '傍晚的工位区。小林已经在收拾包了。' : '你的工位。小林在隔壁敲键盘，阿哲戴着降噪耳机。',
+    acts:() => [
+      {t:'埋头推进本职需求', d:'业务产出 +1 · 压力 +6', fx:{output:1, stress:6},
+        res:() => [N(['你戴上耳机，把积压的一个接口改造做完、自测、提了合并。','你把一个拖了两周的线上问题定位到根因，写了复盘文档。没人会为这种事点赞，但它会出现在你的绩效里。','你把重点需求的方案文档又过了一遍，补完了边界情况。这份方案，你已经写了快一个月。'][S.output % 3])]},
+      {t:'翻工单系统', d:'可获得 E01', special:true, need:() => !has('E01'), fx:{ev:'E01'},
+        res:() => [N('你在工单系统里按"提出人：闻灏"筛了一遍。十四张工单，需求描述写得洋洋洒洒，处理人一栏清一色是你们组的名字。他的名字只出现在"提出人"和"关注人"里。'), OS('原来不是我的错觉。')]},
+      {t:'翻历史私聊', d:'可获得 E03', special:true, need:() => !has('E03'), fx:{ev:'E03'},
+        res:() => [N('你往上翻和闻灏的私聊。三月那次联调，约好晚上七点一起看问题。'), C('闻灏', '[18:02] 我先撤了哈，有问题明天说'), N('那天你一个人查到十点。你截了图，存进一个新建的文件夹，命名为「rats」。')]},
+      {t:'找阿哲问问茶水间那天的事', d:'可获得 E09', need:() => here('zhe') && f().r3Probe && !has('E09'), fx:{ev:'E09', neutral:5},
+        res:() => [C('阿哲（同组）', '她确实那么说了，说你"配合度差""喜欢顶撞跨组同事"。我当时就觉得怪怪的，你那事明明是闻灏先越界的。'), C('阿哲（同组）', '要是需要，我可以跟组长说我听到的。')]},
+      {t:'比对闻灏和汶昊的口径', d:'可获得 E12', need:() => f().ally && !has('E12'), fx:{ev:'E12', stress:5},
+        res:() => [N('你把会议纪要、群聊、两人的私聊口径并排贴进一张表。闻灏说"AI流程汶昊组也认可"，汶昊上周却在评审会说"这个流程我们没参与"。'), OS('结盟的人，最怕的是对口供。')]},
+    ]},
+  tea:{name:'茶水间', kind:'tea', desc:() => present('tea').length ? '咖啡机在嗡嗡响，有人在小声聊天。' : '茶水间没人，冰箱上贴着"请及时取走过期食物"。',
+    acts:() => [{t:'接杯水，听听大家在聊什么', d:'可能会遇到点什么', to:'tea'}]},
+  next:{name:'隔壁组', kind:'office', desc:() => slot() === 3 ? '隔壁组的工位区。闻灏的位子已经空了，显示器上贴着一张便利贴："AI提效！！"' : here('r1') ? '隔壁组的工位区。闻灏在打电话，声音很大："这个我们周三会上推一下。"' : '隔壁组的工位区，比你们组安静。',
+    acts:() => [
+      {t:'看一眼闻灏空着的工位', d:'傍晚限定', need:() => slot() === 3 && !f().sawEmpty, fx:{stress:-4, set:{sawEmpty:true}},
+        res:() => [N('17:30，闻灏的椅子已经推进桌底，水杯也带走了。'), N(has('E02') ? '和考勤记录一模一样。' : '你想起行政那边能导出项目组考勤。也许值得去一趟。'), OS('加班两天，发三遍朋友圈。')]},
+      {t: S.love.man.st ? '去找陈蔓' : '和靠窗那个正在叹气的人搭话', d:'隔壁组的产品', special:true, need:() => loveOk('man') && S.love.man.st !== 1, to:'man', free:true},
+    ]},
+  admin:{name:'行政 · 打印间', kind:'room', desc:() => here('admin') ? '行政 Amy 在打印机边和卡纸搏斗。' : '打印机在午休，屏幕上写着"墨粉不足"。',
+    acts:() => [
+      {t:'找 Amy 导一份项目组考勤', d:'可获得 E02', special:true, need:() => here('admin') && !has('E02'), fx:{ev:'E02', stress:3},
+        res:() => [N('你以"核对跨组联调时间"为由，请 Amy 导了一份近一个月的项目组考勤摘要。'), N('22个工作日，闻灏19天准点或提前离岗。加班的那2天，正好是他在大群里发截图的那2天。')]},
+      {t:'帮 Amy 修好卡纸', d:'中立好感 +3', need:() => here('admin') && f().amy !== S.day, fx:{neutral:3}, act:() => S.flags.amy = S.day,
+        res:() => [C('行政 Amy', '救命，你是今天第一个愿意碰这台机器的人。以后打印找我，插队。')]},
+    ]},
+  stairs:{name:'楼梯间', kind:'dark', desc:() => '楼梯间的声控灯时亮时灭。这里信号不好，但总有人躲在这里打电话。',
+    acts:() => [
+      {t:'在台阶上坐一会儿', d:'可能会听到什么', special:() => stairsEvent() !== null, fx:{}, to:'stairs'},
+    ]},
+  lift:{name:'电梯 · 下班', kind:'lift', desc:() => slot() === 3 ? '电梯口挤满了准点下班的人。' : '电梯口很安静。现在走，算早退。',
+    acts:() => [{t: slot() === 3 ? '下班' : '今天就到这儿，提前走', d: S.ap > 1 ? '剩余时段作废' : '', to:'evening', free:true}]},
+  cafe:{name:'楼下咖啡店', kind:'cafe', desc:() => here('man') ? '楼下咖啡店。靠窗的位子上，隔壁组的陈蔓在发呆。' : '楼下咖啡店。换了新的季节限定。',
+    acts:() => [
+      {t:'买杯咖啡，发会儿呆', d:'压力 -10', fx:{stress:-10}, res:() => [N('你在楼下坐了十分钟。那十分钟里，没有人能在企业微信上找到你。')]},
+      {t: S.love.man.st ? '坐到陈蔓对面' : '和靠窗那个发呆的人拼个桌', d:'隔壁组的产品', special:true, need:() => { if(S.partner && S.partner !== 'man') return false; const L = S.love.man; return here('man') && L.st === 1 && L.last !== S.day; }, to:'man', free:true},
+    ]},
+};
+const MAP = [['roof',1,1],['meet',2,1],['boss',3,1],['hrroom',4,1],['desk',1,2,2],['tea',3,2],['next',4,2],['admin',1,3],['stairs',2,3],['lift',3,3],['cafe',4,3]];
+
+function locActs(id){ return LOCS[id].acts().filter(a => !a.need || a.need()); }
+function hasSpecial(id){  // 按那个地点自己的视角判断（here() 读的是 S.loc）
+  const prev = S.loc; S.loc = id;
+  try { return locActs(id).some(a => typeof a.special === 'function' ? a.special() : a.special); } finally { S.loc = prev; }
+}
 
 SC.hub = () => {
-  if(S.ap <= 0) return {loc:'18:00 · 工位', blocks:[N('窗外天黑了。今天能做的事都做完了。')], choices:[{t:'下班', to:'evening', primary:true}]};
-  const list = ACTIONS.filter(a => !a.need || a.need());
-  return {loc:'工作时间 · 工位', blocks:[
-    N(S.ap === 3 ? '今天还有一整天。你打算先做什么？' : S.ap === 2 ? '时间过了一半。' : '快下班了，还能再做一件事。'),
+  if(S.ap <= 0) return {loc:'18:00 · 下班时间', blocks:[N('窗外天黑了。今天能做的事都做完了。')], choices:[{t:'下班', to:'evening', primary:true}]};
+  return {map:true, loc:SLOTS[slot()] + ' · 办公室', blocks:[], choices:[]};
+};
+
+SC.loc = () => {
+  const L = LOCS[S.loc];
+  const ppl = present(S.loc);
+  return {loc:SLOTS[slot()] + ' · ' + L.name, blocks:[
+    N(L.desc()),
+    ...(ppl.length ? [SYS('这里有：' + ppl.map(p => PEOPLE[p]).join('、'))] : []),
   ], choices:[
-    ...list.map(a => ({...a, ap:true})),
-    {t:'今天到此为止，准点下班', d:'剩余行动作废', to:'evening'},
+    ...locActs(S.loc).map(a => ({...a, ap:!a.free})),
+    {t:'回到地图', d:'走动不花时间', to:'hub'},
+  ]};
+};
+
+/* 楼梯间：偷听 */
+function stairsEvent(){
+  const fl = f();
+  if(S.day <= 3 && !fl.stairsR2) return 'r2call';
+  if(fl.ally && !has('E12') && !fl.stairsAlly) return 'allyTalk';
+  return null;
+}
+SC.stairs = () => {
+  const e = stairsEvent();
+  if(e === 'r2call') return {loc:SLOTS[slot()] + ' · 楼梯间', blocks:[
+    N('你刚在台阶上坐下，楼上半层传来压低的声音。有人在打电话。'),
+    C('楼上的声音', '……放心，改个页眉的事。上次那个不也没人看出来吗？'),
+    C('楼上的声音', '嗯，评审前我拿过来就行。他们组写东西慢，我整理一下就是我的了。'),
+    N('脚步声往上走了。你从扶手缝里只看到一个背影，和一件熟悉的格子衬衫——隔壁组的汶昊。'),
+    OS('"改个页眉的事"。我得记住这句话。'),
+  ], choices:[{t:'悄悄离开', fx:{see:'r2', set:{stairsR2:true, knowR2History:true}, buff:'获得线索：汶昊有前科'}, to:'hub'}]};
+  if(e === 'allyTalk') return {loc:SLOTS[slot()] + ' · 楼梯间', blocks:[
+    N('楼梯间里有两个人在说话。你听出了闻灏和汶昊的声音。'),
+    C('闻灏', '周会上你就说你们组也认可，反正没人会去核实。'),
+    C('汶昊', '行，但评审那件事你也得帮我圆一下。'),
+    N('你打开了手机录音。'),
+  ], choices:[{t:'录完就走', fx:{ev:'E12', stress:-6, set:{stairsAlly:true}}, to:'hub'}]};
+  return {loc:SLOTS[slot()] + ' · 楼梯间', blocks:[N(['声控灯灭了。你在黑暗里坐了一会儿，没人来。','楼上有人在哭，很小声。你没有上去。','你听到两个实习生在讨论转正答辩。你想起了三年前的自己。'][S.day % 3])], choices:[{t:'回到地图', fx:{stress:-5}, to:'hub'}]};
+};
+
+/* ---------- 恋情：江屿 ---------- */
+SC.jiang = () => {
+  const L = S.love.jiang, back = 'hub', a = {ap:true, to:back};
+  if(L.st === 0) return {loc:'天台 · 水箱边', blocks:[
+    N('水箱旁边坐着一个人，膝盖上架着平板，一边啃饭团一边在画什么。你瞄了一眼：是一排像素小图标。'),
+    C('江屿（设计组）', '……你也是来躲人的？'),
+    N('他把平板往旁边挪了挪，给你让出半个台阶。'),
+  ], choices:[
+    {...a, t: S.seen.r1 ? '"在躲一个叫 wén hào 的人。"' : '"在躲一些很会说话的人。"', d:'心动 +15', fx:{stress:-6}, act:loveStep('jiang', 15),
+      res:() => [N('他笑出了声，饭团差点掉了。'), C('江屿（设计组）', '那你来对地方了。这栋楼里，只有天台没有企业微信信号。'), OS('他画的那排小图标里，有一只戴领带的老鼠。')]},
+    {...a, t:'"透透气。"', d:'心动 +8', fx:{stress:-4}, act:loveStep('jiang', 8),
+      res:() => [C('江屿（设计组）', '嗯。这里风大，适合透气。'), N('你们并排坐着，谁也没说话。那种不用说话的安静，你很久没有过了。')]},
+    {t:'点点头，走开', to:'loc'},
+  ]};
+  if(L.st === 1) return {loc:'天台 · 水箱边', blocks:[
+    N('江屿今天没在画画。他盯着楼下发呆。'),
+    C('江屿（设计组）', '你知道吗，我去年做过一版登录页。评审会上，是隔壁组一个人讲的。'),
+    C('江屿（设计组）', '他叫汶昊。我的源文件，他改了个页眉。'),
+    C('江屿（设计组）', '我当时没说话。我觉得说了也没人信。'),
+  ], choices:[
+    {...a, t:'"下次再有，我帮你作证。"', d:'心动 +12', fx:{see:'r2', set:{knowR2History:true, jiangWitness:true}}, act:loveStep('jiang', 12),
+      res:() => [N('他转过头看了你很久。'), C('江屿（设计组）', '……那我也是。你要是需要证人，算我一个。'), SYS('江屿成为汶昊事件的潜在证人')]},
+    {...a, t:'"留着源文件的版本记录，别删。"', d:'心动 +8', fx:{see:'r2', set:{knowR2History:true}}, act:loveStep('jiang', 8),
+      res:() => [C('江屿（设计组）', '你说得对。我回去就把所有东西都备份一遍。'), N('他说"谢谢"的时候，声音有点哑。')]},
+  ]};
+  if(L.st === 2) return {loc:'傍晚 · 天台', blocks:[
+    N('傍晚的天台，江屿在收拾东西。他抬头看见你，犹豫了一下。'),
+    C('江屿（设计组）', '……要不要一起走到地铁站？我顺路。'),
+  ], choices:[
+    {...a, t:'"好。"', d:'心动 +15', fx:{stress:-10, set:{loveSeen:'jiang'}}, act:loveStep('jiang', 15),
+      res:() => [N('你们从侧门出去，沿着马路走了十二分钟。他讲他养的猫，你讲你的绿萝。'), N('走到地铁口的时候，他说："明天见。"'), N('你没注意到，公司大门口有人正好看见了你们。')]},
+    {...a, t:'"今天还有点事，改天吧。"', d:'心动 +3', act:loveStep('jiang', 3),
+      res:() => [C('江屿（设计组）', '好，改天。'), N('他笑了笑，先下楼了。')]},
+  ]};
+  return {loc:'W2 傍晚 · 天台', blocks:[
+    N('天台上只有你们两个人。江屿把平板递给你。'),
+    N('屏幕上是一张像素画：一个小人站在办公室中间，手里举着一个写着「证据」的文件夹，四周的老鼠在往门外跑。小人的发型，和你一模一样。'),
+    C('江屿（设计组）', '……这周画的。我想说，不管你最后留下还是走，我都想继续见到你。'),
+  ], choices:[
+    {...a, t:'"我也是。"', d:'在一起', fx:{stress:-15, buff:'❤ 和江屿在一起了'}, act:() => { loveStep('jiang', 20)(); S.partner = 'jiang'; },
+      res:() => [N('风很大，你们靠得很近。远处的写字楼一格一格亮起来。'), N('你突然觉得，这家公司里，也有不是老鼠的人。')]},
+    {...a, t:'"先做朋友，好吗？"', d:'结束这条线', act:() => { S.love.jiang.st = 4; S.love.jiang.last = S.day; },
+      res:() => [C('江屿（设计组）', '好。那这张画还是送你。'), N('他把图导出来发给了你。你设成了手机壁纸。')]},
+  ]};
+};
+
+/* ---------- 恋情：陈蔓 ---------- */
+SC.man = () => {
+  const L = S.love.man, back = 'hub', a = {ap:true, to:back};
+  if(L.st === 0) return {loc:'隔壁组 · 靠窗的位子', blocks:[
+    N('靠窗的位子上，一个人对着屏幕叹了今天的第三口气。屏幕上是闻灏发来的需求文档。'),
+    C('陈蔓（隔壁组）', '……你就是那个没接闻灏活儿的人？'),
+    C('陈蔓（隔壁组）', '我叫陈蔓，他们组的产品。我们组每次都接，接到我都想辞职。'),
+  ], choices:[
+    {...a, t:'"不是不接，是要他写清楚。"', d:'心动 +15', act:loveStep('man', 15),
+      res:() => [N('她眼睛亮了一下，掏出本子记了一句。'), C('陈蔓（隔壁组）', '"写清楚"。好，我下次也这么说。'), C('陈蔓（隔壁组）', '中午我一般在楼下咖啡店，有空来坐坐？')]},
+    {...a, t:'"我也是被逼的。"', d:'心动 +8', act:loveStep('man', 8),
+      res:() => [C('陈蔓（隔壁组）', '哈，被逼的人联盟。中午楼下咖啡店，入会请喝美式。')]},
+  ]};
+  if(L.st === 1) return {loc:'午休 · 楼下咖啡店', blocks:[
+    N('陈蔓给你点了一杯美式，推到你面前。'),
+    C('陈蔓（隔壁组）', '我想了想，有个东西你可能用得上。'),
+    N('她把手机转过来。是去年闻灏给她们组塞活的聊天记录，一模一样的话术："你们熟悉""先跑起来再说"。'),
+  ], choices:[
+    {...a, t:'"谢谢。我欠你一杯咖啡。"', d:'心动 +12', fx:{ev:'E07'}, act:loveStep('man', 12),
+      res:() => [C('陈蔓（隔壁组）', '那就欠着。欠着才有下次。'), N('她说完自己先笑了。')]},
+    {...a, t:'"你为什么帮我？"', d:'心动 +10', fx:{ev:'E07'}, act:loveStep('man', 10),
+      res:() => [C('陈蔓（隔壁组）', '因为你是第一个说"不"的。'), C('陈蔓（隔壁组）', '……也因为你人挺好的。')]},
+  ]};
+  if(L.st === 2) return {loc:'傍晚 · 隔壁组', blocks:[
+    N('傍晚，隔壁组的人都走了，只有陈蔓还在改PRD。她桌上放着一个烤红薯。'),
+    C('陈蔓（隔壁组）', '还没走？分你一半。楼下大爷说今天最后一个了。'),
+  ], choices:[
+    {...a, t:'接过来，陪她把PRD改完', d:'心动 +15', fx:{stress:-8, set:{loveSeen:'man'}}, act:loveStep('man', 15),
+      res:() => [N('你们分着吃完了一个烤红薯，改完了一份PRD，聊完了各自的前任组长。'), N('走的时候，保安大叔冲你们笑得意味深长。'), N('第二天，茶水间里好像有人在讨论什么。')]},
+    {...a, t:'"我得先走了，你也早点回。"', d:'心动 +3', act:loveStep('man', 3),
+      res:() => [C('陈蔓（隔壁组）', '好，路上小心。')]},
+  ]};
+  return {loc:'W2 傍晚 · 隔壁组', blocks:[
+    N('陈蔓合上电脑，转过来看着你，像是准备了很久。'),
+    C('陈蔓（隔壁组）', '那个……下周末有个像素艺术展。'),
+    C('陈蔓（隔壁组）', '我买了两张票。不是工作，不用写需求文档，也不用对齐分工边界。'),
+  ], choices:[
+    {...a, t:'"那我负责买咖啡。"', d:'在一起', fx:{stress:-15, buff:'❤ 和陈蔓在一起了'}, act:() => { loveStep('man', 20)(); S.partner = 'man'; },
+      res:() => [N('她笑得眼睛都弯了。'), C('陈蔓（隔壁组）', '书面确认了啊。不许反悔。')]},
+    {...a, t:'"我们还是做战友吧。"', d:'结束这条线', act:() => { S.love.man.st = 4; S.love.man.last = S.day; },
+      res:() => [C('陈蔓（隔壁组）', '……行，战友。那票送你一张，你带别人去。'), N('后来你一个人去了那个展。展厅门口，她留了一杯美式给你。')]},
+  ]};
+};
+
+/* 恋情被看见 → 玟颢的新谣言 */
+SC.loveRumor = () => {
+  const k = f().loveSeen, name = LOVE[k].name;
+  return {loc:'茶水间', blocks:[
+    N('你推开茶水间的门，里面的声音停了半秒，又接上了。'),
+    C('玟颢', `……我也是听说的啊，有人看见TA跟${name}一起走的。难怪最近腰杆这么硬，原来是有人撑腰。`),
+    N('她看见你，笑容一点没变："哎呀说曹操曹操到～"'),
+  ], choices:[
+    {t:`"是走得挺近。有什么问题吗？"`, d:'大方承认', fx:{neutral:6, stress:-6, alert:{r3:10}, set:{loveRumorDone:true}},
+      res:() => [N('茶水间安静了。玟颢张了张嘴，没接上话。'), N('有人小声说了句"挺好的呀"。这条谣言，就这么没了下文。')]},
+    {t:'"别瞎说，就是同事。"', d:'压力 +8 · 心动 -10', fx:{stress:8, alert:{r3:6}, set:{loveRumorDone:true}}, act:() => { S.love[k].v = clamp(S.love[k].v - 10); },
+      res:() => [N('你否认得很快。玟颢意味深长地"哦"了一声。'), N(`那天晚上，${name}发来一条消息："今天听说了一些话。你还好吗？"`), OS('我否认的时候，TA也在听吗？')]},
+    {t:'装没听见，接完水就走', d:'谣言会扩散', fx:{stress:5, see:'r3', set:{loveRumorDone:true, rumorSpread:true}, buff:'Debuff【谣言扩散】'},
+      res:() => [OS('这一次，她拿来造谣的是我在乎的人。')]},
   ]};
 };
 
@@ -451,8 +696,8 @@ SC.meeting = () => ({loc:'15:00 · 跨组AI提效同步会', blocks:[
   N('会议提醒弹了出来。你看了一眼参会名单：闻灏发起，你们组和他们组的人都在，组长老周"可选参加"。'),
   OS('去了，大概率要当面对线；不去，他就能在会上随便描述"我们组会负责落地"。两边都不舒服。'),
 ], choices:[
-  {t:'去开会', d:'公开场合，有旁观者，也有压力', to:'meetingIn', act:() => S.flags.meetingDone = true},
-  {t:'不去，留在工位', d:'触发【闻灏｜私聊突袭支线】', to:'dmStart', act:() => S.flags.meetingDone = true, star:true},
+  {t:'去开会', d:'公开场合，有旁观者，也有压力', to:'meetingIn', act:() => { S.flags.meetingDone = true; S.ap = Math.max(0, S.ap - 1); }},
+  {t:'不去，留在工位', d:'触发【闻灏｜私聊突袭支线】', to:'dmStart', act:() => { S.flags.meetingDone = true; S.ap = Math.max(0, S.ap - 1); }, star:true},
 ]});
 
 SC.meetingIn = () => ({loc:'15:00 · 会议室 B2', blocks:[
@@ -595,7 +840,7 @@ SC.leader = () => {
 /* ---------- 茶水间 ---------- */
 SC.tea = () => {
   const fl = f();
-  if(S.day >= 3 && fl.meetingDone && !fl.r3Done){
+  if(S.day >= 3 && fl.meetingDone && !fl.r3Done && slot() === 1){
     return {loc:'茶水间', blocks:[
       N('你推开茶水间的门，正听见玟颢在和两个同事闲聊。她背对着门，没看见你。'),
       C('玟颢', '……我也不是说TA不好啊，就是配合度确实差一点，跨组那边推个东西，TA第一反应就是顶回去。闻灏人多好啊，加班加成那样。'),
@@ -612,6 +857,7 @@ SC.tea = () => {
         res:() => [N('你假装什么都没听到。'), OS('清者自清——这句话在茶水间里，从来没灵过。')]},
     ]};
   }
+  if(fl.loveSeen && !fl.loveRumorDone && !S.expelled.r3 && slot() === 1) return SC.loveRumor();
   if(fl.r2Done && !fl.teaRumor){
     return {loc:'茶水间 · 流言支线', blocks:[
       N('评审会之后，茶水间里有了两种说法。'),
@@ -859,6 +1105,8 @@ SC.end = () => {
     {raw:`<div class="ending-tag">${e.tag}</div>`},
     {raw:`<h2>${e.title}</h2>`},
     ...e.text.map(N),
+    ...(S.partner ? [N(({jiang:{exit:'离职那天，江屿在楼下等你。他说："走吧，我请你吃饭团。"你回头看了一眼那栋楼。天台上的风，大概还在吹。', stay:'下班的时候，你的手机亮了一下。江屿发来一张新画：两个小人坐在天台上，旁边写着「明天见」。'},
+      man:{exit:'你离职那天，陈蔓在你工位上留了一杯美式，杯套上写着：「战友退伍快乐。下周末的展，别迟到。」', stay:'周五傍晚，陈蔓在隔壁组冲你晃了晃两张展票。办公室里还有老鼠，但至少，你不是一个人在抓。'}})[S.partner][/^exit/.test(S.ending) ? 'exit' : 'stay'])] : []),
     {raw:`<div class="verdict">${Object.entries(RATS).map(([k,r]) => S.seen[k] ? `<div class="${S.expelled[k]?'y':''}">${img(k, r.name)}<b>${r.name}</b><em>${S.expelled[k]?'已驱逐':'在逃'}</em></div>` : `<div>${img('unknown')}<b>？？？</b><em>未发现</em></div>`).join('')}</div>`},
     SYS(`看穿 ${Object.keys(S.seen).length} 只｜驱逐 ${nOut} 只｜证据 ${S.ev.length} 件｜组长信任 ${S.trust}｜压力 ${S.stress}`),
     ...(Object.keys(S.seen).length < 4 ? [OS('总觉得……这家公司里，还有我没看穿的人。')] : []),
@@ -870,7 +1118,8 @@ SC.title = () => ({loc:'', titleScreen:true, blocks:[], choices:[]});
 /* ============ 流程 ============ */
 function go(id){
   if(id === '__restart'){ S = fresh(); S.scene = 'intro'; save(); render(); return; }
-  if(id === 'next'){ S.day++; S.ap = 3; if(S.day === 3) S.ap = 2; S.morning = morningMessages(); id = 'dayStart'; }
+  if(id === 'next'){ S.day++; S.ap = SLOT_N; S.loc = 'desk'; S.morning = morningMessages(); id = 'dayStart'; }
+  if((id === 'hub' && S.ap <= 2 || id === 'evening') && S.day === 3 && !S.flags.meetingDone) id = 'meeting';
   if(id === 'morning') id = morningRoute();
   if(id === 'evening') id = eveningRoute();
   if(S.stress >= 100 && !['meltdown','end','__out'].includes(id)){
@@ -935,6 +1184,7 @@ const SPRITES = {
   r3:{base:RAT_BASE, col:{G:'#b48ead'}, over:[[4,3,'BW..BW'],[5,2,'P......P']]},                                       // 玟颢：斜眼 + 腮红
   r4:{base:RAT_BASE, col:{G:'#d9a066'}, over:[[4,2,'KWBKKWBK'],[3,2,'KK....KK']]},       // 雯灏：圆眼镜
   me:{base:HUMAN_BASE, col:{H:'#333c57', C:'#41a6f6'}},
+  jiang:{base:HUMAN_BASE, col:{H:'#29366f', C:'#73eff7'}},
   boss:{base:HUMAN_BASE, col:{H:'#94b0c2', C:'#29366f'}, over:[[4,3,'KBKKBK']]},
   lin:{base:HUMAN_BASE, col:{H:'#5d275d', C:'#38b764'}},
   zhe:{base:HUMAN_BASE, col:{H:'#566c86', C:'#ef7d57'}},
@@ -964,7 +1214,7 @@ const img = (id, alt='') => `<img class="px" src="${sprite(id)}" alt="${esc(alt)
 function speakerSprite(who){
   if(who === '你') return 'me';
   for(const k in RATS) if(who.startsWith(RATS[k].name)) return S.seen[k] ? k : 'd' + k.slice(1);
-  const map = [['老周','boss'],['小林','lin'],['阿哲','zhe'],['陈蔓','man'],['许姐','hr'],['猎头','hunt']];
+  const map = [['老周','boss'],['小林','lin'],['阿哲','zhe'],['陈蔓','man'],['许姐','hr'],['猎头','hunt'],['江屿','jiang']];
   for(const [n,id] of map) if(who.startsWith(n)) return id;
   return 'npc';
 }
@@ -1022,11 +1272,24 @@ function render(){
       </div>
       <div class="press">PRESS 1 OR ENTER TO START</div></div>`;
     el.querySelector('[data-i="new"]').onclick = () => { S = fresh(); S.scene = 'intro'; save(); render(); };
-    const r = el.querySelector('[data-i="resume"]'); if(r) r.onclick = () => { S = saved; render(); };
+    const r = el.querySelector('[data-i="resume"]'); if(r) r.onclick = () => { S = Object.assign(fresh(), saved); render(); };
     el.querySelector('[data-i="new"]').focus({preventScroll:true});
     renderSide(); renderClock(); return;
   }
 
+  if(sc.map){
+    const s = slot();
+    el.innerHTML = `<div class="fade"><div class="scene-head"><span><b>${DAYS[S.day]}</b>　${esc(sc.loc)}</span><span>[ 自由行动 ]</span></div>
+      <div class="scene-body"><p class="narr">${['早上的办公室，键盘声此起彼伏。','午休了，一半人去吃饭，一半人趴在桌上。','下午最难熬，空调和会议一样多。','天快黑了，有人开始收拾包。'][s]}</p>
+      <p class="sys">点一个地方走过去。走动不花时间；在那里做事会用掉一个时段。✦ 表示那里好像有什么。</p>
+      <div class="map" data-slot="${s}">${MAP.map(([id,c,r,span]) => {
+        const L = LOCS[id], ppl = present(id), cur = S.loc === id, sp = hasSpecial(id);
+        return `<button class="tile k-${L.kind} ${cur?'here':''}" data-loc="${id}" style="grid-column:${c} / span ${span||1};grid-row:${r}"><span class="tn">${L.name}${sp?'<i class="spark">✦</i>':''}</span><span class="ppl">${ppl.map(p => img(peopleSprite(p), PEOPLE[p])).join('')}${cur ? `<span class="you">${img('me','你')}</span>` : ''}</span></button>`;
+      }).join('')}</div></div></div>`;
+    el.querySelectorAll('[data-loc]').forEach(b => b.onclick = () => { S.loc = b.dataset.loc; go('loc'); });
+    window.scrollTo({top:0});
+    renderSide(); renderClock(); showReveal(); return;
+  }
   const head = `<div class="scene-head"><span><b>${esc(sc.title || DAYS[S.day])}</b>　${esc(sc.loc||'')}</span><span>${S.scene === 'hub' ? '[ 选择行动 ]' : ''}</span></div>`;
   const dayCard = S.scene === 'dayStart' ? `<div class="daycard"><b>DAY ${S.day}</b><span>${DAYS[S.day]}<br>剩余 ${LAST_DAY - S.day} 天</span></div>` : '';
   const body = dayCard + sc.blocks.map(blockHTML).join('') + (sc.chips && sc.chips.length ? `<div class="h3">— 数值变动 —</div><div class="chips">${sc.chips.map(chipHTML).join('')}</div>` : '');
@@ -1053,7 +1316,7 @@ function renderHud(){
   const el = document.getElementById('hud');
   if(S.scene === 'title'){ el.innerHTML = ''; return; }
   const st = (k, label, v, col) => `<div class="${_hudPrev[k] !== undefined && _hudPrev[k] !== v ? 'bump' : ''}"><span>${label}</span><i><b style="width:${v}%;background:${col}"></b></i><em>${v}</em></div>`;
-  el.innerHTML = `<div class="hud-row"><span class="day">${DAYS[S.day]}</span><span class="pips">${[0,1,2].map(i => `<i class="${i < S.ap ? 'on':''}"></i>`).join('')}</span>
+  el.innerHTML = `<div class="hud-row"><span class="day">${DAYS[S.day]}</span><span>${S.ap > 0 ? SLOTS[slot()].split(' ')[0] : '18:00'}</span><span class="pips">${[0,1,2,3].map(i => `<i class="${i < S.ap ? 'on':''}"></i>`).join('')}</span>
     <span class="hud-btns"><button data-sheet="rats">图鉴 <span class="n">${Object.keys(S.seen).length}</span></button><button data-sheet="ev">证据 <span class="n">${S.ev.length}</span></button><button id="hudMenu">菜单</button></span></div>
     <div class="hud-stats">${st('stress','压力',S.stress,S.stress >= 75 ? 'var(--red)' : 'var(--rat)')}${st('trust','信任',S.trust,'var(--green)')}${st('neutral','好感',S.neutral,'var(--gold)')}</div>`;
   _hudPrev = {stress:S.stress, trust:S.trust, neutral:S.neutral};
@@ -1069,7 +1332,7 @@ function renderClock(){
   document.body.classList.toggle('ingame', S.scene !== 'title');
   renderHud();
   if(S.scene === 'title'){ el.innerHTML = ''; return; }
-  el.innerHTML = `<span class="day">${DAYS[S.day]}</span><span class="pips" title="今日剩余行动">AP ${[0,1,2].map(i => `<i class="${i < S.ap ? 'on':''}"></i>`).join('')}</span><button class="iconbtn" id="toTitle">MENU</button>`;
+  el.innerHTML = `<span class="day">${DAYS[S.day]}</span><span>${S.ap > 0 ? SLOTS[slot()] : '18:00 下班'}</span><span class="pips" title="今日剩余时段">${[0,1,2,3].map(i => `<i class="${i < S.ap ? 'on':''}"></i>`).join('')}</span><button class="iconbtn" id="toTitle">MENU</button>`;
   document.getElementById('toTitle').onclick = () => { S.scene = 'title'; render(); };
 }
 
@@ -1108,6 +1371,7 @@ function renderSide(){
     <section class="panel win"><span class="win-title">STATUS</span>
       ${row('压力值', S.stress, 'stress' + (S.stress >= 75 ? ' hot' : ''))}${row('组长信任', S.trust, 'trust')}${row('中立好感', S.neutral, 'neutral')}
       <div class="stat"><span>业务产出</span><div class="outdots">${[0,1,2,3,4].map(i => `<i class="${i<S.output?'on':''}"></i>`).join('')}</div><span class="v">${S.output}</span></div>
+      ${Object.entries(LOVE).filter(([k]) => S.love[k].st > 0).map(([k,l]) => `<div class="stat"><span>♥ ${l.name}</span>${seg(S.love[k].v, 'love')}<span class="v">${S.partner === k ? '❤' : S.love[k].v}</span></div>`).join('')}
       ${debuffs.length ? `<div class="debuffs">${debuffs.join('')}</div>` : ''}
     </section>
     <section class="panel win"><span class="win-title">${tab === 'rats' ? 'RAT 图鉴' : tab === 'ev' ? 'ITEMS 证据库' : 'LOG 日志'}</span>
@@ -1183,6 +1447,6 @@ document.addEventListener('keydown', e => {
 
 /* 热更新时保留进度 */
 window.claude?.hot?.snapshot?.(() => S);
-const start = d => { if(d && d.scene) S = d; render(); };
+const start = d => { if(d && d.scene) S = Object.assign(fresh(), d); render(); };
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? null);
 </script>
