@@ -4,21 +4,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
-/* Layout: 手机优先的"打工人日常"小游戏。顶部状态卡（日期/时钟/三条数值），中间是地点插画 + 站在画里的同事 + 圆角行动按钮，底部四个页签；对话是视觉小说式底部气泡。单一亮色主题：薄荷绿底 + 白卡片 + 珊瑚色强调 */
+/* Layout: 手机优先的"打工人日常"小游戏。顶部状态卡，中间地点插画 + 站在画里的同事 + 圆角行动按钮，底部五个页签；对话是视觉小说式底部气泡。单一亮色主题：薄荷绿底 + 白卡片 + 珊瑚色强调 */
 :root{
-  --bg:#E4F5EE;        /* 薄荷底 */
-  --card:#FFFFFF;
-  --soft:#F4F1FB;      /* 浅薰衣草，次级卡片 */
-  --ink:#2E2A3B;
-  --muted:#8A86A0;
-  --line:#E7E3F0;
-  --coral:#FF8A7A;     /* 主强调 */
-  --coral-d:#E96A5A;
-  --sky:#7CC6FE;
-  --sun:#FFD66B;
-  --mint:#5CCB9F;
-  --pink:#FF9EC4;
-  --grape:#A98BFF;
+  --bg:#E4F5EE; --card:#FFFFFF; --soft:#F4F1FB; --ink:#2E2A3B; --muted:#8A86A0; --line:#E7E3F0;
+  --coral:#FF8A7A; --coral-d:#E96A5A; --sky:#7CC6FE; --sun:#FFD66B; --mint:#5CCB9F; --pink:#FF9EC4; --grape:#A98BFF;
   --f-disp:"ZCOOL KuaiLe","PingFang SC","Microsoft YaHei",sans-serif;
   --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
   color-scheme:light;
@@ -30,14 +19,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);fo
   background-image:radial-gradient(rgba(92,203,159,.18) 1.5px,transparent 1.5px);background-size:22px 22px}
 button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;border:0;background:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
-.app{max-width:460px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding-inline:14px;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+button:disabled{cursor:default}
+.app{max-width:460px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding-inline:14px;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 
-/* 顶部状态卡 */
 .hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-top:10px;background:var(--card);border-radius:22px;padding:12px 14px;box-shadow:0 6px 0 rgba(46,42,59,.06),0 10px 24px rgba(46,42,59,.06)}
 .hud-top{display:flex;align-items:center;gap:10px}
-.date{font-size:12px;font-weight:700;background:var(--soft);color:var(--grape);padding:3px 10px;border-radius:99px}
-.clock{font-family:var(--f-disp);font-size:30px;line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums}
-.money{margin-left:auto;font-weight:700;font-size:14px;background:#FFF4D1;color:#B07A00;padding:3px 10px;border-radius:99px;font-variant-numeric:tabular-nums}
+.date{font-size:12px;font-weight:700;background:var(--soft);color:var(--grape);padding:3px 10px;border-radius:99px;white-space:nowrap}
+.clock{font-family:var(--f-disp);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.money{margin-left:auto;font-weight:700;font-size:14px;background:#FFF4D1;color:#B07A00;padding:3px 10px;border-radius:99px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
 .meter{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
 .meter b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
@@ -46,17 +35,17 @@ button:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
 .bar i{display:block;height:100%;border-radius:99px;transition:width .4s cubic-bezier(.3,1.4,.5,1)}
 .bar.energy i{background:var(--sun)} .bar.mood i{background:var(--pink)} .bar.perf i{background:var(--mint)}
 .bar.low i{background:var(--coral)}
+.order-chip{margin-top:8px;font-size:12px;background:#FFF0EC;color:var(--coral-d);border-radius:12px;padding:4px 10px;font-weight:700}
 
-/* 地点 */
 .view{margin-top:14px;display:flex;flex-direction:column;gap:14px}
 .place-head{display:flex;align-items:center;gap:10px}
 .place-head h1{font-family:var(--f-disp);font-weight:400;font-size:26px;margin:0;line-height:1.1}
-.place-head .move{margin-left:auto;background:var(--ink);color:#fff;font-weight:700;font-size:13px;padding:8px 14px;border-radius:99px;box-shadow:0 4px 0 rgba(0,0,0,.18)}
-.place-head .move:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.pillbtn{margin-left:auto;background:var(--ink);color:#fff;font-weight:700;font-size:13px;padding:8px 14px;border-radius:99px;box-shadow:0 4px 0 rgba(0,0,0,.18);white-space:nowrap}
+.pillbtn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
 .stage{position:relative;border-radius:24px;overflow:hidden;background:var(--card);box-shadow:0 6px 0 rgba(46,42,59,.07)}
 .stage svg.bgart{display:block;width:100%;height:auto}
 .cast{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:center;gap:4px;padding-inline:8px;flex-wrap:wrap}
-.person{display:flex;flex-direction:column;align-items:center;animation:idle 2.4s ease-in-out infinite}
+.person{display:flex;flex-direction:column;align-items:center;animation:idle 2.4s ease-in-out infinite;position:relative}
 .person:nth-child(2){animation-delay:.5s}.person:nth-child(3){animation-delay:1s}.person:nth-child(4){animation-delay:1.5s}
 .person .av{width:62px;height:62px;filter:drop-shadow(0 3px 0 rgba(46,42,59,.12))}
 .person .tag{font-size:11px;font-weight:700;background:var(--card);padding:0 8px;border-radius:99px;margin-top:-4px;box-shadow:0 2px 0 rgba(46,42,59,.08)}
@@ -74,19 +63,19 @@ button:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
 .act .t{font-weight:700;font-size:14px;line-height:1.3;display:block}
 .act .d{font-size:12px;color:var(--muted);line-height:1.35;display:block}
 .act.hot{background:#FFF0EC}.act.hot .ic{background:#FFD9D2}
-.act.off{opacity:.55}
+.act.off{opacity:.55}.act.off:active{transform:none}
 .act.wide{grid-column:1 / -1}
+.act:disabled{opacity:.45}
 
-/* 页签 */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;padding:8px 14px calc(8px + env(safe-area-inset-bottom,0px));pointer-events:none}
-.tabbar .in{pointer-events:auto;max-width:432px;width:100%;background:var(--ink);border-radius:24px;display:grid;grid-template-columns:repeat(4,1fr);padding:6px;box-shadow:0 8px 24px rgba(46,42,59,.25)}
+.tabbar .in{pointer-events:auto;max-width:432px;width:100%;background:var(--ink);border-radius:24px;display:grid;grid-template-columns:repeat(5,1fr);padding:6px;box-shadow:0 8px 24px rgba(46,42,59,.25)}
 .tabbar button{color:#B9B5CC;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0;border-radius:18px;position:relative}
 .tabbar button .i{font-size:20px;line-height:1.1}
 .tabbar button[aria-selected="true"]{background:rgba(255,255,255,.12);color:#fff}
-.badge{position:absolute;top:2px;right:calc(50% - 24px);min-width:18px;height:18px;border-radius:99px;background:var(--coral);color:#fff;font-size:11px;line-height:18px;padding:0 5px}
+.badge{position:absolute;top:2px;right:calc(50% - 22px);min-width:18px;height:18px;border-radius:99px;background:var(--coral);color:#fff;font-size:11px;line-height:18px;padding:0 5px}
 
-/* 通用卡片列表 */
 .sec-title{font-family:var(--f-disp);font-weight:400;font-size:26px;margin:2px 0 0}
+.sec-title small{font-family:var(--f-body);font-size:13px;color:var(--muted)}
 .card{background:var(--card);border-radius:20px;padding:14px;box-shadow:0 5px 0 rgba(46,42,59,.06)}
 .task{display:flex;flex-direction:column;gap:8px}
 .task .row{display:flex;gap:8px;align-items:flex-start}
@@ -98,27 +87,30 @@ button:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
 .task.done{opacity:.7}.task.done .bar i{background:var(--mint)}
 .task.focus{box-shadow:0 0 0 3px var(--sky),0 5px 0 rgba(46,42,59,.06)}
 .task .meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
-.focusbtn{font-size:12px;font-weight:700;color:#3D9BE0;white-space:nowrap}
+.linkbtn{font-size:12px;font-weight:700;color:#3D9BE0;white-space:nowrap}
 .empty{color:var(--muted);font-size:14px;text-align:center;padding:24px 0;margin:0}
 .people{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.pc{background:var(--card);border-radius:18px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 5px 0 rgba(46,42,59,.06);text-align:center;min-width:0}
+.pc{background:var(--card);border-radius:18px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 5px 0 rgba(46,42,59,.06);text-align:center;min-width:0;position:relative}
 .pc .av{width:60px;height:60px}
 .pc b{font-size:14px}
 .pc small{font-size:11px;color:var(--muted);line-height:1.3}
 .hearts{font-size:11px;color:var(--pink);letter-spacing:1px}
 .pc.rat{background:#FFF0F3}
+.pc .dot{position:absolute;top:6px;right:8px;font-size:14px}
 .ratchip{display:inline-block;font-size:10px;font-weight:700;background:var(--coral);color:#fff;border-radius:99px;padding:0 7px;line-height:1.7}
 .msg{display:flex;gap:10px;align-items:flex-start}
 .msg .av{width:42px;height:42px;flex:none}
 .msg .bd{background:var(--card);border-radius:4px 16px 16px 16px;padding:8px 12px;font-size:14px;min-width:0;box-shadow:0 3px 0 rgba(46,42,59,.05)}
 .msg .who{font-size:12px;color:var(--muted)}
 .msg.unread .bd{box-shadow:0 0 0 2px var(--coral)}
+.story{font-size:13px;color:var(--muted);line-height:1.6;margin:6px 0 0;padding-left:18px}
+.story li.done{color:var(--ink)}
 
-/* 对话 */
 .dlg{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(46,42,59,.28);padding:0 12px calc(12px + env(safe-area-inset-bottom,0px))}
-.dlg .box{max-width:460px;width:100%;margin:0 auto;background:var(--card);border-radius:26px;padding:16px 16px 14px;position:relative;box-shadow:0 10px 40px rgba(46,42,59,.25);animation:up .22s cubic-bezier(.3,1.4,.5,1)}
+.dlg .box{max-width:460px;width:100%;margin:0 auto;background:var(--card);border-radius:26px;padding:16px 16px 14px;position:relative;box-shadow:0 10px 40px rgba(46,42,59,.25);animation:up .22s cubic-bezier(.3,1.4,.5,1);max-height:80vh;max-height:80dvh;overflow:auto}
 @keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
 .dlg .face{position:absolute;top:-58px;left:16px;width:84px;height:84px;background:var(--card);border-radius:50%;padding:6px;box-shadow:0 6px 0 rgba(46,42,59,.08)}
+.dlg .box:has(.face){overflow:visible;margin-top:70px}
 .dlg .face .av{width:72px;height:72px}
 .dlg .name{margin-left:96px;font-weight:700;font-size:15px;display:flex;gap:6px;align-items:center;min-height:24px;flex-wrap:wrap}
 .dlg .name small{font-weight:400;color:var(--muted);font-size:12px}
@@ -133,28 +125,35 @@ button:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
 .dlg .ch:active{background:#E7E1FA}
 .dlg .ch.main{background:var(--coral);color:#fff}.dlg .ch.main small{color:#FFE8E4}
 
-/* 底部面板 */
 .sheet{position:fixed;inset:0;z-index:45;background:rgba(46,42,59,.3);display:flex;align-items:flex-end;justify-content:center}
-.sheet .in{background:var(--bg);width:100%;max-width:460px;border-radius:28px 28px 0 0;padding:16px 14px calc(18px + env(safe-area-inset-bottom,0px));max-height:85vh;max-height:85dvh;overflow:auto;animation:up .22s cubic-bezier(.3,1.4,.5,1)}
-.sheet h2{font-family:var(--f-disp);font-weight:400;font-size:24px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+.sheet .in{background:var(--bg);width:100%;max-width:460px;border-radius:28px 28px 0 0;padding:16px 14px calc(18px + env(safe-area-inset-bottom,0px));max-height:88vh;max-height:88dvh;overflow:auto;animation:up .22s cubic-bezier(.3,1.4,.5,1);display:flex;flex-direction:column;gap:10px}
+.sheet h2{font-family:var(--f-disp);font-weight:400;font-size:24px;margin:0;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .sheet h2 button{font-family:var(--f-body);font-size:13px;color:var(--muted);padding:6px 10px}
 .locs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.loc{background:var(--card);border-radius:18px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:4px;box-shadow:0 5px 0 rgba(46,42,59,.06);min-width:0}
+.loc{background:var(--card);border-radius:18px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:4px;box-shadow:0 5px 0 rgba(46,42,59,.06);min-width:0;position:relative}
 .loc .t{font-weight:700;display:flex;gap:6px;align-items:center}
 .loc .t span{font-size:20px}
 .loc .who{display:flex;gap:2px;min-height:28px;flex-wrap:wrap}
 .loc .who .av{width:28px;height:28px}
 .loc small{font-size:11px;color:var(--muted)}
 .loc.here{box-shadow:0 0 0 3px var(--coral),0 5px 0 rgba(46,42,59,.06)}
-.loc:disabled{opacity:.5;cursor:default}
+.loc:disabled{opacity:.5}
+.loc .talk{position:absolute;top:8px;right:10px;font-size:16px;animation:nudge 1s ease-in-out infinite}
+.shop{display:flex;flex-direction:column;gap:8px}
+.item{background:var(--card);border-radius:18px;padding:10px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 0 rgba(46,42,59,.06);text-align:left;width:100%}
+.item .ic{font-size:26px;width:44px;height:44px;border-radius:14px;background:var(--soft);display:grid;place-items:center;flex:none}
+.item .tx{flex:1;min-width:0}
+.item .t{font-weight:700;font-size:14px;display:block;line-height:1.35}
+.item .d{font-size:12px;color:var(--muted);display:block;line-height:1.4}
+.item .pr{font-weight:700;color:#B07A00;white-space:nowrap;font-variant-numeric:tabular-nums}
+.item.owned .pr{color:#2F9B70}
+.hint{font-size:12px;color:var(--muted);text-align:center;margin:0}
 
-/* 飘字 */
-.toasts{position:fixed;left:0;right:0;top:calc(128px + env(safe-area-inset-top,0px));z-index:60;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+.toasts{position:fixed;left:0;right:0;top:calc(132px + env(safe-area-inset-top,0px));z-index:60;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
 .toast{background:var(--ink);color:#fff;font-weight:700;font-size:13px;padding:6px 14px;border-radius:99px;animation:pop 1.9s ease forwards;box-shadow:0 6px 18px rgba(46,42,59,.25)}
 .toast.good{background:var(--mint)}.toast.bad{background:var(--coral)}.toast.gold{background:var(--sun);color:#5A4300}
 @keyframes pop{0%{transform:translateY(10px) scale(.9);opacity:0}12%{transform:none;opacity:1}80%{opacity:1}100%{transform:translateY(-14px);opacity:0}}
 
-/* 大卡片（标题/早晨/晚上/揭露/结局） */
 .big{display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;padding:26px 20px}
 .big h1{font-family:var(--f-disp);font-weight:400;font-size:34px;line-height:1.15;margin:0;text-wrap:balance}
 .big h1 em{font-style:normal;color:var(--coral)}
@@ -168,6 +167,12 @@ button:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
 .stats div{background:var(--soft);border-radius:14px;padding:8px 10px;text-align:left;font-size:13px;color:var(--muted)}
 .stats b{display:block;color:var(--ink);font-size:18px;font-variant-numeric:tabular-nums}
 .grade{font-family:var(--f-disp);font-size:72px;line-height:1;color:var(--coral)}
+.slip{width:100%;background:var(--soft);border-radius:16px;padding:10px 14px;text-align:left;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.slip div{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.slip .sum{border-top:2px dashed var(--line);padding-top:6px;font-weight:700}
+.wk-head{display:flex;gap:8px;justify-content:center}
+.wk-head span{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--soft);color:var(--muted)}
+.wk-head span.on{background:var(--coral);color:#fff}
 .reveal .av{width:120px;height:120px;animation:wob .6s ease 2}
 @keyframes wob{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -186,20 +191,13 @@ button:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
 /* =================== 角色 =================== */
 const CHARS = {
   me:   {name:'我', hair:'#3B3A57', style:'short', shirt:'#7CC6FE'},
-  lin:  {name:'小林', role:'同组搭子', hair:'#7A4E3A', style:'bob', shirt:'#9EE6B8',
-         facts:['工位抽屉里永远有三种口味的薯片。','其实偷偷在考公，书藏在显示器底下。','说你是TA在这家公司唯一的朋友。']},
-  zhe:  {name:'阿哲', role:'同组 · 降噪耳机常驻', hair:'#2D2D3A', style:'spiky', shirt:'#FFD59E', acc:'phones',
-         facts:['耳机里放的其实是白噪音，不是音乐。','养了一只叫"需求"的猫。','三年没请过假，因为不知道请假要找谁审批。']},
-  boss: {name:'老周', role:'组长', hair:'#A7B0BA', style:'thin', shirt:'#5B7BD5', acc:'glasses',
-         facts:['手机壁纸是女儿画的全家福。','也被他的老板抢过功劳。','很想早点下班，但他的老板不下班。']},
-  jiang:{name:'江屿', role:'设计组', hair:'#2F3E64', style:'messy', shirt:'#C9B8FF', love:true,
-         facts:['午休在天台画像素画，画过整栋楼的平面图。','设计稿被人"借"去汇报过，从那以后每版都留源文件。','觉得你笑起来像他画过的一个小人。']},
-  man:  {name:'陈蔓', role:'隔壁组产品', hair:'#3A2A2A', style:'long', shirt:'#FFB3C1', love:true,
-         facts:['美式不加糖，奶茶全糖。','隔壁组最常接到奇怪需求的人，正在写一本《需求吐槽大全》。','买了两张像素艺术展的票，还没想好约谁。']},
-  amy:  {name:'Amy', role:'行政', hair:'#C97B4A', style:'bun', shirt:'#FFF1A8',
-         facts:['公司每台打印机卡纸的姿势她都记得。','下午茶是她自掏腰包补的差价。','知道全公司每个人的生日。']},
-  xu:   {name:'许姐', role:'HRBP', hair:'#4A3B52', style:'bob', shirt:'#E9E9F2', acc:'earring',
-         facts:['桌上的龟背竹养了六年。','面试过公司一半的人，包括你。','说"有事随时找我"是真心的。']},
+  lin:  {name:'芸芸', role:'同组搭子', hair:'#7A4E3A', style:'bob', shirt:'#9EE6B8'},
+  zhe:  {name:'科一', role:'同组 · 降噪耳机常驻', hair:'#2D2D3A', style:'spiky', shirt:'#FFD59E', acc:'phones'},
+  boss: {name:'雷雷', role:'组长', hair:'#A7B0BA', style:'thin', shirt:'#5B7BD5', acc:'glasses'},
+  jiang:{name:'尘尘', role:'设计组', hair:'#2F3E64', style:'messy', shirt:'#C9B8FF', love:true},
+  man:  {name:'环环', role:'隔壁组产品', hair:'#3A2A2A', style:'long', shirt:'#FFB3C1', love:true},
+  amy:  {name:'蟀蟀', role:'行政', hair:'#C97B4A', style:'bun', shirt:'#FFF1A8'},
+  xu:   {name:'糖糖', role:'HRBP', hair:'#4A3B52', style:'bob', shirt:'#E9E9F2', acc:'earring'},
   wh1:  {name:'闻灏', role:'隔壁组 · 爱提方案', hair:'#5A5A66', style:'side', shirt:'#FFFFFF', acc:'tie', rat:'越界派活 · 双标',
          facts:['加过两次班，发过六次朋友圈。','提的方案很多，落地的都不是他。','到点就走，从不例外。']},
   wh2:  {name:'汶昊', role:'隔壁组', hair:'#8A5A3C', style:'short', shirt:'#A3B1C2', acc:'shades', rat:'抢功劳 · 改页眉',
@@ -211,13 +209,10 @@ const CHARS = {
 };
 const RATS = ['wh1','wh2','wh3','wh4'];
 const LOVERS = ['jiang','man'];
+const FRIENDS = ['lin','zhe','boss','jiang','man','amy','xu'];
 
 /* 卡通头像（SVG） */
-const HAIR_BACK = {
-  long:'M13 30 Q13 7 32 7 Q51 7 51 30 L53 56 Q32 62 11 56Z',
-  bob:'M12 31 Q12 7 32 7 Q52 7 52 31 L52 45 Q32 50 12 45Z',
-  bun:'M32 2 a7 7 0 1 0 .1 0Z',
-};
+const HAIR_BACK = {long:'M13 30 Q13 7 32 7 Q51 7 51 30 L53 56 Q32 62 11 56Z', bob:'M12 31 Q12 7 32 7 Q52 7 52 31 L52 45 Q32 50 12 45Z', bun:'M32 2 a7 7 0 1 0 .1 0Z'};
 const HAIR_FRONT = {
   short:'M14 31 Q12 9 32 9 Q52 9 50 31 Q46 19 32 18 Q20 18 14 31Z',
   bob:'M13 31 Q13 9 32 9 Q51 9 51 31 Q45 21 37 17 Q31 24 21 21 Q16 25 13 31Z',
@@ -252,31 +247,60 @@ function avatar(id, opt = {}){
   return s + `</svg>`;
 }
 
-/* =================== 地点插画 =================== */
+/* =================== 日历 =================== */
+const WD = d => (d - 1) % 5;
+const WK = d => Math.floor((d - 1) / 5) + 1;
+const dayName = d => `W${WK(d)} 周${'一二三四五'[WD(d)]}`;
+const isPayday = d => d % 10 === 0;
+const seed = (d, i = 0) => Math.abs(Math.sin(d * 9301 + i * 49297) * 233280) % 1;
+
+/* =================== 食堂：每天换菜 =================== */
+const DISHES = [['番茄炒蛋饭',15,25,3],['红烧肉饭',18,28,6],['麻婆豆腐饭',14,22,4],['酸菜鱼',22,25,8],['宫保鸡丁饭',16,24,5],['土豆牛腩饭',20,28,6],
+  ['清炒时蔬+米饭',10,15,1],['卤肉饭',16,26,6],['咖喱鸡饭',17,25,6],['红烧牛肉面',18,26,5],['鱼香肉丝饭',15,24,4],['小炒黄牛肉',24,28,9],['糖醋里脊饭',19,25,7],['黄焖鸡米饭',18,27,5]];
+const DARK = [['西瓜炒肉',8],['月饼炒青椒',8],['草莓炖排骨',9],['香蕉拌面',8],['菠萝炒苦瓜',9]];
+function todayMenu(d = S.day){
+  const picks = [], used = new Set();
+  for(let i = 0; picks.length < 3; i++){ const k = Math.floor(seed(d, i) * DISHES.length); if(!used.has(k)){ used.add(k); picks.push(DISHES[k]); } }
+  const dark = d % 3 === 0 ? DARK[Math.floor(seed(d, 99) * DARK.length)] : null;
+  return {picks, dark};
+}
+
+/* =================== 外卖 =================== */
+const SHOPS = [
+  {name:'老王麻辣烫', ic:'🌶️', eta:35, items:[['招牌麻辣烫',26,22,10],['番茄锅麻辣烫',28,22,9]]},
+  {name:'隔壁炸鸡', ic:'🍗', eta:40, items:[['炸鸡全家桶（一人份）',39,25,15],['韩式甜辣鸡翅饭',29,22,12]]},
+  {name:'隆江猪脚饭', ic:'🍖', eta:30, items:[['猪脚饭加卤蛋',25,30,8],['烧鸭双拼饭',28,30,8]]},
+  {name:'柳州螺蛳粉', ic:'🍜', eta:35, items:[['螺蛳粉（加臭加辣）',22,25,14,'smelly']]},
+  {name:'轻食主义', ic:'🥗', eta:30, items:[['牛油果鸡胸沙拉',42,16,5],['藜麦能量碗',38,20,4]]},
+  {name:'回转寿司外送', ic:'🍣', eta:45, items:[['豪华寿司拼盘',88,24,22]]},
+  {name:'快乐柠檬', ic:'🧋', eta:25, items:[['全糖珍珠奶茶',18,6,12,'drink'],['杨枝甘露',22,5,12,'drink']]},
+];
+
+/* =================== 商城 =================== */
+const ITEMS = {
+  chair:{ic:'🪑', name:'人体工学椅', price:1999, d:'干活掉精力少三成'},
+  brewer:{ic:'☕', name:'桌面咖啡机', price:899, d:'工位上随时自己做咖啡'},
+  phones:{ic:'🎧', name:'降噪耳机', price:1299, d:'干活不再掉心情'},
+  phone:{ic:'📱', name:'新手机', price:5999, d:'摸鱼更快乐，屏幕更大更容易被抓'},
+  console:{ic:'🎮', name:'游戏机', price:2999, d:'晚上和周末打游戏心情翻倍'},
+  monstera:{ic:'🪴', name:'龟背竹', price:199, d:'每天上班心情 +3'},
+  bag:{ic:'👜', name:'名牌包', price:8999, d:'买的那一刻心情 +35'},
+  trip:{ic:'🏝️', name:'海岛旅行套票', price:4999, d:'解锁周末「去海岛」'},
+  massage:{ic:'💆', name:'按摩券', price:299, d:'用一次精力 +40（可叠加）', use:true},
+  cake:{ic:'🍰', name:'小蛋糕', price:38, d:'送人好感 +10（可叠加）', use:true},
+  drink:{ic:'🧋', name:'奶茶', price:18, d:'送人好感 +6（可叠加）', use:true},
+};
+
+/* =================== 插画 =================== */
 const ART = {
-  desk:`<rect width="360" height="190" fill="#DCF0FF"/><rect y="130" width="360" height="60" fill="#F3E6D8"/><rect x="24" y="22" width="90" height="60" rx="10" fill="#fff"/><rect x="32" y="30" width="74" height="10" rx="5" fill="#FFD6CF"/><rect x="32" y="46" width="50" height="8" rx="4" fill="#CDEBFF"/><rect x="32" y="60" width="62" height="8" rx="4" fill="#D8F3E6"/>
-    <rect x="160" y="64" width="110" height="68" rx="10" fill="#3B3F5C"/><rect x="168" y="72" width="94" height="52" rx="6" fill="#7CC6FE"/><rect x="176" y="82" width="40" height="5" rx="2.5" fill="#fff" opacity=".8"/><rect x="176" y="92" width="62" height="5" rx="2.5" fill="#fff" opacity=".6"/><rect x="176" y="102" width="30" height="5" rx="2.5" fill="#fff" opacity=".6"/>
-    <rect x="205" y="132" width="20" height="10" fill="#3B3F5C"/><rect x="120" y="140" width="220" height="14" rx="7" fill="#F2C9A0"/><rect x="300" y="104" width="26" height="36" rx="8" fill="#FF9E80"/><circle cx="306" cy="96" r="12" fill="#5CCB9F"/><circle cx="320" cy="90" r="11" fill="#7ADBB3"/><rect x="134" y="120" width="18" height="20" rx="4" fill="#fff"/><path d="M152 125 q8 2 0 10" stroke="#fff" stroke-width="3" fill="none"/>`,
-  tea:`<rect width="360" height="190" fill="#FFF1D6"/><rect y="132" width="360" height="58" fill="#F6DDC3"/><rect x="20" y="96" width="220" height="44" rx="8" fill="#fff"/><rect x="20" y="92" width="220" height="10" rx="5" fill="#E8C8A6"/>
-    <rect x="40" y="48" width="48" height="50" rx="10" fill="#3B3F5C"/><rect x="50" y="58" width="28" height="12" rx="4" fill="#FFD66B"/><rect x="56" y="78" width="16" height="14" rx="3" fill="#fff"/>
-    <rect x="110" y="70" width="18" height="24" rx="5" fill="#FF8A7A"/><rect x="134" y="74" width="18" height="20" rx="5" fill="#7CC6FE"/><rect x="158" y="72" width="18" height="22" rx="5" fill="#A98BFF"/>
-    <rect x="270" y="30" width="66" height="110" rx="12" fill="#E8F4FF"/><rect x="276" y="38" width="54" height="40" rx="6" fill="#fff"/><rect x="276" y="84" width="54" height="48" rx="6" fill="#fff"/><rect x="320" y="52" width="4" height="14" rx="2" fill="#C9D3E0"/><rect x="200" y="28" width="46" height="34" rx="6" fill="#fff"/><text x="223" y="50" text-anchor="middle" font-size="12" fill="#FF8A7A">TEA</text>`,
-  meeting:`<rect width="360" height="190" fill="#ECE7FF"/><rect y="138" width="360" height="52" fill="#DCD3F7"/><rect x="110" y="18" width="140" height="80" rx="10" fill="#fff"/><rect x="126" y="70" width="16" height="18" rx="3" fill="#FF8A7A"/><rect x="150" y="56" width="16" height="32" rx="3" fill="#FFD66B"/><rect x="174" y="40" width="16" height="48" rx="3" fill="#5CCB9F"/><rect x="198" y="30" width="16" height="58" rx="3" fill="#7CC6FE"/><path d="M128 66 L158 50 L182 36 L222 26" stroke="#A98BFF" stroke-width="3" fill="none"/>
-    <rect x="40" y="118" width="280" height="22" rx="11" fill="#fff"/><circle cx="70" cy="112" r="10" fill="#C9B8FF"/><circle cx="290" cy="112" r="10" fill="#C9B8FF"/><rect x="18" y="40" width="70" height="46" rx="8" fill="#fff" opacity=".7"/><text x="53" y="68" text-anchor="middle" font-size="11" fill="#A98BFF">对齐！</text>`,
-  bossroom:`<rect width="360" height="190" fill="#E3F2EA"/><rect y="136" width="360" height="54" fill="#D0E6DA"/><rect x="200" y="20" width="130" height="90" rx="10" fill="#fff"/><g fill="#CDEBFF"><rect x="208" y="28" width="114" height="10" rx="3"/><rect x="208" y="44" width="114" height="10" rx="3"/><rect x="208" y="60" width="114" height="10" rx="3"/><rect x="208" y="76" width="114" height="10" rx="3"/><rect x="208" y="92" width="114" height="10" rx="3"/></g>
-    <rect x="40" y="108" width="190" height="34" rx="10" fill="#B98B64"/><rect x="70" y="80" width="54" height="30" rx="5" fill="#3B3F5C"/><rect x="150" y="88" width="16" height="20" rx="4" fill="#FFD66B"/><path d="M146 90 h24" stroke="#FFD66B" stroke-width="4"/><rect x="30" y="30" width="60" height="40" rx="6" fill="#fff"/><text x="60" y="55" text-anchor="middle" font-size="11" fill="#5CCB9F">KPI</text>`,
-  roof:`<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FD8FF"/><stop offset="1" stop-color="#FFF4E0"/></linearGradient></defs><rect width="360" height="190" fill="url(#sky)"/>
-    <g fill="#fff"><ellipse cx="70" cy="40" rx="30" ry="12"/><ellipse cx="92" cy="34" rx="20" ry="12"/><ellipse cx="270" cy="56" rx="34" ry="12"/><ellipse cx="296" cy="50" rx="20" ry="11"/></g>
-    <g fill="#C9D9EE"><rect x="10" y="88" width="40" height="60"/><rect x="56" y="70" width="34" height="78"/><rect x="250" y="80" width="44" height="68"/><rect x="300" y="96" width="50" height="52"/></g>
-    <rect y="140" width="360" height="50" fill="#B9C6D6"/><g stroke="#7E8BA3" stroke-width="4"><path d="M0 128 H360"/><path d="M20 128 V150 M70 128 V150 M120 128 V150 M170 128 V150 M220 128 V150 M270 128 V150 M320 128 V150"/></g><rect x="150" y="96" width="50" height="40" rx="6" fill="#E6EDF5"/>`,
-  canteen:`<rect width="360" height="190" fill="#FFE7E0"/><rect y="134" width="360" height="56" fill="#F7D3C8"/><rect x="20" y="20" width="320" height="40" rx="10" fill="#fff"/><text x="180" y="46" text-anchor="middle" font-size="14" fill="#FF8A7A">今日菜单：番茄炒蛋 · 红烧肉 · 麻辣烫</text>
-    <rect x="30" y="112" width="130" height="16" rx="8" fill="#fff"/><rect x="200" y="112" width="130" height="16" rx="8" fill="#fff"/><g fill="#FFD66B"><ellipse cx="70" cy="108" rx="18" ry="6"/><ellipse cx="240" cy="108" rx="18" ry="6"/></g><g fill="#FF8A7A"><ellipse cx="115" cy="108" rx="14" ry="5"/><ellipse cx="290" cy="108" rx="14" ry="5"/></g><rect x="40" y="70" width="40" height="30" rx="6" fill="#fff" opacity=".7"/><rect x="280" y="70" width="40" height="30" rx="6" fill="#fff" opacity=".7"/>`,
-  store:`<rect width="360" height="190" fill="#E2FAEF"/><rect y="140" width="360" height="50" fill="#CBEBDD"/><rect x="0" y="0" width="360" height="22" fill="#5CCB9F"/><text x="180" y="16" text-anchor="middle" font-size="12" fill="#fff">楼下便利店 · 24H</text>
-    <g><rect x="20" y="40" width="150" height="100" rx="8" fill="#fff"/><g fill="#FF8A7A"><rect x="30" y="50" width="20" height="24" rx="3"/><rect x="56" y="50" width="20" height="24" rx="3"/></g><g fill="#FFD66B"><rect x="82" y="50" width="20" height="24" rx="3"/><rect x="108" y="50" width="20" height="24" rx="3"/></g><g fill="#7CC6FE"><rect x="30" y="86" width="26" height="20" rx="3"/><rect x="62" y="86" width="26" height="20" rx="3"/></g><g fill="#A98BFF"><rect x="96" y="86" width="26" height="20" rx="3"/><rect x="130" y="86" width="26" height="20" rx="3"/></g><g fill="#5CCB9F"><rect x="30" y="114" width="126" height="16" rx="3"/></g></g>
-    <rect x="200" y="36" width="140" height="104" rx="10" fill="#DFF3FF"/><g fill="#fff"><rect x="210" y="46" width="56" height="84" rx="6"/><rect x="274" y="46" width="56" height="84" rx="6"/></g><g fill="#FF9EC4"><rect x="218" y="56" width="12" height="20" rx="3"/><rect x="236" y="56" width="12" height="20" rx="3"/></g><g fill="#FFD66B"><rect x="282" y="56" width="12" height="20" rx="3"/><rect x="300" y="56" width="12" height="20" rx="3"/></g>`,
-  wc:`<rect width="360" height="190" fill="#E6F1F8"/><g stroke="#D3E3EE" stroke-width="2"><path d="M0 40 H360 M0 80 H360 M0 120 H360 M60 0 V190 M120 0 V190 M180 0 V190 M240 0 V190 M300 0 V190"/></g><rect y="140" width="360" height="50" fill="#D7E6F0"/>
-    <rect x="40" y="30" width="80" height="60" rx="30" fill="#fff"/><rect x="30" y="100" width="100" height="20" rx="8" fill="#fff"/><rect x="74" y="92" width="12" height="10" rx="3" fill="#B9C6D6"/>
-    <rect x="220" y="30" width="110" height="110" rx="10" fill="#C9D9EE"/><rect x="228" y="38" width="94" height="102" rx="6" fill="#DCE8F5"/><circle cx="310" cy="92" r="4" fill="#7E8BA3"/><rect x="250" y="56" width="50" height="16" rx="8" fill="#5CCB9F"/><text x="275" y="68" text-anchor="middle" font-size="10" fill="#fff">无人</text>`,
+  desk:`<rect width="360" height="190" fill="#DCF0FF"/><rect y="130" width="360" height="60" fill="#F3E6D8"/><rect x="24" y="22" width="90" height="60" rx="10" fill="#fff"/><rect x="32" y="30" width="74" height="10" rx="5" fill="#FFD6CF"/><rect x="32" y="46" width="50" height="8" rx="4" fill="#CDEBFF"/><rect x="32" y="60" width="62" height="8" rx="4" fill="#D8F3E6"/><rect x="160" y="64" width="110" height="68" rx="10" fill="#3B3F5C"/><rect x="168" y="72" width="94" height="52" rx="6" fill="#7CC6FE"/><rect x="176" y="82" width="40" height="5" rx="2.5" fill="#fff" opacity=".8"/><rect x="176" y="92" width="62" height="5" rx="2.5" fill="#fff" opacity=".6"/><rect x="205" y="132" width="20" height="10" fill="#3B3F5C"/><rect x="120" y="140" width="220" height="14" rx="7" fill="#F2C9A0"/><rect x="300" y="104" width="26" height="36" rx="8" fill="#FF9E80"/><circle cx="306" cy="96" r="12" fill="#5CCB9F"/><circle cx="320" cy="90" r="11" fill="#7ADBB3"/><rect x="134" y="120" width="18" height="20" rx="4" fill="#fff"/>`,
+  tea:`<rect width="360" height="190" fill="#FFF1D6"/><rect y="132" width="360" height="58" fill="#F6DDC3"/><rect x="20" y="96" width="220" height="44" rx="8" fill="#fff"/><rect x="20" y="92" width="220" height="10" rx="5" fill="#E8C8A6"/><rect x="40" y="48" width="48" height="50" rx="10" fill="#3B3F5C"/><rect x="50" y="58" width="28" height="12" rx="4" fill="#FFD66B"/><rect x="56" y="78" width="16" height="14" rx="3" fill="#fff"/><rect x="110" y="70" width="18" height="24" rx="5" fill="#FF8A7A"/><rect x="134" y="74" width="18" height="20" rx="5" fill="#7CC6FE"/><rect x="158" y="72" width="18" height="22" rx="5" fill="#A98BFF"/><rect x="270" y="30" width="66" height="110" rx="12" fill="#E8F4FF"/><rect x="276" y="38" width="54" height="40" rx="6" fill="#fff"/><rect x="276" y="84" width="54" height="48" rx="6" fill="#fff"/><rect x="200" y="28" width="46" height="34" rx="6" fill="#fff"/><text x="223" y="50" text-anchor="middle" font-size="12" fill="#FF8A7A">TEA</text>`,
+  meeting:`<rect width="360" height="190" fill="#ECE7FF"/><rect y="138" width="360" height="52" fill="#DCD3F7"/><rect x="110" y="18" width="140" height="80" rx="10" fill="#fff"/><rect x="126" y="70" width="16" height="18" rx="3" fill="#FF8A7A"/><rect x="150" y="56" width="16" height="32" rx="3" fill="#FFD66B"/><rect x="174" y="40" width="16" height="48" rx="3" fill="#5CCB9F"/><rect x="198" y="30" width="16" height="58" rx="3" fill="#7CC6FE"/><rect x="40" y="118" width="280" height="22" rx="11" fill="#fff"/><rect x="18" y="40" width="70" height="46" rx="8" fill="#fff" opacity=".7"/><text x="53" y="68" text-anchor="middle" font-size="11" fill="#A98BFF">对齐！</text>`,
+  bossroom:`<rect width="360" height="190" fill="#E3F2EA"/><rect y="136" width="360" height="54" fill="#D0E6DA"/><rect x="200" y="20" width="130" height="90" rx="10" fill="#fff"/><g fill="#CDEBFF"><rect x="208" y="28" width="114" height="10" rx="3"/><rect x="208" y="44" width="114" height="10" rx="3"/><rect x="208" y="60" width="114" height="10" rx="3"/><rect x="208" y="76" width="114" height="10" rx="3"/></g><rect x="40" y="108" width="190" height="34" rx="10" fill="#B98B64"/><rect x="70" y="80" width="54" height="30" rx="5" fill="#3B3F5C"/><rect x="146" y="82" width="26" height="26" rx="4" fill="#fff"/><path d="M150 102 l6-8 5 5 4-6 4 9z" fill="#FF9EC4"/><rect x="30" y="30" width="60" height="40" rx="6" fill="#fff"/><text x="60" y="55" text-anchor="middle" font-size="11" fill="#5CCB9F">KPI</text>`,
+  roof:`<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FD8FF"/><stop offset="1" stop-color="#FFF4E0"/></linearGradient></defs><rect width="360" height="190" fill="url(#sky)"/><g fill="#fff"><ellipse cx="70" cy="40" rx="30" ry="12"/><ellipse cx="92" cy="34" rx="20" ry="12"/><ellipse cx="270" cy="56" rx="34" ry="12"/></g><g fill="#C9D9EE"><rect x="10" y="88" width="40" height="60"/><rect x="56" y="70" width="34" height="78"/><rect x="250" y="80" width="44" height="68"/><rect x="300" y="96" width="50" height="52"/></g><rect y="140" width="360" height="50" fill="#B9C6D6"/><g stroke="#7E8BA3" stroke-width="4"><path d="M0 128 H360"/><path d="M20 128 V150 M70 128 V150 M120 128 V150 M170 128 V150 M220 128 V150 M270 128 V150 M320 128 V150"/></g>`,
+  canteen:() => { const m = todayMenu(); return `<rect width="360" height="190" fill="#FFE7E0"/><rect y="134" width="360" height="56" fill="#F7D3C8"/><rect x="16" y="14" width="328" height="${m.dark ? 62 : 44}" rx="10" fill="#fff"/><text x="180" y="40" text-anchor="middle" font-size="13" fill="#FF8A7A">今日：${m.picks.map(p => p[0]).join(' · ')}</text>${m.dark ? `<text x="180" y="62" text-anchor="middle" font-size="12" fill="#A98BFF">★ 今日挑战：${m.dark[0]}</text>` : ''}<rect x="30" y="112" width="130" height="16" rx="8" fill="#fff"/><rect x="200" y="112" width="130" height="16" rx="8" fill="#fff"/><g fill="#FFD66B"><ellipse cx="70" cy="108" rx="18" ry="6"/><ellipse cx="240" cy="108" rx="18" ry="6"/></g>`; },
+  store:`<rect width="360" height="190" fill="#E2FAEF"/><rect y="140" width="360" height="50" fill="#CBEBDD"/><rect width="360" height="22" fill="#5CCB9F"/><text x="180" y="16" text-anchor="middle" font-size="12" fill="#fff">楼下便利店 · 24H</text><rect x="20" y="40" width="150" height="100" rx="8" fill="#fff"/><g fill="#FF8A7A"><rect x="30" y="50" width="20" height="24" rx="3"/><rect x="56" y="50" width="20" height="24" rx="3"/></g><g fill="#FFD66B"><rect x="82" y="50" width="20" height="24" rx="3"/><rect x="108" y="50" width="20" height="24" rx="3"/></g><g fill="#7CC6FE"><rect x="30" y="86" width="26" height="20" rx="3"/><rect x="62" y="86" width="26" height="20" rx="3"/></g><g fill="#A98BFF"><rect x="96" y="86" width="26" height="20" rx="3"/><rect x="130" y="86" width="26" height="20" rx="3"/></g><rect x="200" y="36" width="140" height="104" rx="10" fill="#DFF3FF"/><g fill="#fff"><rect x="210" y="46" width="56" height="84" rx="6"/><rect x="274" y="46" width="56" height="84" rx="6"/></g>`,
+  wc:`<rect width="360" height="190" fill="#E6F1F8"/><g stroke="#D3E3EE" stroke-width="2"><path d="M0 40 H360 M0 80 H360 M0 120 H360 M60 0 V190 M120 0 V190 M180 0 V190 M240 0 V190 M300 0 V190"/></g><rect y="140" width="360" height="50" fill="#D7E6F0"/><rect x="40" y="30" width="80" height="60" rx="30" fill="#fff"/><rect x="30" y="100" width="100" height="20" rx="8" fill="#fff"/><rect x="220" y="30" width="110" height="110" rx="10" fill="#C9D9EE"/><rect x="228" y="38" width="94" height="102" rx="6" fill="#DCE8F5"/><rect x="250" y="56" width="50" height="16" rx="8" fill="#5CCB9F"/><text x="275" y="68" text-anchor="middle" font-size="10" fill="#fff">无人</text>`,
 };
 
 /* =================== 地点 =================== */
@@ -294,17 +318,17 @@ const LUNCH = t => t >= 720 && t < 810;
 function where(id){
   const t = S.time, d = S.day, L = LUNCH(t);
   switch(id){
-    case 'lin': return L ? 'canteen' : (t >= 900 && t < 930) ? 'tea' : 'desk';
+    case 'lin': if(S.flags.linGone) return null; return L ? 'canteen' : (t >= 900 && t < 930) ? 'tea' : 'desk';
     case 'zhe': return L ? 'store' : 'desk';
     case 'boss': if(t >= 600 && t < 630) return 'meeting'; if(t >= 840 && t < 900) return 'meeting'; if(L) return 'canteen'; if(t >= 960 && t < 990) return 'desk'; return 'bossroom';
     case 'jiang': if(t >= 630 && t < 690) return 'tea'; if(L) return 'roof'; if(t >= 1050) return 'roof'; return null;
-    case 'man': if(L) return 'canteen'; if(t >= 930 && t < 990) return 'tea'; if(t >= 1020 && t < 1065) return 'store'; return null;
-    case 'amy': if(t < 630) return 'tea'; if(L) return 'store'; return null;
-    case 'xu': return L ? 'canteen' : null;
+    case 'man': if(L) return 'canteen'; if(t >= 930 && t < 990) return 'tea'; if(t >= 1020 && t < 1070) return 'store'; return null;
+    case 'amy': if(t < 630) return 'tea'; if(L) return 'store'; if(t >= 900 && t < 930) return 'tea'; return null;
+    case 'xu': if(L) return 'canteen'; if(t >= 990 && t < 1020) return 'tea'; return null;
     case 'wh1': if(t >= 660 && t < 720) return 'tea'; if(t >= 840 && t < 900) return 'meeting'; return null;
     case 'wh2': return (t >= 990 && t < 1050) ? 'tea' : null;
     case 'wh3': if(t >= 900 && t < 960 && d >= 2) return 'tea'; if(L) return 'canteen'; return null;
-    case 'wh4': return (t >= 900 && t < 1080 && d !== 3) ? 'meeting' : null;
+    case 'wh4': return (t >= 900 && t < 1080 && WD(d) !== 2) ? 'meeting' : null;
   }
   return null;
 }
@@ -322,27 +346,46 @@ const TASKS = {
   t8:{name:'准备评审会材料', need:150, from:'boss'},
   t9:{name:'整理"对齐会"的会议纪要的对齐纪要', need:60, from:'boss'},
   t10:{name:'填团建报名表（要写三百字感想）', need:30, from:'amy'},
-  t11:{name:'写季度总结（要有方法论）', need:150, from:'boss'},
+  t11:{name:'写双周总结（要有方法论）', need:150, from:'boss'},
   x1:{name:'帮隔壁组看个"很简单"的问题', need:120, from:'wh1'},
   x2:{name:'AI 提效流程落地维护', need:180, from:'wh1'},
+  p1:{name:'把老板说的"简单改改"改完', need:90, from:'boss'},
+  p2:{name:'给新人写入职文档', need:120, from:'boss'},
+  p3:{name:'把 Excel 里的合并单元格全部拆开', need:60, from:'boss'},
+  p4:{name:'回复客户的第 17 封邮件', need:60, from:'boss'},
+  p5:{name:'给周报加点"方法论"', need:60, from:'boss'},
+  p6:{name:'查清楚三年前那段代码是谁写的（是你）', need:90, from:'boss'},
+  p7:{name:'把需求从 A 方案改回 A 方案', need:120, from:'boss'},
+  p8:{name:'做一页"一图看懂"（老板看不懂）', need:90, from:'boss'},
+  p9:{name:'给系统起个好听的英文名', need:30, from:'boss'},
+  p10:{name:'迁移一个没人敢碰的老服务', need:180, from:'boss'},
 };
 const DAY_TASKS = {1:[['t1',1],['t2',2]], 2:[['t3',2],['t4',3]], 3:[['t5',3]], 4:[['t6',4]], 5:[['t7',5]], 6:[['t8',7]], 7:[['t9',7]], 8:[['t10',8]], 9:[['t11',10]]};
-const DAYS = ['','W1 周一','W1 周二','W1 周三','W1 周四','W1 周五','W2 周一','W2 周二','W2 周三','W2 周四','W2 周五'];
-const LAST_DAY = 10;
+function dailyTasks(d){
+  if(DAY_TASKS[d]) return DAY_TASKS[d];
+  const pool = Object.keys(TASKS).filter(k => k[0] === 'p');
+  const k = pool[Math.floor(seed(d, 3) * pool.length)];
+  const out = [[k + '_' + d, d + 1 + (seed(d, 5) < .5 ? 0 : 1), k]];
+  if(seed(d, 7) < .4){ const k2 = pool[Math.floor(seed(d, 8) * pool.length)]; if(k2 !== k) out.push([k2 + '_' + d, d + 2, k2]); }
+  return out;
+}
+const taskDef = key => TASKS[key] || TASKS[key.split('_')[0]];
 
 /* =================== 状态 =================== */
-const fresh = () => ({v:2, day:1, time:570, loc:'desk', energy:80, mood:70, money:1200, perf:0,
-  rel:{lin:20, zhe:10, boss:30, jiang:0, man:0, amy:5, xu:10, wh1:0, wh2:0, wh3:0, wh4:0},
-  met:{lin:true, zhe:true, boss:true}, revealed:{}, tasks:[], focus:null, items:{coffee:0},
-  msgs:[], talked:{}, flags:{}, coffeeToday:0, ate:false, last:'', scene:'title', partner:null, overtimeMin:0, nightText:''});
+const fresh = () => ({v:3, day:1, time:570, loc:'desk', energy:80, mood:70, money:1200, perf:0, perfAtCycle:0,
+  rel:{lin:20, zhe:10, boss:25, jiang:0, man:0, amy:5, xu:5, wh1:0, wh2:0, wh3:0, wh4:0},
+  met:{lin:true, zhe:true, boss:true}, revealed:{}, tasks:[], focus:null, items:{}, orders:[],
+  msgs:[], talked:{}, flags:{}, arc:{}, arcDay:{}, locSeen:{}, coffeeToday:0, ate:false, last:'', scene:'title',
+  partner:null, overtimeMin:0, nightText:'', wk:null, spent:0, history:[]});
 let S = null;
 const clamp = (v, a = 0, b = 100) => Math.max(a, Math.min(b, v));
 const fmt = t => `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
-function save(){ try{ localStorage.setItem('grom2', JSON.stringify(S)); }catch(e){} }
-function load(){ try{ const t = localStorage.getItem('grom2'); return t ? JSON.parse(t) : null; }catch(e){ return null; } }
+const has = k => (S.items[k] || 0) > 0;
+function save(){ try{ localStorage.setItem('grom3', JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const t = localStorage.getItem('grom3'); return t ? JSON.parse(t) : null; }catch(e){ return null; } }
 const topLover = () => S.partner || [...LOVERS].sort((a,b) => S.rel[b] - S.rel[a])[0];
 
-/* =================== 数值变化 =================== */
+/* =================== 数值 =================== */
 function toast(text, cls = ''){
   const el = document.createElement('div'); el.className = 'toast ' + cls; el.textContent = text;
   document.getElementById('toasts').appendChild(el);
@@ -353,7 +396,7 @@ function fx(o = {}){
   if(o.time) S.time += o.time;
   if(o.energy){ S.energy = clamp(S.energy + o.energy); toast(`精力 ${sign(o.energy)}`, o.energy > 0 ? 'good' : 'bad'); }
   if(o.mood){ S.mood = clamp(S.mood + o.mood); toast(`心情 ${sign(o.mood)}`, o.mood > 0 ? 'good' : 'bad'); }
-  if(o.money){ S.money += o.money; toast(`¥ ${sign(o.money)}`, 'gold'); }
+  if(o.money){ S.money += o.money; if(o.money < 0) S.spent -= o.money; toast(`¥ ${sign(o.money)}`, 'gold'); }
   if(o.perf){ S.perf += o.perf; toast(`绩效 ${sign(o.perf)}`, o.perf > 0 ? 'good' : 'bad'); }
   if(o.rel) for(const k in o.rel){ S.rel[k] = clamp((S.rel[k] || 0) + o.rel[k]); S.met[k] = true; toast(`${CHARS[k].name} 好感 ${sign(o.rel[k])}`, o.rel[k] > 0 ? 'good' : 'bad'); }
   if(o.item) for(const k in o.item) S.items[k] = (S.items[k] || 0) + o.item[k];
@@ -365,17 +408,14 @@ function addTask(key, due){
   S.tasks.push({key, done:0, due, fin:false, late:false});
   const cur = S.tasks.find(t => t.key === S.focus);
   if(!cur || cur.fin) S.focus = key;
-  const n = TASKS[key].name;
+  const n = taskDef(key).name;
   toast('新待办：' + (n.length > 14 ? n.slice(0, 14) + '…' : n));
 }
-function msg(from, text){ S.msgs.unshift({from, text, when:`${DAYS[S.day]} ${fmt(S.time)}`, read:false}); }
+function msg(from, text){ S.msgs.unshift({from, text, when:`${dayName(S.day)} ${fmt(S.time)}`, read:false}); S.msgs = S.msgs.slice(0, 60); }
 
 /* =================== 对话引擎 =================== */
 let DQ = null;
-function talk(conv){
-  DQ = {lines:[...(conv.lines || [])], choices:conv.choices || null, end:conv.end || null};
-  stepDlg();
-}
+function talk(conv){ DQ = {lines:[...(conv.lines || [])], choices:conv.choices || null, end:conv.end || null}; stepDlg(); }
 function stepDlg(){
   if(!DQ) return;
   if(DQ.lines.length){ const [who, text] = DQ.lines.shift(); drawDlg(who, typeof text === 'function' ? text() : text, null); return; }
@@ -402,9 +442,7 @@ function drawDlg(who, text, choices){
       if(c2.act) c2.act(); if(c2.fx) fx(c2.fx);
       DQ.lines = [...(c2.lines || [])]; DQ.choices = c2.choices || null; if(c2.end) DQ.end = c2.end;
       renderHud(); stepDlg(); });
-  } else {
-    el.onclick = () => stepDlg();
-  }
+  } else el.onclick = () => stepDlg();
 }
 document.addEventListener('keydown', e => {
   const d = document.getElementById('dlg');
@@ -412,56 +450,59 @@ document.addEventListener('keydown', e => {
   if(e.key === 'Escape') closeSheet();
 });
 
-/* =================== 行动 =================== */
+/* =================== 工作 =================== */
 function workEff(){ return (S.energy < 20 ? .5 : S.energy < 45 ? .8 : 1) * (S.mood < 25 ? .7 : 1); }
 function doWork(min){
   const t = S.tasks.find(x => x.key === S.focus && !x.fin) || S.tasks.find(x => !x.fin);
   if(!t){ S.last = '手头没有待办了。你把桌面整理了一遍，又整理了一遍。'; fx({time:min, mood:3}); return; }
-  const gain = Math.round(min * workEff()), T = TASKS[t.key];
+  const T = taskDef(t.key), gain = Math.round(min * workEff());
   t.done = Math.min(T.need, t.done + gain);
-  fx({time:min, energy:-Math.round(min / 6), mood:-Math.round(min / 20)});
+  fx({time:min, energy:-Math.round(min / 6 * (has('chair') ? .7 : 1)), mood: has('phones') ? 0 : -Math.round(min / 20)});
   if(t.done >= T.need){
-    t.fin = true;
+    t.fin = true; t.finDay = S.day;
     const late = S.day > t.due;
     S.perf += late ? 3 : 10; toast(`完成！绩效 +${late ? 3 : 10}`, 'good');
     S.last = `搞定了「${T.name}」。`;
     const nx = S.tasks.find(x => !x.fin); S.focus = nx ? nx.key : null;
-  } else {
-    S.last = `「${T.name}」推进到 ${Math.round(t.done / T.need * 100)}%。` + (workEff() < 1 ? '（状态不好，效率打折了）' : '');
-  }
+  } else S.last = `「${T.name}」推进到 ${Math.round(t.done / T.need * 100)}%。` + (workEff() < 1 ? '（状态不好，效率打折了）' : '');
 }
 function bossCatch(){
   const near = ['desk','bossroom'].includes(where('boss')) && !LUNCH(S.time);
-  if(near && Math.random() < .3){
-    S.flags.caught = (S.flags.caught || 0) + 1;
+  if(near && Math.random() < (has('phone') ? .4 : .3)){
     talk({lines:[['sys','你正刷到第三个猫猫视频，背后传来一声咳嗽。'], ['boss','……在研究竞品？'], ['me','对……对，竞品的……猫。']], end:() => { fx({rel:{boss:-4}, perf:-3, mood:-6}); afterAction(); }});
     return true;
   }
   return false;
 }
 
+/* =================== 各地点能做的事 =================== */
 function actsFor(loc){
   const t = S.time, a = [];
   if(loc === 'desk'){
     a.push({ic:'⌨️', t:'认真干活', d:'1 小时 · 推进待办', run:() => doWork(60)});
     a.push({ic:'🔥', t:'冲刺模式', d:'2 小时 · 很累', run:() => doWork(120)});
-    a.push({ic:'📱', t:'摸鱼刷手机', d:'30 分钟 · 心情 +', run:() => { fx({time:30, mood:8, energy:2}); S.last = ['你看完了一个讲怎么摸鱼的视频。','你在购物车里加了 6 件东西，删了 5 件。','你给一个陌生人的猫点了 12 个赞。'][S.day % 3]; return bossCatch(); }});
-    if(S.flags.tidy !== S.day) a.push({ic:'🪴', t:'浇浇绿萝', d:'15 分钟 · 心情 +', run:() => { S.flags.tidy = S.day; fx({time:15, mood:4}); S.last = '绿萝喝饱了水，看起来比你精神。'; }});
+    a.push({ic:'📱', t:'摸鱼刷手机', d:`30 分钟 · 心情 +${has('phone') ? 12 : 8}`, run:() => { fx({time:30, mood: has('phone') ? 12 : 8, energy:2}); S.last = ['你看完了一个讲怎么摸鱼的视频。','你在购物车里加了 6 件东西，删了 5 件。','你给一个陌生人的猫点了 12 个赞。','你刷到一个帖子：《如何优雅地拒绝同事》。收藏了。'][(S.day + S.time) % 4]; return bossCatch(); }});
+    if(t >= 630 && t < 810 && !S.ate) a.push({ic:'🛵', t:'点外卖', d:'选店选菜，送到工位', run:() => { openTakeout(); return true; }});
+    else if(t >= 600 && t < 1050) a.push({ic:'🧋', t:'点杯奶茶', d:'下午续命', run:() => { openTakeout(true); return true; }});
+    if(has('brewer')) a.push({ic:'☕', t:'用桌面咖啡机', d:'10 分钟 · 精力 +10', run:() => { fx({time:10, energy:10}); S.last = '你的私人咖啡机发出满足的咕噜声。'; }});
+    if(S.flags.tidy !== S.day) a.push({ic:'🪴', t:'浇浇绿植', d:'15 分钟 · 心情 +', run:() => { S.flags.tidy = S.day; fx({time:15, mood: has('monstera') ? 6 : 4}); S.last = has('monstera') ? '龟背竹又长出一片新叶子，带洞的那种。' : '绿萝喝饱了水，看起来比你精神。'; }});
+    if(S.items.massage) a.push({ic:'💆', t:'用一张按摩券', d:'下楼 40 分钟 · 精力 +40', run:() => { S.items.massage--; fx({time:40, energy:40, mood:5}); S.last = '楼下按摩店的师傅说你的肩颈"像一块铁"。'; }});
   }
   if(loc === 'tea'){
     a.push({ic:'☕', t:'冲杯咖啡', d: S.coffeeToday >= 2 ? '今天喝太多了' : '15 分钟 · 精力 +15', run:() => { S.coffeeToday++; const over = S.coffeeToday > 2; fx({time:15, energy: over ? 3 : 15, mood: over ? -3 : 2}); S.last = over ? '第三杯了，你的手有点抖。' : '咖啡机嗡嗡响，世界慢慢清晰起来。'; }});
-    a.push({ic:'🍪', t:'翻零食柜', d:'10 分钟 · 心情 +', run:() => { fx({time:10, mood:5}); S.last = 'Amy 补的新零食：海苔、小饼干，还有一包没人敢吃的榴莲干。'; }});
+    a.push({ic:'🍪', t:'翻零食柜', d:'10 分钟 · 心情 +5', run:() => { fx({time:10, mood:5}); S.last = ['蟀蟀补的新零食：海苔、小饼干，还有一包没人敢吃的榴莲干。','零食柜里只剩一包无糖苏打饼干。你还是吃了。','有人在零食柜上贴了便利贴："谁拿了我的辣条请放回来"。'][S.day % 3]; }});
   }
-  if(loc === 'roof') a.push({ic:'🌬️', t:'吹风发呆', d:'30 分钟 · 心情 +10', run:() => { fx({time:30, mood:10, energy:4}); S.last = '风把烦恼吹散了一点点。楼下的车像玩具。'; }});
+  if(loc === 'roof') a.push({ic:'🌬️', t:'吹风发呆', d:'30 分钟 · 心情 +10', run:() => { fx({time:30, mood:10, energy:4}); S.last = ['风把烦恼吹散了一点点。楼下的车像玩具。','一只鸽子落在你旁边，看了你一眼，走了。','你数了数对面楼亮着的窗户。一共 47 扇，都在加班。'][S.day % 3]; }});
   if(loc === 'canteen' && LOCS.canteen.open(t)){
+    const m = todayMenu();
     if(!S.ate){
-      a.push({ic:'🍅', t:'食堂套餐', d:'¥15 · 精力 +25', run:() => eat(15, 25, 3, '番茄炒蛋配米饭，稳定发挥。')});
-      a.push({ic:'🌶️', t:'麻辣烫', d:'¥28 · 精力 +20 心情 +10', run:() => eat(28, 20, 10, '加了两份宽粉，下午可能会困，但值得。')});
-      a.push({ic:'🥗', t:'轻食沙拉', d:'¥38 · 精力 +15 心情 +5', run:() => eat(38, 15, 5, '你吃得很健康。两点的时候你开始想念麻辣烫。')});
+      m.picks.forEach(([n,p,e,md]) => a.push({ic:'🍚', t:n, d:`¥${p} · 精力 +${e} 心情 +${md}`, run:() => eat(p, e, md, `${n}，${['稳定发挥。','阿姨今天手没抖。','分量很足，下午可能会困。'][Math.floor(seed(S.day, n.length) * 3)]}`)}));
+      if(m.dark) a.push({ic:'🎲', t:`挑战：${m.dark[0]}`, d:`¥${m.dark[1]} · 好吃还是翻车？`, run:() => { const ok = seed(S.day, 42) < .5; eat(m.dark[1], 15, ok ? 15 : -10, ok ? `${m.dark[0]}……居然出乎意料地好吃！你决定发个朋友圈。` : `${m.dark[0]}。你吃了一口，沉默了很久。`); }});
     } else a.push({ic:'🍵', t:'坐着消食', d:'20 分钟', run:() => { fx({time:20, energy:3}); S.last = '饭后犯困是人类的本能。'; }});
   }
   if(loc === 'store'){
-    a.push({ic:'🧋', t:'买杯咖啡送人', d:'¥18 · 可以送给同事', run:() => { fx({time:15, money:-18, item:{coffee:1}}); S.last = `你拎着咖啡。现在有 ${S.items.coffee} 杯可以送人，点同事就能送。`; }});
+    a.push({ic:'🧋', t:'买杯奶茶带着', d:'¥18 · 可以送同事', run:() => { fx({time:10, money:-18, item:{drink:1}}); S.last = `你拎着奶茶。现在有 ${S.items.drink} 杯可以送人，点同事就能送。`; }});
+    a.push({ic:'🍰', t:'买个小蛋糕', d:'¥38 · 送人好感 +10', run:() => { fx({time:10, money:-38, item:{cake:1}}); S.last = '草莓小蛋糕，盒子上有个蝴蝶结。'; }});
     a.push({ic:'🍙', t:'买个饭团', d:'¥8 · 精力 +10', run:() => { fx({time:10, money:-8, energy:10}); if(LUNCH(S.time)) S.ate = true; S.last = '金枪鱼饭团，永远的神。'; }});
     a.push({ic:'🍫', t:'囤点零食', d:'¥12 · 心情 +6', run:() => { fx({time:10, money:-12, mood:6}); S.last = '抽屉里的快乐储备 +1。'; }});
   }
@@ -470,31 +511,71 @@ function actsFor(loc){
     a.push({ic:'🪞', t:'洗把脸', d:'5 分钟 · 精力 +5', run:() => { fx({time:5, energy:5}); S.last = '镜子里的人看起来还能再撑一会儿。'; }});
   }
   if(loc === 'bossroom' && where('boss') === 'bossroom' && S.flags.report !== S.day){
-    a.push({ic:'📈', t:'找老周汇报进度', d:'30 分钟', run:() => { S.flags.report = S.day; const good = !S.tasks.some(x => !x.fin && S.day >= x.due);
-      talk({lines: good ? [['boss','嗯，进度挺好。你最近状态不错。'], ['sys','老周在本子上写了点什么。']] : [['boss','那个……之前那个任务怎么样了？'], ['me','在、在推进了。'], ['boss','抓紧一点哈。']],
+    a.push({ic:'📈', t:'找雷雷汇报进度', d:'30 分钟', run:() => { S.flags.report = S.day; const good = !S.tasks.some(x => !x.fin && S.day >= x.due);
+      talk({lines: good ? [['boss','嗯，进度挺好。你最近状态不错。'], ['sys','雷雷在本子上写了点什么。']] : [['boss','那个……之前那个任务怎么样了？'], ['me','在、在推进了。'], ['boss','抓紧一点哈。']],
         end:() => { fx({time:30, rel:{boss: good ? 5 : -3}, perf: good ? 3 : 0}); afterAction(); }}); return true; }});
   }
-  if(loc === 'meeting' && !cast('meeting').length){
-    a.push({ic:'😴', t:'躲在空会议室眯一会儿', d:'30 分钟 · 精力 +15', run:() => { fx({time:30, energy:15}); S.last = '你趴在会议桌上睡了半小时，脸上压出了桌子的纹路。'; }});
-  }
+  if(loc === 'meeting' && !cast('meeting').length) a.push({ic:'😴', t:'躲在空会议室眯一会儿', d:'30 分钟 · 精力 +15', run:() => { fx({time:30, energy:15}); S.last = '你趴在会议桌上睡了半小时，脸上压出了桌子的纹路。'; }});
   return a;
 }
 function eat(price, en, md, text){
   S.ate = true;
-  const mate = cast('canteen').filter(k => k !== 'xu' && !RATS.includes(k));
+  const mate = cast('canteen').filter(k => FRIENDS.includes(k));
   fx({time:40, money:-price, energy:en, mood:md}); S.last = text;
   if(mate.length){ const k = mate[(S.day + S.time) % mate.length]; fx({rel:{[k]:4}}); S.last += `${CHARS[k].name}端着餐盘坐到了你对面。`; }
 }
 
+/* =================== 外卖 App =================== */
+function openTakeout(drinkOnly){
+  const el = document.getElementById('sheet');
+  const shops = SHOPS.filter(s => drinkOnly ? s.items.some(i => i[4] === 'drink') : true);
+  el.innerHTML = `<div class="in"><h2>🛵 ${drinkOnly ? '下午茶' : '点外卖'}<button id="closeSheet">关闭</button></h2>
+    <p class="hint">满 30 减 5 · 配送费 ¥3 · 余额 ¥${S.money}</p>
+    ${shops.map((s, si) => `<div class="card"><b>${s.ic} ${s.name}</b> <small style="color:var(--muted)">约 ${s.eta} 分钟送达</small>
+      <div class="shop" style="margin-top:8px">${s.items.filter(i => drinkOnly ? i[4] === 'drink' : true).map(i => { const ii = s.items.indexOf(i); return `<button class="item" data-s="${SHOPS.indexOf(s)}" data-i="${ii}"><span class="tx"><span class="t">${i[0]}</span><span class="d">精力 +${i[2]} · 心情 +${i[3]}${i[4] === 'smelly' ? ' · 味道很冲' : ''}</span></span><span class="pr">¥${i[1]}</span></button>`; }).join('')}</div></div>`).join('')}</div>`;
+  el.hidden = false; el.onclick = e => { if(e.target === el){ closeSheet(); afterAction(); } };
+  el.querySelector('#closeSheet').onclick = () => { closeSheet(); afterAction(); };
+  el.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { const shop = SHOPS[+b.dataset.s], it = shop.items[+b.dataset.i]; closeSheet(); placeOrder(shop, it); });
+}
+function placeOrder(shop, it){
+  const total = it[1] + 3 - (it[1] >= 30 ? 5 : 0);
+  if(S.money < total){ toast('余额不足', 'bad'); afterAction(); return; }
+  const mates = cast('desk').filter(k => FRIENDS.includes(k));
+  const done = (share) => { const price = share ? total - 4 : total; fx({money:-price, time:5}); S.orders.push({name:it[0], shop:shop.name, en:it[2], md:it[3], tag:it[4] || '', at:S.time + shop.eta + Math.floor(seed(S.day, S.time) * 10), share});
+    S.last = `下单了「${it[0]}」，预计 ${fmt(S.time + shop.eta)} 左右送到。`; };
+  if(S.loc === 'desk' && mates.length) talk({lines:[['sys', `下单前，你瞄了一眼旁边的${mates.map(k => CHARS[k].name).join('和')}。`]], choices:[
+    {t:'自己吃', act:() => done(false)},
+    {t:`问${CHARS[mates[0]].name}要不要拼单`, d:'省 ¥4 · 好感 +3', act:() => { done(mates[0]); fx({rel:{[mates[0]]:3}}); }, lines:[[mates[0], it[4] === 'smelly' && mates[0] !== 'zhe' ? '……螺蛳粉？我、我还是不了。' : '拼！我要一样的！']]},
+  ]});
+  else { done(false); afterAction(); }
+}
+function deliver(o){
+  const r = seed(S.day, o.at + o.name.length);
+  const lines = [['sys', `📦 外卖到了：${o.shop}的「${o.name}」。`]];
+  let en = o.en, md = o.md;
+  if(r < .18){ lines.push(['sys','袋子打开的一瞬间，你闻到了汤的味道……洒了一半。商家赔了你一张 5 元券。']); en = Math.round(en / 2); md -= 8; fx({money:5}); }
+  else if(r < .28){ lines.push(['sys','……这不是你点的。袋子上写着另一个人的名字，里面是一份全麻全辣的冒菜。']); md += 4; }
+  else if(r < .38){ lines.push(['sys','骑手发来消息："不好意思，路上电动车没电了，晚到 20 分钟。"']); S.time += 20; md -= 3; }
+  else if(r < .45){ lines.push(['sys','商家送了一张手写卡片：「打工人辛苦了！」还多送了一个卤蛋。']); md += 6; }
+  if(o.tag === 'smelly'){
+    const around = cast('desk').filter(k => FRIENDS.includes(k));
+    if(around.length){ lines.push(['sys','螺蛳粉的味道在工位区迅速扩散。']);
+      around.forEach(k => { if(k === 'zhe'){ lines.push(['zhe','（摘下耳机，深吸一口气）……螺蛳粉？好品味。']); S.rel.zhe = clamp(S.rel.zhe + 5); } else { lines.push([k, '……你认真的吗。']); S.rel[k] = clamp(S.rel[k] - 3); } }); }
+  }
+  if(o.share) lines.push([o.share, '开饭开饭！']);
+  if(o.tag !== 'drink') S.ate = true;
+  talk({lines, end:() => { fx({energy:en, mood:md}); afterAction(); }});
+}
+
 /* =================== 和同事聊天 =================== */
 const CHAT = {
-  lin:['你听说没，楼下新开了一家麻辣烫，第二份半价。','我今天的需求改了第四版了，我想静静。','下班一起走？我知道一部不用排队的电梯。'],
-  zhe:['（摘下一边耳机）……嗯？','我的猫今天把键盘踩出了一行代码，居然能跑。','我不是不说话，是在省电。'],
-  boss:['最近辛苦了，有什么困难随时跟我说。','我老板又改需求了。我也很无奈。','你手上那个任务，周五前能给我吗？'],
-  jiang:['你也来躲人？','我在画这层楼的平面图，你的工位我画了一盆绿萝。','风很大，适合什么都不想。'],
-  man:['今天第三次有人跟我说"这个需求很简单"。','你喝美式还是拿铁？我记一下。','我在写一本《需求吐槽大全》，你要不要投稿？'],
-  amy:['下午茶今天是蛋挞，三点准时开抢！','打印机又卡纸了，它今天第九次背叛我。','你生日快到了吧？我有记哦。'],
-  xu:['最近还适应吗？有什么不顺心可以来找我。','我面试你的时候，你紧张到把简历拿反了。','好好吃饭，身体是自己的。'],
+  lin:['你听说没，楼下新开了一家麻辣烫，第二份半价。','我今天的需求改了第四版了，我想静静。','下班一起走？我知道一部不用排队的电梯。','你周末干嘛了？我在家刷了一整天题……啊，没什么。'],
+  zhe:['（摘下一边耳机）……嗯？','我的猫今天把键盘踩出了一行代码，居然能跑。','我不是不说话，是在省电。','你听过白噪音吗？雨声那种。我能听一整天。'],
+  boss:['最近辛苦了，有什么困难随时跟我说。','我老板又改需求了。我也很无奈。','你手上那个任务，周五前能给我吗？','（看着手机屏保笑了一下）啊，没事。'],
+  jiang:['你也来躲人？','我在画这层楼的平面图，你的工位我画了一盆绿植。','风很大，适合什么都不想。','今天的云像一只没画完的猫。'],
+  man:['今天第三次有人跟我说"这个需求很简单"。','你喝美式还是拿铁？我记一下。','我在写一本《需求吐槽大全》，你要不要投稿？','如果我开一家咖啡店，门口就挂一个牌子：本店不接需求。'],
+  amy:['下午茶今天是蛋挞，三点准时开抢！','打印机又卡纸了，它今天第九次背叛我。','你生日快到了吧？我有记哦。','我在给下个月的生日会订蛋糕，你喜欢什么口味？'],
+  xu:['最近还适应吗？有什么不顺心可以来找我。','我面试你的时候，你紧张到把简历拿反了。','好好吃饭，身体是自己的。','最近楼里在传一些消息……你别太往心里去。'],
   wh1:['哎，你们组最近挺闲的吧？','我最近在想一个提效方案，回头拉你们一起落地。','我前两天加班到九点，真的累。'],
   wh2:['你那个方案写得不错啊，发我参考一下？','评审会的事，我们可以一起讨论。','（迅速切换了屏幕）啊，你好你好。'],
   wh3:['哎你知道吗……算了算了，不说了。','你最近和谁走得比较近呀？','我也是听别人说的哈。'],
@@ -503,137 +584,302 @@ const CHAT = {
 function chatWith(id){
   const c = CHARS[id], first = !S.met[id];
   S.met[id] = true;
+  if(beatReady(id)){ runBeat(id); return; }
   const lines = [];
   if(first) lines.push(['sys', `你认识了${c.name}（${c.role}）。`]);
   const pool = CHAT[id];
   lines.push([id, pool[(S.day + Math.floor(S.time / 60)) % pool.length]]);
   const already = S.talked[id] === S.day;
+  const gifts = RATS.includes(id) ? [] : [['drink','送一杯奶茶',6],['cake','送一个小蛋糕',10]].filter(([k]) => S.items[k] > 0);
   const choices = [
-    {t:'随便聊两句', d: already ? '今天已经聊过了 · 15 分钟' : '15 分钟 · 好感 +', act:() => { fx({time:15}); if(!already){ S.talked[id] = S.day; fx({rel:{[id]: c.love ? 6 : 4}, mood:3}); } },
-      lines:[[id, () => relLine(id)]]},
+    {t:'随便聊两句', d: already ? '今天已经聊过了 · 15 分钟' : '15 分钟 · 好感 +', act:() => { fx({time:15}); if(!already){ S.talked[id] = S.day; fx({rel:{[id]: c.love ? 7 : 5}, mood:3}); } },
+      lines:[[id, () => smallTalk(id)]]},
+    ...gifts.map(([k, label, v]) => ({t:label, d:`好感 +${c.love ? v + 4 : v}`, act:() => { S.items[k]--; fx({time:5, rel:{[id]: c.love ? v + 4 : v}}); }, lines:[[id, c.love ? '……给我的？谢谢。我会记住的。' : '哇，谢谢！你人真好！']]})),
   ];
-  if(S.items.coffee > 0 && !RATS.includes(id)) choices.push({t:'送 TA 一杯咖啡', d:'好感 ++', act:() => { S.items.coffee--; fx({time:5, rel:{[id]: c.love ? 12 : 8}}); }, lines:[[id, c.love ? '……给我的？谢谢。我会记住你喜欢喝什么的。' : '哇，谢谢！你人真好！']]});
   if(c.love && S.rel[id] >= 30 && S.time < 720 && !S.flags.lunchDate) choices.push({t:'中午一起吃饭？', d:'约午饭 · 12:00 去食堂', act:() => { S.flags.lunchDate = id; fx({time:5}); }, lines:[[id, '好啊。十二点，食堂见？']]});
-  if(c.love && S.rel[id] >= 50 && S.time >= 1050 && S.flags.walkHome !== S.day) choices.push({t:'下班一起走？', d:'好感 +10', act:() => { S.flags.walkHome = S.day; S.flags.walkWith = id; fx({rel:{[id]:10}, mood:8}); },
-    lines:[['sys', `你们一起走到了地铁站。${id === 'jiang' ? '他讲他养的猫，你讲你的绿萝。' : '她讲她写的需求吐槽，你笑出了眼泪。'}`], [id, '明天见。']]});
+  if(c.love && S.rel[id] >= 45 && S.time >= 1050 && S.flags.walkHome !== S.day) choices.push({t:'下班一起走？', d:'好感 +10', act:() => { S.flags.walkHome = S.day; S.flags.walkWith = id; fx({rel:{[id]:10}, mood:8}); },
+    lines:[['sys', `你们一起走到了地铁站。${id === 'jiang' ? '他讲他养的猫，你讲你的绿植。' : '她讲她写的需求吐槽，你笑出了眼泪。'}`], [id, '明天见。']]});
   choices.push({t:'先不打扰了'});
   talk({lines, choices});
 }
-function relLine(id){
-  const c = CHARS[id];
+function smallTalk(id){
   if(RATS.includes(id)) return S.revealed[id] ? '（胡子抖了一下）……你今天怎么怪怪的。' : '嗯嗯，有空多交流～';
-  const r = S.rel[id], lv = r >= 60 ? 2 : r >= 40 ? 1 : r >= 20 ? 0 : -1;
-  const known = S.flags['fact_' + id] || 0;
-  if(lv >= 0 && known < lv + 1){ S.flags['fact_' + id] = known + 1; toast(`解锁了${c.name}的小秘密`, 'gold'); return '跟你说个秘密：' + c.facts[known]; }
-  return ['哈哈，是吧。','嗯，下次再聊！','你今天看起来不错哦。'][Math.floor(S.time / 15) % 3];
+  const r = S.rel[id];
+  return r >= 60 ? ['跟你聊天总是很轻松。','你在真好。','下次周末一起出去玩吧？'][S.day % 3] : r >= 30 ? ['哈哈，你也这么觉得？','我们挺聊得来的。','下次再跟你说个好玩的。'][S.day % 3] : ['哈哈，是吧。','嗯，下次再聊！','你今天看起来不错哦。'][S.day % 3];
 }
 
-/* =================== 剧情事件 =================== */
+/* =================== 个人故事线 =================== */
+const ARCS = {
+  lin:[
+    {rel:15, title:'显示器底下的书', lines:[['sys','芸芸去打水了。你瞥见她显示器底下压着一本书，书脊上写着《行测 5000 题》。'], ['lin','（回来，看见你的视线，迅速把书往里推了推）……你什么都没看见。']],
+      choices:[{t:'"我什么都没看见。"', d:'好感 +6', fx:{rel:{lin:6}}, lines:[['lin','……谢谢。中午请你喝奶茶。']]},
+               {t:'小声问："你在考公？"', d:'好感 +8', fx:{rel:{lin:8}}, act:() => S.flags.linSecret = true, lines:[['lin','嘘——！'], ['lin','……嗯。我爸妈说，三十五岁之前得有个"稳定的"。'], ['lin','你别告诉别人，雷雷要是知道了，我年终奖就没了。']]}]},
+    {rel:30, at:['canteen','tea'], title:'稳定的工作', lines:[['lin','你说，我是不是真的不喜欢现在的工作？'], ['lin','我其实挺喜欢写代码的。就是……一想到三十五岁，就睡不着。'], ['lin','我妈每天给我转发"35 岁程序员被优化"的文章。']],
+      choices:[{t:'"做你自己想做的事。"', d:'', fx:{rel:{lin:8}}, act:() => S.flags.linPath = 'stay', lines:[['lin','……自己想做的事。我好久没想过这个问题了。']]},
+               {t:'"考公也挺好的，至少不用加班。"', d:'', fx:{rel:{lin:8}}, act:() => S.flags.linPath = 'exam', lines:[['lin','嗯……也是。那我再努力一下。'], ['lin','考试在下周四下午。']]}]},
+    {rel:42, title:'打掩护', when:() => S.flags.linPath === 'exam', lines:[['lin','（压低声音）那个……下周四下午我要去面试。我请不了假，雷雷那边……'], ['lin','你能不能帮我打个掩护？就说我去楼下取快递了。取……四个小时的快递。']],
+      choices:[{t:'"去吧，我帮你挡着。"', d:'好感 +12 · 有风险', fx:{rel:{lin:12}}, act:() => S.flags.linCover = true, lines:[['lin','你是我在这家公司唯一的朋友。真的。']]},
+               {t:'"我怕被发现……"', d:'好感 -4', fx:{rel:{lin:-4}}, lines:[['lin','……没事，我理解。我再想想办法。']]}]},
+    {rel:42, title:'留下来', when:() => S.flags.linPath === 'stay', lines:[['lin','我把那本《行测 5000 题》送给楼下保安大叔了。他说他儿子明年考。'], ['lin','然后我给自己报了一个算法课。'], ['lin','我想再试一次。做我喜欢的事。']],
+      choices:[{t:'"我陪你一起学。"', d:'好感 +12', fx:{rel:{lin:12}, perf:3}, act:() => S.flags.linStudy = true, lines:[['lin','真的？那我们每周三下班一起刷题！不许放鸽子！']]}]},
+    {rel:55, title:'结果', lines:() => S.flags.linPath === 'exam'
+        ? (S.flags.linCover ? [['lin','（拿着手机，手在抖）……我、我过了。'], ['lin','下个月入职。'], ['sys','她哭了，又笑了。'], ['lin','我会想你的。还有抽屉里的薯片，都留给你。']] : [['lin','面试……没赶上。雷雷那天下午一直在找我。'], ['lin','算了。也许这就是命吧。'], ['lin','我还是在这儿陪你吧。']])
+        : [['lin','我刷完第一百道题了！'], ['lin','雷雷说下季度有个核心模块，问我要不要接。'], ['lin','我说要。我第一次觉得，我是因为喜欢才留下来的。']],
+      choices:[{t:'抱抱她', d:'好感 +10 · 心情 +10', fx:{rel:{lin:10}, mood:10}, act:() => { if(S.flags.linPath === 'exam' && S.flags.linCover) S.flags.linLeaving = S.day + 5; }, lines:[['lin','谢谢你。这两周，谢谢你。']]}]},
+  ],
+  zhe:[
+    {rel:15, at:['desk'], title:'耳机没电了', lines:[['sys','科一的降噪耳机发出"嘀"的一声，没电了。他愣了几秒，转过来。'], ['zhe','……你知道吗，我的猫叫"需求"。'], ['zhe','因为它每天都在变，而且永远不满意。']],
+      choices:[{t:'"有照片吗？"', d:'好感 +8', fx:{rel:{zhe:8}}, lines:[['sys','他掏出手机，相册里有 3247 张猫的照片。'], ['zhe','这张是它踩在键盘上。这张也是。这张……也是。']]},
+               {t:'"哈哈，好名字。"', d:'好感 +5', fx:{rel:{zhe:5}}}]},
+    {rel:28, at:['store'], title:'泡面货架前', lines:[['sys','午休，科一站在泡面货架前，一动不动。'], ['zhe','听说……要裁员。'], ['zhe','我上个月刚买了房。三十年贷款。'], ['zhe','我连请假要找谁审批都不知道。我是不是那种……最先被裁的人？']],
+      choices:[{t:'"你写的代码是组里最稳的。"', d:'好感 +10', fx:{rel:{zhe:10}}, lines:[['zhe','……真的吗？'], ['zhe','从来没人跟我说过。']]},
+               {t:'"我帮你去问问糖糖。"', d:'好感 +8 · 解锁糖糖的线索', fx:{rel:{zhe:8}}, act:() => S.flags.askHR = true, lines:[['zhe','……谢谢。我不太会跟人打交道。']]}]},
+    {rel:40, at:['desk'], title:'抓老鼠的小游戏', lines:[['zhe','（犹豫了很久）……给你看个东西。'], ['sys','他的屏幕上是一个像素小游戏：一个小人在办公室里抓老鼠。老鼠都打着领带。'], ['zhe','业余做的。没给别人看过。'], ['zhe','你觉得……能发出去吗？']],
+      choices:[{t:'"太好玩了！发！"', d:'好感 +12', fx:{rel:{zhe:12}}, act:() => S.flags.zheRelease = true, lines:[['zhe','那……那我今晚就发。']]},
+               {t:'"挺好的，再打磨打磨？"', d:'好感 +5', fx:{rel:{zhe:5}}, lines:[['zhe','嗯。我也觉得还不够好。']]}]},
+    {rel:55, title:'榜单', lines:() => S.flags.zheRelease
+        ? [['zhe','（第一次主动摘下耳机）你看！'], ['sys','他的小游戏上了独立游戏周榜第七名。评论区第一条写着："谁的同事这么懂？"'], ['zhe','……我好像，有点开心。'], ...(S.flags.hrSafe ? [['zhe','而且糖糖说，名单上没有我。']] : [])]
+        : [['zhe','我把那个小游戏删了。'], ['zhe','……开玩笑的。还在硬盘里。'], ['zhe','等我准备好吧。']],
+      choices:[{t:'"恭喜你，科一。"', d:'好感 +10', fx:{rel:{zhe:10}, mood:8}, lines:[['zhe','叫我一就行。……不对，叫我科一。']]}]},
+  ],
+  boss:[
+    {rel:32, at:['bossroom'], title:'手机屏保', lines:[['sys','雷雷的手机亮了一下。屏保是一张蜡笔画：三个歪歪扭扭的小人。'], ['boss','我女儿画的。她说中间那个是我，所以画得最大。'], ['boss','……其实我在家的时间最少。']],
+      choices:[{t:'"她一定很爱你。"', d:'好感 +8', fx:{rel:{boss:8}}, lines:[['boss','嗯。下周四她钢琴汇报演出。'], ['boss','……但我老板那天晚上约了复盘会。']]}]},
+    {rel:40, at:['bossroom'], title:'周四晚上', lines:[['boss','那个……有件事想请你帮忙。'], ['boss','周四晚上七点的复盘会，你能不能替我讲一下？材料我都准备好了。'], ['boss','我想……去看女儿的演出。']],
+      choices:[{t:'"去吧，交给我。"', d:'周四要加班 1 小时 · 好感 +14', fx:{rel:{boss:14}}, act:() => S.flags.bossCover = true, lines:[['boss','……谢谢。真的谢谢。']]},
+               {t:'"我那天也有事……"', d:'好感 -2', fx:{rel:{boss:-2}}, lines:[['boss','没事没事，我再想想办法。']]}]},
+    {rel:52, at:['bossroom'], title:'被抢过的功劳', when:() => S.flags.bossCoverDone || !S.flags.bossCover, lines:() => [
+        ...(S.flags.bossCoverDone ? [['boss','（给你看手机里的视频）她弹的是《小星星》。弹错了三个音。'], ['boss','她谢幕的时候往台下找我。我在。']] : [['boss','坐吧，跟你聊几句。']]),
+        ['boss','跟你说个事。我刚当组长那年，我的方案被我老板拿去汇报，拿了个大奖。'], ['boss','我当时什么都没说。到现在都后悔。'], ['boss','所以如果你遇到这种事——跟我说。我站你这边。']],
+      choices:[{t:'"谢谢你，雷雷。"', d:'好感 +10', fx:{rel:{boss:10}}}]},
+    {rel:62, at:['bossroom'], title:'晋升', lines:() => [['boss','下季度的晋升名单，我准备报你。'], ['boss', S.perf >= 60 ? '你的活干得漂亮，这个不用我多说。' : '活还得再干得漂亮一点，我帮你争取。']],
+      choices:[{t:'"谢谢，我会继续努力。"', fx:{rel:{boss:5}, perf:5}, act:() => S.flags.promo = true},
+               {t:'"我还想提一个跨组任务的分工规则。"', d:'从根上解决问题', need:() => Object.keys(S.revealed).length >= 2, main:true, fx:{rel:{boss:8}, perf:8}, act:() => { S.flags.rule = true; S.flags.promo = true; }, lines:[['boss','你说的这个，我也想了很久。你写个草案，我带去经理会。']]}]},
+  ],
+  jiang:[
+    {rel:12, at:['roof','tea'], title:'像素平面图', lines:[['jiang','（把平板转过来）你看。'], ['sys','是这层楼的像素平面图。每个工位都画得很仔细，连你桌上的绿植都在。'], ['jiang','我想在里面画几个小人。你要不要……当其中一个？']],
+      choices:[{t:'"好啊，把我画好看点。"', d:'好感 +8', fx:{rel:{jiang:8}}, lines:[['jiang','我只会画写实的。'], ['sys','他说完自己先笑了。']]},
+               {t:'"为什么是我？"', d:'好感 +10', fx:{rel:{jiang:10}}, lines:[['jiang','……因为你每次来天台，都像是来喘口气的。我也是。']]}]},
+    {rel:28, at:['roof'], title:'被借走的设计稿', lines:[['jiang','你知道吗，我去年做过一版登录页。'], ['jiang','评审会上，是隔壁组的汶昊讲的。我的源文件，他改了个页眉。'], ['jiang','我当时什么都没说。我觉得说了也没人信。']],
+      choices:[{t:'"下次再有，我帮你作证。"', d:'好感 +12', fx:{rel:{jiang:12}}, act:() => S.flags.jiangWitness = true, lines:[['jiang','……那我也是。你要是需要证人，算我一个。']]},
+               {t:'"以后每一版都留源文件。"', d:'好感 +8', fx:{rel:{jiang:8}}, lines:[['jiang','你说得对。我现在连草稿都备份三份。']]}]},
+    {rel:40, at:['roof'], title:'插画展', lines:[['jiang','城西有个独立插画展在征稿。'], ['jiang','我画了这层楼。所有人都在里面。'], ['jiang','但我不敢投。万一……没人喜欢呢。']],
+      choices:[{t:'"投！我第一个去看。"', d:'好感 +12', fx:{rel:{jiang:12}}, act:() => S.flags.jiangSubmit = true, lines:[['jiang','……好。那你说话算话。']]},
+               {t:'"等你准备好了再说。"', d:'好感 +5', fx:{rel:{jiang:5}}, lines:[['jiang','嗯。也许明年吧。']]}]},
+    {rel:55, at:['roof'], title:'入选', when:() => S.flags.jiangSubmit, lines:[['jiang','（声音有点抖）……入选了。'], ['jiang','这个周末开幕。'], ['jiang','你说过你第一个去看的。']],
+      choices:[{t:'"周末见。"', d:'解锁周末活动「看尘尘的展」', main:true, fx:{rel:{jiang:10}, mood:10}, act:() => S.flags.jiangShow = true}]},
+    {rel:70, at:['roof'], title:'告白', when:() => S.time >= 1050 && !S.partner, lines:[['sys','傍晚的天台，尘尘把平板递给你。'], ['sys','屏幕上是一张画：一个小人站在办公室中间，四周打领带的老鼠在往门外跑。小人的发型和你一模一样。'], ['jiang','……我想说，下班之后，也想继续见到你。']],
+      choices:[{t:'"我也是。"', d:'在一起', main:true, act:() => S.partner = 'jiang', fx:{mood:20, rel:{jiang:15}}, lines:[['jiang','……那，明天见。不对，今晚见？']]},
+               {t:'"我们还是做朋友吧。"', fx:{mood:-4}, act:() => S.flags.jiangNo = true, lines:[['jiang','……嗯，好。画还是送你。']]}]},
+  ],
+  man:[
+    {rel:12, at:['canteen','tea'], title:'需求吐槽大全', lines:[['man','（把小本子推过来）给你看我收集的。'], ['sys','第 37 条：「这个按钮能不能再大一点，但不要显得大。」'], ['sys','第 52 条：「需求很简单，就是做一个淘宝。」']],
+      choices:[{t:'笑出声', d:'好感 +8', fx:{rel:{man:8}, mood:6}, lines:[['man','对吧！我每天就靠这个续命。']]},
+               {t:'"我这儿也有一条。"', d:'好感 +10', fx:{rel:{man:10}}, lines:[['man','快说快说！'], ['sys','你讲了闻灏的"你们组下班早"。她认真地记成了第 53 条。']]}]},
+    {rel:28, at:['tea'], title:'第五个需求', lines:[['sys','茶水间里，环环背对着门，肩膀在抖。'], ['man','……闻灏今天给我塞了第五个需求。全是口头的。'], ['man','我拒绝不了。我一开口就觉得自己不合群。']],
+      choices:[{t:'教她："先说一句『麻烦写清楚』。"', d:'好感 +10', fx:{rel:{man:10}}, act:() => S.flags.manBoundary = true, lines:[['man','"麻烦写清楚"……我练练。'], ['man','麻烦写清楚。麻烦写清楚。……好像还挺爽的。']]},
+               {t:'陪她一起骂闻灏', d:'好感 +8 心情 +5', fx:{rel:{man:8}, mood:5}, lines:[['man','哈……哈哈，你骂人的词怎么这么文明。']]}]},
+    {rel:40, at:['store'], title:'不接需求的咖啡店', lines:[['man','你有没有想过不上班了？'], ['man','我想开一家咖啡店。门口挂个牌子：本店不接需求。'], ['man','……是不是很幼稚？']],
+      choices:[{t:'"一点都不。我当第一个顾客。"', d:'好感 +12', fx:{rel:{man:12}}, act:() => S.flags.manCafe = true, lines:[['man','那我给你办一张终身会员卡。手写的。']]},
+               {t:'"先攒够钱再说？"', d:'好感 +6', fx:{rel:{man:6}}, lines:[['man','你说得对……那我先把奶茶戒了。'], ['man','……明天再戒。']]}]},
+    {rel:55, title:'加班夜', when:() => S.time >= 1020, lines:() => [['sys','傍晚，环环还在改 PRD。她桌上放着一个烤红薯。'], ['man','还没走？分你一半。楼下大爷说今天最后一个了。'], ...(S.flags.manBoundary ? [['man','对了，我今天跟闻灏说了"麻烦写清楚"。他愣了五秒。']] : [])],
+      choices:[{t:'陪她把 PRD 改完', d:'好感 +12 · 心情 +8', fx:{rel:{man:12}, mood:8, time:40}, act:() => { S.flags.walkWith = 'man'; }, lines:[['sys','你们分着吃完了一个烤红薯，改完了一份 PRD，聊完了各自的前任组长。']]}]},
+    {rel:70, at:['store'], title:'告白', when:() => !S.partner, lines:[['sys','环环在便利店门口等你，手里捏着两张票。'], ['man','下周末有个像素艺术展。不是工作，不用写需求文档，也不用对齐分工边界。'], ['man','……你来吗？']],
+      choices:[{t:'"那我负责买咖啡。"', d:'在一起', main:true, act:() => S.partner = 'man', fx:{mood:20, rel:{man:15}}, lines:[['man','书面确认了啊，不许反悔。']]},
+               {t:'"我们还是做朋友吧。"', fx:{mood:-4}, act:() => S.flags.manNo = true, lines:[['man','……嗯，好。票送你一张，你带别人去。']]}]},
+  ],
+  amy:[
+    {rel:12, at:['tea'], title:'生日表格', lines:[['sys','蟀蟀在茶水间对着笔记本敲 Excel。表头写着：全公司生日 & 忌口 & 喜欢的蛋糕口味。'], ['amy','312 个人。我每个都记得。']],
+      choices:[{t:'"那你自己的生日呢？"', d:'好感 +8', fx:{rel:{amy:8}}, act:() => S.flags.amyAsk = true, lines:[['amy','……我的？'], ['amy','行政的生日，一般没人记得啦。下周三。你也别记。']]},
+               {t:'"你好厉害。"', d:'好感 +5', fx:{rel:{amy:5}}}]},
+    {rel:20, at:['tea'], title:'蟀蟀的生日', when:() => S.flags.amyAsk && WD(S.day) === 2 && S.day >= 6, lines:[['sys','周三。茶水间里，蟀蟀一个人在吃一块很小的蛋糕。'], ['amy','啊，你来啦。……这是我自己买的，别笑我。']],
+      choices:[{t:'拿出你准备的小蛋糕', d:'需要「小蛋糕」', need:() => S.items.cake > 0, main:true, act:() => S.items.cake--, fx:{rel:{amy:20}, mood:10},
+                 lines:[['amy','……'], ['amy','你记得。'], ['sys','她哭了。这是她来公司五年，第一次有人记得她的生日。'], ['amy','以后你的每个生日，我都给你订最大的蛋糕。']]},
+               {t:'"生日快乐，蟀蟀。"', d:'好感 +8', fx:{rel:{amy:8}}, lines:[['amy','谢谢。能听到这句，已经很好了。']]}]},
+    {rel:40, title:'行政的秘密', lines:[['amy','跟你说个秘密。'], ['amy','下午茶的预算其实早就砍了。这半年，是我自己贴钱买的。'], ['amy','因为……大家吃到蛋挞的时候，会笑。']],
+      choices:[{t:'"下周的下午茶，我来请。"', d:'¥-200 · 好感 +15', need:() => S.money >= 200, fx:{money:-200, rel:{amy:15, lin:3, zhe:3}, mood:8}, lines:[['amy','……你这个人啊。']]},
+               {t:'"你真的很好。"', d:'好感 +8', fx:{rel:{amy:8}}}]},
+  ],
+  xu:[
+    {rel:10, at:['canteen'], title:'五年后', lines:[['xu','可以坐这儿吗？'], ['xu','我面试过你，你记得吗？那时候你说，想做一个"让人用起来不累"的东西。'], ['xu','现在呢？还想吗？']],
+      choices:[{t:'"还想。"', d:'好感 +8', fx:{rel:{xu:8}}, lines:[['xu','那就好。很多人进来两年，就忘了自己为什么来。']]},
+               {t:'"现在只想准点下班。"', d:'好感 +6', fx:{rel:{xu:6}}, lines:[['xu','哈哈，这也是一种成熟。']]}]},
+    {rel:15, at:['canteen','tea'], title:'传闻', when:() => S.flags.askHR, lines:[['me','糖糖，楼里说要裁员……科一很担心。'], ['xu','（沉默了一会儿）我不能说名单。'], ['xu','但我可以告诉你：你们组，这次没有人在上面。'], ['xu','让他好好吃饭，别熬夜。']],
+      choices:[{t:'"谢谢你，糖糖。"', d:'好感 +10', fx:{rel:{xu:10, zhe:6}}, act:() => S.flags.hrSafe = true}]},
+    {rel:35, at:['tea','canteen'], title:'HR 的建议', lines:[['xu','我看到你最近在跟闻灏他们周旋。'], ['xu','给你一个建议：把边界写下来。'], ['xu','口头的东西，在这家公司最不值钱。写下来的东西，最值钱。']],
+      choices:[{t:'"记住了。"', d:'好感 +8 · 绩效 +3', fx:{rel:{xu:8}, perf:3}}]},
+  ],
+};
+function nextBeat(c){
+  const list = ARCS[c] || [], i = S.arc[c] || 0;
+  return list[i] ? {b:list[i], i} : null;
+}
+function beatReady(c){
+  if(!ARCS[c] || !S.met[c] || S.arcDay[c] === S.day) return false;
+  const nb = nextBeat(c); if(!nb) return false;
+  const b = nb.b;
+  if(S.rel[c] < b.rel) return false;
+  if(b.at && !b.at.includes(where(c))) return false;
+  if(b.when && !b.when()) return false;
+  return where(c) !== null;
+}
+function runBeat(c){
+  const nb = nextBeat(c); S.arc[c] = nb.i + 1; S.arcDay[c] = S.day;
+  const b = nb.b, lines = typeof b.lines === 'function' ? b.lines() : b.lines;
+  S.flags['arcDone_' + c + '_' + nb.i] = S.day;
+  talk({lines:[['sys', `💬 ${CHARS[c].name}的故事 · ${b.title}`], ...lines], choices:b.choices});
+}
+// 尘尘"入选"只在投稿后出现；没投稿时直接跳过
+function skipDeadBeats(){
+  const j = S.arc.jiang || 0;
+  if(ARCS.jiang[j] && ARCS.jiang[j].title === '入选' && (S.arc.jiang || 0) === 3 && !S.flags.jiangSubmit) S.arc.jiang = 4;
+  const l = S.arc.lin || 0;
+  if(ARCS.lin[l] && ARCS.lin[l].title === '打掩护' && S.flags.linPath === 'stay') S.arc.lin = l + 1;
+  if(ARCS.lin[S.arc.lin || 0] && ARCS.lin[S.arc.lin || 0].title === '留下来' && S.flags.linPath === 'exam') S.arc.lin = (S.arc.lin || 0) + 1;
+  const a = S.arc.amy || 0;
+  if(ARCS.amy[a] && ARCS.amy[a].title === '蟀蟀的生日' && (!S.flags.amyAsk || S.day > 8)) S.arc.amy = a + 1;
+  const x = S.arc.xu || 0;
+  if(ARCS.xu[x] && ARCS.xu[x].title === '传闻' && !S.flags.askHR && (S.arc.zhe || 0) >= 2) S.arc.xu = x + 1;
+}
+
+/* =================== 地点随机小事件 =================== */
+const LOC_EVENTS = {
+  tea:[
+    {lines:[['sys','有人在微波炉里热了一盒鱼。整个茶水间的空气都凝固了。']], choices:[{t:'屏住呼吸冲咖啡', fx:{mood:-3}}, {t:'打开窗户', fx:{mood:3}, lines:[['sys','冷风灌进来。有人在背后小声说了句："谢谢你。"']]}]},
+    {lines:[['sys','冰箱上贴着一张愤怒的便利贴："谁偷喝了我的酸奶？？？我知道你是谁。"'], ['sys','你想起你昨天好像……不，你没有。']], choices:[{t:'默默走开', fx:{mood:2}}]},
+    {lines:[['sys','咖啡机发出一声惨叫，开始往外喷蒸汽。']], choices:[{t:'按下那个从没人按过的红色按钮', d:'?', act:() => { if(seed(S.day, 77) < .6){ S.last = '咖啡机安静了。你被路过的同事鼓了掌。'; S.mood = clamp(S.mood + 6); } else { S.last = '咖啡机喷了你一身奶泡。'; S.mood = clamp(S.mood - 6); } }}, {t:'假装没看见，赶紧溜', fx:{mood:-1}}]},
+    {lines:[['sys','桌上有半盒不知道谁留下的蛋挞，旁边写着："大家随便吃"。']], choices:[{t:'拿一个', fx:{mood:6, energy:4}}, {t:'拿两个', fx:{mood:9, energy:6}, lines:[['sys','你拿第二个的时候，和进门的人对视了一眼。']]}]},
+  ],
+  desk:[
+    {lines:[['sys','你的显示器上贴了一张便利贴："今天也辛苦了。"没有署名。']], when:() => LOVERS.some(k => S.rel[k] >= 30), choices:[{t:'把便利贴收进抽屉', fx:{mood:10}}]},
+    {lines:[['sys','电脑弹窗："系统将在 1 分钟后自动更新。"'], ['sys','你的文档还没保存。']], choices:[{t:'疯狂按 Ctrl+S', fx:{time:5}}, {t:'接受命运', fx:{time:20, mood:-5}, lines:[['sys','更新了 20 分钟。重启后，你的桌面图标全乱了。']]}]},
+    {lines:[['sys','隔壁工位的人在外放短视频。是那首你已经听了一百遍的歌。']], choices:[{t:'戴上耳机', fx:{mood:-2}}, {t:'跟着哼起来', fx:{mood:4}, lines:[['sys','对方愣了一下，把音量调大了。你们达成了某种默契。']]}]},
+    {lines:[['sys','楼下传来一阵喧哗。有人在楼下用喇叭喊："谁的电动车挡住消防通道了——"']], choices:[{t:'下意识摸了摸口袋里的钥匙', fx:{mood:1}}]},
+  ],
+  roof:[
+    {lines:[['sys','雨刚停。天边挂着一道很淡的彩虹。']], choices:[{t:'拍下来发朋友圈', fx:{mood:12}, lines:[['sys','五分钟后，有 23 个人点了赞。其中一个是雷雷。']]}, {t:'就这么看着', fx:{mood:15}}]},
+    {lines:[['sys','保洁阿姨坐在水箱边歇脚，看见你，冲你招手。'], ['sys','"小年轻，又来透气啊？我在这栋楼扫了十年地，见过的加班的人，比你见过的星星还多。"']], choices:[{t:'坐下来陪她聊会儿', fx:{mood:10, time:15}, lines:[['sys','"人啊，别把自己搞丢了。"她拍了拍你的肩，拎着拖把走了。']]}]},
+    {lines:[['sys','天台角落里，一个你不认识的人在打电话，声音哽咽："……妈，我没事，就是有点累。"']], choices:[{t:'悄悄离开，把空间留给他', fx:{mood:-2}}, {t:'放一包纸巾在他旁边', fx:{mood:4}, lines:[['sys','他抬头看了你一眼，点了点头。']]}]},
+  ],
+  wc:[
+    {lines:[['sys','隔壁隔间有人在开电话会："嗯嗯，这个我们对齐一下……"'], ['sys','然后冲了一下水。']], choices:[{t:'憋笑', fx:{mood:8}}]},
+    {lines:[['sys','你在镜子前碰到了雷雷。他正在整理他所剩不多的头发。'], ['boss','……你什么都没看见。']], choices:[{t:'"我什么都没看见。"', fx:{rel:{boss:3}, mood:3}}]},
+  ],
+  store:[
+    {lines:[['sys','便利店在搞新品试吃：芥末味的冰淇淋。']], choices:[{t:'试一口', act:() => { const ok = seed(S.day, 11) < .4; S.mood = clamp(S.mood + (ok ? 8 : -4)); S.last = ok ? '意外地……还不错？你买了一盒。' : '你的鼻子在燃烧。'; }}, {t:'礼貌拒绝'}]},
+    {lines:[['sys','收银员认出了你："老样子？"'], ['sys','你突然意识到，你在这家便利店的熟悉程度，超过了你的大部分同事。']], choices:[{t:'"老样子。"', fx:{mood:5, money:-8, energy:8}}]},
+    {lines:[['sys','收银台旁边有个抽奖箱：消费满 10 元抽一次。']], choices:[{t:'抽一次', d:'¥-10', fx:{money:-10}, act:() => { const r = seed(S.day, 12); if(r < .15){ S.money += 100; S.last = '你抽中了 100 元购物卡！'; } else if(r < .5){ S.items.drink = (S.items.drink || 0) + 1; S.last = '你抽中了一杯奶茶。'; } else S.last = '谢谢惠顾。'; }}, {t:'算了'}]},
+  ],
+  meeting:[
+    {lines:[['sys','白板上有人画了一只猫，旁边写着：「需求是会变的，猫不会。」'], ['sys','字迹很像科一的。']], choices:[{t:'在旁边画一只老鼠', fx:{mood:6}}]},
+    {lines:[['sys','会议桌上落下了一份打印的会议纪要。第一行写着："关于 xx 组承接 AI 提效落地的初步共识"。'], ['sys','"初步共识"的那场会，你没被邀请。']], choices:[{t:'拍照存证', fx:{mood:2}, act:() => S.flags.photoMinutes = true}, {t:'当没看见'}]},
+  ],
+  bossroom:[
+    {lines:[['sys','雷雷不在。他桌上摆着一个奖杯，底座上刻着："年度最佳……"后面被一张便利贴挡住了。']], choices:[{t:'别乱动别人的东西', fx:{mood:1}}]},
+  ],
+  canteen:[
+    {lines:[['sys','打饭阿姨的手抖了三下，你碗里的红烧肉从四块变成了一块。']], choices:[{t:'用眼神求阿姨', act:() => { S.last = '阿姨看了你一眼，又给你加了一勺土豆。'; S.mood = clamp(S.mood + 4); }}]},
+    {lines:[['sys','食堂角落里，有人当众表白。对象是……打饭的阿姨的女儿，她今天来帮忙。'], ['sys','全食堂起哄。']], choices:[{t:'跟着起哄', fx:{mood:8}}]},
+  ],
+};
+function maybeLocEvent(){
+  const pool = (LOC_EVENTS[S.loc] || []).map((e, i) => ({e, id:S.loc + i})).filter(x => S.locSeen[x.id] === undefined || S.day - S.locSeen[x.id] >= 6).filter(x => !x.e.when || x.e.when());
+  if(!pool.length || S.flags['le_' + S.loc] === S.day || Math.random() > .45) return false;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  S.locSeen[pick.id] = S.day; S.flags['le_' + S.loc] = S.day;
+  talk({lines:pick.e.lines, choices:pick.e.choices});
+  return true;
+}
+
+/* =================== 主线 / 公司事件 =================== */
 const EVENTS = [
   {id:'d1_wh1', when:() => S.day === 1 && S.time >= 630, run:() => { S.met.wh1 = true; talk({lines:[
-      ['sys','手机震了一下。隔壁组的闻灏发来私聊。'],
-      ['wh1','哈喽～我们组有个小问题，很简单的，你帮忙看一下呗？'],
-      ['wh1','反正你们组平时下班都挺早的嘛😊']],
+      ['sys','手机震了一下。隔壁组的闻灏发来私聊。'], ['wh1','哈喽～我们组有个小问题，很简单的，你帮忙看一下呗？'], ['wh1','反正你们组平时下班都挺早的嘛😊']],
     choices:[
       {t:'"好吧，我看看。"', d:'多一个待办', fx:{task:['x1',2], mood:-4}, lines:[['wh1','爱你！我就知道你最靠谱～']]},
       {t:'"麻烦把需求写清楚，走组长对齐一下？"', d:'守住边界', main:true, fx:{rel:{boss:2}}, act:() => S.flags.wh1No = true, lines:[['wh1','……啊，这么正式啊。行吧。'], ['sys','他没再回消息。']]},
     ]}); }},
-  {id:'d2_bday', when:() => S.day === 2 && S.time >= 900 && S.loc === 'tea', run:() => talk({lines:[
-      ['amy','surprise～今天是小林生日！蛋糕切好了，每人一块！'], ['lin','（眼眶有点红）你们怎么知道的……'], ['amy','我知道全公司每个人的生日哦。']],
+  {id:'d2_hint', when:() => S.day === 2 && S.time >= 840, run:() => { msg('amy','15:00 茶水间有惊喜，别告诉芸芸！'); toast('蟀蟀：15:00 茶水间有惊喜'); afterAction(); }},
+  {id:'d2_bday', when:() => S.day === 2 && S.time >= 900 && S.time < 960 && S.loc === 'tea', run:() => talk({lines:[
+      ['amy','surprise～今天是芸芸生日！蛋糕切好了，每人一块！'], ['lin','（眼眶有点红）你们怎么知道的……'], ['amy','我知道全公司每个人的生日哦。']],
     choices:[
       {t:'带头唱生日歌', d:'好感 + 心情 +', fx:{rel:{lin:10, amy:5}, mood:10, time:20}, lines:[['lin','……谢谢你们。这是我在这家公司过得最好的一个生日。']]},
       {t:'默默吃蛋糕', d:'心情 + 精力 +', fx:{mood:8, energy:6, time:15}, lines:[['sys','奶油很甜。你多拿了一块草莓。']]},
     ]})},
-  {id:'d2_bday_hint', when:() => S.day === 2 && S.time >= 840, run:() => { msg('amy','15:00 茶水间有惊喜，别告诉小林！'); toast('Amy：15:00 茶水间有惊喜'); afterAction(); }},
   {id:'d3_notice', when:() => S.day === 3, run:() => { msg('boss','今天 14:00 跨组周会，会议室，记得来。'); toast('新消息：14:00 跨组周会'); afterAction(); }},
   {id:'d3_meeting', when:() => S.day === 3 && S.time >= 840 && S.time < 900 && S.loc === 'meeting', run:() => { S.met.wh1 = true; talk({lines:[
       ['sys','投屏上是一页「AI 赋能 · 流程提效」的 PPT，配色很用心。闻灏讲了二十分钟，前十八分钟是愿景。'],
-      ['wh1','落地这块，主要就是你们组来维护、调试规则。我看你们平时下班都挺早的，工作量应该挤得出来。'],
-      ['sys','会议室安静了两秒。所有人都看向你。']],
+      ['wh1','落地这块，主要就是你们组来维护、调试规则。我看你们平时下班都挺早的，工作量应该挤得出来。'], ['sys','会议室安静了两秒。所有人都看向你。']],
     choices:[
-      {t:'"跨组任务，麻烦先跟两边组长书面对齐分工。"', d:'有理有据', main:true, fx:{rel:{boss:6}, mood:6, perf:3, time:60}, act:() => reveal('wh1'),
-        lines:[['boss','嗯，这个流程没问题。会后把分工写清楚，两边组长签字。'], ['wh1','……当然当然。']]},
+      {t:'"跨组任务，麻烦先跟两边组长书面对齐分工。"', d:'有理有据', main:true, fx:{rel:{boss:6}, mood:6, perf:3, time:60}, act:() => reveal('wh1'), lines:[['boss','嗯，这个流程没问题。会后把分工写清楚，两边组长签字。'], ['wh1','……当然当然。']]},
       {t:'沉默', d:'多一个大待办', fx:{task:['x2',5], mood:-10, time:60}, lines:[['sys','你没说话。会议纪要里写着："落地：你们组（待评估）"。']]},
     ]}); }},
-  {id:'d3_missed', when:() => S.day === 3 && S.time >= 900 && !S.flags.ev_d3_meeting, run:() => { S.flags.ev_d3_meeting = true; msg('boss','周会你没来？闻灏说他的方案你们组来落地，我先答应了哈。'); toast('老周发来一条消息'); fx({task:['x2',5], rel:{boss:-3}}); afterAction(); }},
-  {id:'d4_outage', when:() => S.day === 4, run:() => talk({lines:[
-      ['sys','09:31。你刚坐下，群里炸了。'], ['boss','线上出问题了！谁有空看一下？'], ['zhe','（摘下两边耳机）……是周四的那个 bug。它又来了。']],
+  {id:'d3_missed', when:() => S.day === 3 && S.time >= 900 && !S.flags.ev_d3_meeting, run:() => { S.flags.ev_d3_meeting = true; msg('boss','周会你没来？闻灏说他的方案你们组来落地，我先答应了哈。'); toast('雷雷发来一条消息'); fx({task:['x2',5], rel:{boss:-3}}); afterAction(); }},
+  {id:'d4_outage', when:() => S.day === 4, run:() => talk({lines:[['sys','09:31。你刚坐下，群里炸了。'], ['boss','线上出问题了！谁有空看一下？'], ['zhe','（摘下两边耳机）……是周四的那个 bug。它又来了。']],
     choices:[{t:'"我来。"', d:'今天的重点：修 bug', main:true, fx:{rel:{boss:4, zhe:4}}}]})},
+  {id:'lin_cover', when:() => S.flags.linCover && !S.flags.linCoverDone && WD(S.day) === 3 && S.time >= 840, run:() => { S.flags.linCoverDone = true; talk({lines:[['sys','下午两点，芸芸的工位空了。'], ['boss','（走过来）芸芸呢？'], ['me','她……去楼下取快递了。'], ['boss','……取了多久了？']],
+    choices:[{t:'"刚下去。快递有点多。"', act:() => { if(seed(S.day, 21) < .3){ S.rel.boss = clamp(S.rel.boss - 5); S.last = '雷雷看了你一眼，什么都没说。你知道他看穿了。'; } else S.last = '雷雷"哦"了一声，走了。你松了一口气。'; }}]}); }},
+  {id:'boss_cover', when:() => S.flags.bossCover && !S.flags.bossCoverDone && WD(S.day) === 3 && S.time >= 1080, run:() => { S.flags.bossCoverDone = true; talk({lines:[['sys','晚上七点，你替雷雷站在复盘会的投屏前。'], ['sys','他的老板问了三个刁钻问题。你答上来两个半。'], ['sys','散会的时候，手机亮了。雷雷发来一张照片：舞台上，一个穿白裙子的小女孩在鞠躬。']],
+    end:() => { S.overtimeMin += 60; fx({perf:6, mood:-3, energy:-10, rel:{boss:6}}); offWork(); }}); }},
   {id:'d5_wh4', when:() => S.day === 5 && S.time >= 1035, run:() => { S.met.wh4 = true; talk({lines:[
-      ['sys','周五傍晚，项目经理雯灏端着保温杯走到你身边。'],
-      ['wh4','哎，周末有空吗？项目下周一节点，大家都在扛。'],
-      ['wh4','都是一个大项目的，别分这么清楚嘛。上线了我请大家吃饭。']],
+      ['sys','周五傍晚，项目经理雯灏端着保温杯走到你身边。'], ['wh4','哎，周末有空吗？项目下周一节点，大家都在扛。'], ['wh4','都是一个大项目的，别分这么清楚嘛。上线了我请大家吃饭。']],
     choices:[
-      {t:'"可以，你在系统里建个单，写清楚范围和验收人？"', d:'把人情变成书面', main:true, act:() => reveal('wh4'), fx:{mood:6},
-        lines:[['wh4','……这么小的事还建单啊。'], ['sys','他嘟囔着走了。那张单子，最终没有被建出来。']]},
-      {t:'"好吧……"', d:'周末要来加班', act:() => S.flags.weekendWork = true, fx:{mood:-10}, lines:[['wh4','好嘞！就知道你最有团队精神！']]},
+      {t:'"可以，你在系统里建个单，写清楚范围和验收人？"', d:'把人情变成书面', main:true, act:() => reveal('wh4'), fx:{mood:6}, lines:[['wh4','……这么小的事还建单啊。'], ['sys','他嘟囔着走了。那张单子，最终没有被建出来。']]},
+      {t:'"好吧……"', d:'周六上午要来加班', act:() => S.flags.weekendWork = S.day, fx:{mood:-10}, lines:[['wh4','好嘞！就知道你最有团队精神！']]},
       {t:'"周末我有安排了。"', d:'直接拒绝', fx:{mood:4}, lines:[['wh4','现在的年轻人啊……']]},
     ]}); }},
   {id:'d7_notice', when:() => S.day === 7, run:() => { msg('boss','10:00–12:00 评审会，会议室。评审材料是你准备的，你来讲。'); toast('新消息：10:00 评审会'); afterAction(); }},
   {id:'d7_review', when:() => S.day === 7 && S.time >= 600 && S.time < 720 && S.loc === 'meeting', run:() => { S.met.wh2 = true; const mine = S.tasks.some(t => t.key === 't8' && t.fin);
-    talk(mine ? {lines:[['sys','评审会。投屏上的汇报人一栏写着：汶昊。'], ['wh2','这个方案是我们这边整理的，大家可以看一下第三页……'], ['sys','那是你熬夜写的材料。页眉改了，作者也改了。']],
+    talk(mine ? {lines:[['sys','评审会。投屏上的汇报人一栏写着：汶昊。'], ['wh2','这个方案是我们这边整理的，大家可以看一下第三页……'], ['sys','那是你熬夜写的材料。页眉改了，作者也改了。'], ...(S.flags.jiangWitness ? [['sys','你看到坐在角落的尘尘冲你点了点头。']] : [])],
       choices:[
         {t:'"补充一下，这份文档的版本历史在这里，作者是我。"', d:'拿出证据', main:true, act:() => reveal('wh2'), fx:{perf:8, rel:{boss:8}, mood:10, time:60},
-          lines:[['wh2','……这个是团队一起讨论的结果。'], ['boss','会后你们俩来我办公室一下。']]},
+          lines:[['wh2','……这个是团队一起讨论的结果。'], ...(S.flags.jiangWitness ? [['jiang','汶昊，去年我的登录页，也是"一起讨论"的吗？']] : []), ['boss','会后你们俩来我办公室一下。']]},
         {t:'算了', d:'心情 --', fx:{mood:-15, time:60}, lines:[['boss','汶昊这次挺有想法的。'], ['sys','你低头看着自己的手。']]},
       ]} : {lines:[['sys','评审会开始了。你的材料还没准备完。'], ['wh2','没关系没关系，我这边整理了一版，我先讲吧。'], ['sys','他讲的东西，有一半是你草稿里的。'], ['boss','汶昊准备得很充分嘛。']], end:() => { fx({mood:-12, perf:-4, time:60}); afterAction(); }}); }},
   {id:'wh3_gossip', when:() => S.day >= 4 && S.loc === 'tea' && where('wh3') === 'tea', run:() => { S.met.wh3 = true; const k = S.partner || S.flags.walkWith;
-    talk({lines:[
-      ['sys','你推开茶水间的门，正听见玟颢在和人闲聊。'],
-      ['wh3', k ? `……我也是听说的啊，有人看见TA跟${CHARS[k].name}一起下班。啧啧。` : '……我也不是说TA不好，就是配合度差一点，跨组推个东西，第一反应就是顶回去。'],
-      ['wh3','哎呀，说曹操曹操到～']],
+    talk({lines:[['sys','你推开茶水间的门，正听见玟颢在和人闲聊。'],
+      ['wh3', k ? `……我也是听说的啊，有人看见TA跟${CHARS[k].name}一起下班。啧啧。` : '……我也不是说TA不好，就是配合度差一点，跨组推个东西，第一反应就是顶回去。'], ['wh3','哎呀，说曹操曹操到～']],
     choices:[
       {t:'"有什么想知道的，可以直接问我。"', d:'不卑不亢', main:true, act:() => reveal('wh3'), fx:{mood:6}, lines:[['sys','茶水间安静了。有人小声说了句"就是"。玟颢张了张嘴，没接上话。']]},
       {t:'装没听见', d:'心情 -8', fx:{mood:-8}, lines:[['sys','你接完水就走了。背后传来一阵笑声。']]},
     ]}); }},
-  {id:'d8_teambuild', when:() => S.day === 8 && S.time >= 900, run:() => { const opts = ['lin','zhe','jiang','man','amy'].filter(k => S.met[k]);
+  {id:'d8_teambuild', when:() => S.day === 8 && S.time >= 900, run:() => { const opts = ['lin','zhe','jiang','man','amy'].filter(k => S.met[k] && where(k) !== undefined && !(k === 'lin' && S.flags.linGone));
     talk({lines:[['amy','团建时间到！今天下午的项目是——密室逃脱！'], ['amy','两人一组，自己选搭档哦～']],
-      choices:opts.map(k => ({t:`和${CHARS[k].name}一组`, d: CHARS[k].love ? '💗' : '', fx:{rel:{[k]: CHARS[k].love ? 18 : 10}, mood:12},
+      choices:opts.map(k => ({t:`和${CHARS[k].name}一组`, d: CHARS[k].love ? '💗' : '', fx:{rel:{[k]: CHARS[k].love ? 16 : 10}, mood:12},
         lines: CHARS[k].love ? [['sys','密室里很黑。最后一道机关需要两个人同时按住。'], [k, k === 'jiang' ? '……你的手好冰。' : '……你别笑，我真的有点怕黑。'], ['sys','你们是最后一组出来的。']] : [['sys','你们配合默契，第一个逃出了密室。'], [k,'我们简直是天作之合！（工作意义上的）']]})),
       end:() => { S.time = Math.max(S.time, 1080); S.loc = 'desk'; S.last = '团建结束了。你的手机里多了很多张糊掉的合照。'; afterAction(); }}); }},
-  {id:'d9_boss_hint', when:() => S.day === 9, run:() => { msg('boss','下午四点来我办公室一趟，聊聊。'); toast('老周：下午四点来我办公室'); afterAction(); }},
-  {id:'d9_boss', when:() => S.day === 9 && S.time >= 960 && S.loc === 'bossroom', run:() => talk({lines:[
-      ['boss','来得正好，坐。'], ['boss', S.perf >= 80 ? '这两周你表现很好。下季度的晋升名单，我准备报你。' : S.perf >= 45 ? '这两周还行，继续保持。有什么想法可以跟我说。' : '最近……是不是状态不太好？任务有点拖。']],
-    choices:[
-      {t:'"谢谢老周，我会继续努力。"', fx:{rel:{boss:5}}},
-      {t:'"其实我想聊聊跨组任务的分工规则。"', d:'从根上解决问题', need:() => Object.keys(S.revealed).length >= 2, main:true, fx:{rel:{boss:8}, perf:5}, act:() => S.flags.rule = true,
-        lines:[['boss','你说的这个，我也想了很久。你写个草案，我带去经理会。']]},
-    ]})},
-  {id:'lunch_date', when:() => S.flags.lunchDate && S.loc === 'canteen' && LUNCH(S.time), run:() => { const k = S.flags.lunchDate; S.flags.lunchDate = null;
+  {id:'payday_msg', when:() => isPayday(S.day) && !S.flags['pay' + S.day], run:() => { S.flags['pay' + S.day] = true; msg('xu', '本期工资已发放，请注意查收。'); toast('💰 工资今天发！下班后结算'); afterAction(); }},
+  {id:'lunch_date', repeat:true, when:() => S.flags.lunchDate && S.loc === 'canteen' && LUNCH(S.time), run:() => { const k = S.flags.lunchDate; S.flags.lunchDate = null;
     talk({lines:[[k, k === 'jiang' ? '我帮你占了靠窗的位子。' : '我点了两份番茄炒蛋，你不爱吃葱对吧？'], ['sys','你们聊了很久，饭都凉了。']], end:() => { S.ate = true; fx({time:50, energy:20, rel:{[k]:10}, mood:8}); afterAction(); }}); }},
-  {id:'lunch_miss', when:() => S.flags.lunchDate && S.time >= 810, run:() => { const k = S.flags.lunchDate; S.flags.lunchDate = null; msg(k, '……你今天中午是不是忘了？没事。'); fx({rel:{[k]:-6}}); afterAction(); }},
-  {id:'d10_confess', when:() => S.day === 10 && S.time >= 1050 && !S.partner && LOVERS.some(k => S.rel[k] >= 65 && where(k) === S.loc), run:() => { const k = LOVERS.find(k => S.rel[k] >= 65 && where(k) === S.loc);
-    talk({lines: k === 'jiang' ? [['sys','傍晚的天台，江屿把平板递给你。'], ['sys','屏幕上是一张画：一个小人站在办公室中间，四周的老鼠在往门外跑。小人的发型和你一模一样。'], ['jiang','……我想说，下班之后，也想继续见到你。']]
-      : [['sys','陈蔓在便利店门口等你，手里捏着两张票。'], ['man','下周末有个像素艺术展。不是工作，不用写需求文档，也不用对齐分工边界。'], ['man','……你来吗？']],
-      choices:[
-        {t: k === 'jiang' ? '"我也是。"' : '"那我负责买咖啡。"', d:'在一起', main:true, act:() => { S.partner = k; }, fx:{mood:20, rel:{[k]:15}}, lines:[[k, k === 'jiang' ? '……那，明天见。不对，今晚见？' : '书面确认了啊，不许反悔。']]},
-        {t:'"我们还是做朋友吧。"', fx:{mood:-4}, lines:[[k, '……嗯，好。']]},
-      ]}); }},
+  {id:'lunch_miss', repeat:true, when:() => S.flags.lunchDate && S.time >= 810, run:() => { const k = S.flags.lunchDate; S.flags.lunchDate = null; msg(k, '……你今天中午是不是忘了？没事。'); fx({rel:{[k]:-6}}); afterAction(); }},
+  {id:'lin_leave', when:() => S.flags.linLeaving && S.day >= S.flags.linLeaving, run:() => { S.flags.linGone = true; talk({lines:[['sys','芸芸的最后一天。她的工位空了，只剩一个纸箱。'], ['lin','（抱着纸箱）抽屉里的薯片，三种口味，都给你。'], ['lin','以后周末，我们还是可以吃火锅的。对吧？']], choices:[{t:'"对。每个周末。"', fx:{mood:-5, rel:{lin:10}}}]}); }},
 ];
-['lunch_miss','lunch_date'].forEach(id => EVENTS.find(e => e.id === id).repeat = true);
-function reveal(id){
-  if(S.revealed[id]) return;
-  S.revealed[id] = true; S.met[id] = true;
-  S.pendingReveal = id;
-}
+function reveal(id){ if(S.revealed[id]) return; S.revealed[id] = true; S.met[id] = true; S.pendingReveal = id; }
 
 /* =================== 时间流转 =================== */
-function afterAction(){
+function afterAction(fromMove){
   if(DQ) return;
+  if(S.scene !== 'office' && IN_GAME.includes(S.scene)) S.scene = 'office';
   if(S.pendingReveal){ const id = S.pendingReveal; S.pendingReveal = null; showReveal(id); return; }
+  skipDeadBeats();
   for(const e of EVENTS){
     if(!S.flags['ev_' + e.id] && e.when()){ if(!e.repeat) S.flags['ev_' + e.id] = true; e.run(); return; }
   }
-  if(!S.flags['tasks' + S.day] && DAY_TASKS[S.day]){ S.flags['tasks' + S.day] = true; DAY_TASKS[S.day].forEach(([k,d]) => addTask(k, d)); msg('boss', '今天的活：' + DAY_TASKS[S.day].map(([k]) => TASKS[k].name).join('；')); }
-  if(S.time >= 690 && !S.flags['lunchMsg' + S.day] && !S.flags.lunchDate){ S.flags['lunchMsg' + S.day] = true; msg('lin','饭？'); toast('小林：饭？'); }
-  if(S.energy <= 0 && S.flags.sleepy !== S.day){ S.flags.sleepy = S.day; talk({lines:[['sys','你的眼皮打架打赢了。你在工位上睡着了四十分钟。'], ['zhe','（轻轻推你）……老周往这边走了。']], end:() => { S.loc = 'desk'; fx({time:40, energy:25}); afterAction(); }}); return; }
+  const due = S.orders.find(o => S.time >= o.at);
+  if(due){ S.orders = S.orders.filter(o => o !== due); deliver(due); return; }
+  if(!S.flags['tasks' + S.day]){ S.flags['tasks' + S.day] = true; const ts = dailyTasks(S.day); ts.forEach(([k,d]) => addTask(k, d)); msg('boss', '今天的活：' + ts.map(([k]) => taskDef(k).name).join('；')); }
+  if(S.time >= 690 && !S.flags['lunchMsg' + S.day] && !S.flags.lunchDate && !S.ate){ S.flags['lunchMsg' + S.day] = true; msg(S.flags.linGone ? 'zhe' : 'lin', '饭？还是点外卖？'); toast('午饭时间到了'); }
+  // 有人想找你聊（故事线）
+  for(const c of Object.keys(ARCS)) if(where(c) === S.loc && beatReady(c)){ runBeat(c); return; }
+  if(fromMove && maybeLocEvent()) return;
+  if(S.energy <= 0 && S.flags.sleepy !== S.day){ S.flags.sleepy = S.day; talk({lines:[['sys','你的眼皮打架打赢了。你在工位上睡着了四十分钟。'], ['zhe','（轻轻推你）……雷雷往这边走了。']], end:() => { S.loc = 'desk'; fx({time:40, energy:25}); afterAction(); }}); return; }
   if(S.mood <= 0 && S.flags.emo !== S.day){ S.flags.emo = S.day; talk({lines:[['sys','你盯着屏幕，突然什么都看不进去了。'], ['sys','你去天台站了很久。']], end:() => { S.loc = 'roof'; fx({time:45, mood:30}); afterAction(); }}); return; }
   if(S.time >= 1080 && S.flags.off !== S.day){ S.flags.off = S.day; offWork(); return; }
   save(); render();
 }
 function offWork(){
   const due = S.tasks.filter(t => !t.fin && t.due <= S.day);
-  talk({lines:[['sys', `18:00 到了。${due.length ? `「${TASKS[due[0].key].name}」今天截止，还没做完。` : '今天的活都在掌控之中。'}`]],
+  talk({lines:[['sys', `下班时间到了。${due.length ? `「${taskDef(due[0].key).name}」今天截止，还没做完。` : '今天的活都在掌控之中。'}`]],
     choices:[
       {t:'准点下班！', d:'人间清醒', main:!due.length, end:() => goHome()},
       {t:'加班 1 小时', d:'推进待办 · 精力 -10 心情 -9', main:!!due.length, end:() => { doWork(60); fx({mood:-6}); S.overtimeMin += 60;
@@ -641,37 +887,115 @@ function offWork(){
     ]});
 }
 function goHome(){
-  S.tasks.forEach(t => { if(!t.fin && t.due <= S.day && !t.late){ t.late = true; S.perf -= 5; S.rel.boss = clamp(S.rel.boss - 3); msg('boss', `「${TASKS[t.key].name}」怎么样了？尽快给我。`); } });
+  S.tasks.forEach(t => { if(!t.fin && t.due <= S.day && !t.late){ t.late = true; S.perf -= 5; S.rel.boss = clamp(S.rel.boss - 3); msg('boss', `「${taskDef(t.key).name}」怎么样了？尽快给我。`); } });
+  S.tasks = S.tasks.filter(t => !t.fin || S.day - (t.finDay || S.day) < 3);
+  S.orders = [];
   S.scene = 'home'; save(); render();
 }
 function night(choice){
   const o = {
     rest:{energy:60, mood:5, text:'你十点就上床了。这是这个月第一次。'},
-    drama:{energy:40, mood:15, text:'你追完了三集剧。"就最后一集"这句话你说了三次。'},
+    drama:{energy:40, mood:has('console') ? 22 : 15, text: has('console') ? '你打了三个小时游戏，终于打过了那个 boss。比打过雷雷的老板还爽。' : '你追完了三集剧。"就最后一集"这句话你说了三次。'},
     study:{energy:35, mood:-3, perf:3, text:'你看了两小时课程。第二天你会忘掉一半，但另一半是你的。'},
     love:{energy:40, mood:14, text:''},
   }[choice];
-  if(choice === 'love'){ const k = topLover(); o.text = `你和${CHARS[k].name}聊到了十二点。${k === 'jiang' ? '他发来一张画：你的绿萝开了一朵花。' : '她说她的《需求吐槽大全》第一章是写你的。'}`; S.rel[k] = clamp(S.rel[k] + 5); }
+  if(choice === 'love'){ const k = topLover(); o.text = `你和${CHARS[k].name}聊到了十二点。${k === 'jiang' ? '他发来一张画：你的绿植开了一朵花。' : '她说她的《需求吐槽大全》第一章是写你的。'}`; S.rel[k] = clamp(S.rel[k] + 5); }
   S.energy = clamp(S.energy + o.energy); S.mood = clamp(S.mood + o.mood); if(o.perf) S.perf += o.perf;
   S.nightText = o.text;
-  if(S.day === LAST_DAY){ S.scene = 'ending'; save(); render(); return; }
-  if(S.day === 5){ S.scene = 'weekend'; save(); render(); return; }
+  if(isPayday(S.day) && S.flags.paidOut !== S.day){ S.scene = 'payday'; save(); render(); return; }
+  if(WD(S.day) === 4){ startWeekend(); return; }
   nextDay();
 }
 function nextDay(){
-  S.day++; S.time = 570; S.loc = 'desk'; S.coffeeToday = 0; S.ate = false; S.last = '';
+  S.day++; S.time = 570; S.loc = 'desk'; S.coffeeToday = 0; S.ate = false; S.last = ''; S.flags.walkWith = S.partner || null;
+  if(has('monstera')) S.mood = clamp(S.mood + 3);
   S.scene = 'morning'; save(); render();
 }
 
+/* =================== 发工资 =================== */
+function payroll(){
+  const gained = S.perf - S.perfAtCycle;
+  const grade = gained >= 140 ? 'S' : gained >= 105 ? 'A' : gained >= 65 ? 'B' : 'C';
+  const bonus = {S:3000, A:1500, B:500, C:0}[grade];
+  return {gained, grade, salary:9800, rent:3500, bonus, total:9800 - 3500 + bonus};
+}
+
+/* =================== 周末 =================== */
+const MOVIES = [['《打工人逆袭》','喜剧','全场笑了九十分钟。散场时你发现自己的心情好了很多。',18],['《楼上的老鼠》','悬疑','反派是一只打领带的老鼠。你看得后背发凉，又有点解气。',12],['《周五的天台》','爱情','男女主在天台上告白的时候，你旁边的情侣哭了。',14],['《绩效之王》','动作','主角一个人干了整个部门的活。你觉得这是恐怖片。',8],['《需求变更》','恐怖','最吓人的一幕：甲方说"我们再改一版"。',6],['《猫咪需求》','动画','一只叫"需求"的猫，最后终于满意了。',16]];
+const WK_SLOTS = ['上午','下午','晚上'];
+function startWeekend(){ S.wk = {d:0, slot:0, log:[]}; S.scene = 'weekend'; save(); render(); }
+function weekendActs(){
+  const w = S.wk, a = [], sat = w.d === 0;
+  if(sat && w.slot === 0 && S.flags.weekendWork && S.flags.weekendWork === S.day){ a.push({ic:'🏢', t:'去公司加班（答应了雯灏）', d:'精力 -15 心情 -20 · 没有加班费', run:() => { S.flags.weekendWork = null; wfx({energy:-15, mood:-20}, '周六的办公室里，只有你和饮水机。雯灏在群里发了个"辛苦了🎉"，没有@你。'); }}); return a; }
+  if(w.slot === 0) a.push({ic:'🛏️', t:'睡懒觉', d:'精力 +30', run:() => wfx({energy:30, mood:5}, '你睡到了十一点。阳光从窗帘缝里漏进来，像一条金色的线。')});
+  a.push({ic:'🎮', t: has('console') ? '宅家打游戏机' : '宅家刷剧', d: has('console') ? '心情 +22' : '心情 +12', run:() => wfx({mood: has('console') ? 22 : 12, energy:5}, has('console') ? '你和网上的陌生人组队打了一下午。有个人叫你"大佬"。' : '你看完了一整季。片尾曲响起的时候，有点空落落的。')});
+  a.push({ic:'🍳', t:'自己做饭', d:'¥-30 · 可能会糊', run:() => { const ok = Math.random() < .65; wfx({money:-30, energy:15, mood: ok ? 12 : -4}, ok ? '你做了一桌三菜一汤。拍照的时候，发现自己像个大人了。' : '你做糊了。厨房的烟雾报警器替你哭了一场。'); }});
+  a.push({ic:'🛍️', t:'逛商场', d:'可以买东西 · 心情 +6', run:() => { openShop(true); }});
+  if(w.slot > 0){ const mv = movieOf(); a.push({ic:'🎬', t:`看电影：${mv[0]}`, d:`¥45 · ${mv[1]}`, run:() => wfx({money:-45, mood:mv[3]}, mv[2] + (S.partner ? `${CHARS[S.partner].name}在黑暗里握住了你的手。` : ''))}); }
+  if(w.slot < 2) a.push({ic:'🌳', t:'去公园', d:'心情 +10 · 随机遇到点什么', run:() => { const r = Math.random(); wfx({mood:10, energy:5}, r < .33 ? '你在草坪上躺了一下午。一只金毛跑过来，把头放在你肚子上。' : r < .66 ? '公园里有人在放风筝。你借了一只，放得比所有人都高。' : '你在长椅上看了一本书。旁边的大爷下棋下了三个小时，一步都没走。'); }});
+  if(w.slot > 0) a.push({ic:'🧩', t:'剧本杀', d:'¥128 · 心情 +18', run:() => wfx({money:-128, mood:18, energy:-5}, ['你抽到了凶手的本。你演得太好，全场没人怀疑你。','你抽到了侦探的本。你推理了四个小时，凶手是你自己。'][Math.floor(Math.random() * 2)])});
+  if(sat && w.slot === 0) a.push({ic:'🚄', t:'周边两日游', d:'¥-800 · 占满整个周末 · 心情 +40', run:() => { S.money -= 800; S.spent += 800; S.mood = clamp(S.mood + 40); S.energy = clamp(S.energy + 30); endWeekend('你去了一座海边小城。手机开了飞行模式。周日晚上回来的时候，你觉得自己像被重新充了电。'); }});
+  if(sat && w.slot === 0 && has('trip')) a.push({ic:'🏝️', t:'用掉海岛旅行套票', d:'心情满 · 精力满', run:() => { S.items.trip--; S.mood = 100; S.energy = 100; endWeekend('你在海岛上晒了两天太阳。回来的时候，晒黑了一个色号，工作群的 99+ 你一条都没看。'); }});
+  // 约同事
+  const hang = {lin:['🍲','吃火锅',60,'她点了九宫格，最后一个人吃了三盘毛肚。' + (S.flags.linPath === 'exam' ? '她说考完试，想去旅行。' : '她说她报的课第一周就作业爆炸了。')],
+    zhe:['🐱','去猫咖',50,'你终于见到了那只叫"需求"的猫。它对你很冷淡，就像真正的需求一样。科一笑了，你第一次见他笑出声。'],
+    jiang:['🖼️', S.flags.jiangShow ? '看尘尘的插画展' : '去美术馆',80, S.flags.jiangShow ? '展厅最里面挂着那张平面图。画里的天台上，有两个小人并排坐着。他说："右边那个是你。"' : '他在每一幅画前都站很久，然后小声给你讲画家是怎么用颜色的。'],
+    man:['📚','逛书店喝咖啡',60, S.flags.manCafe ? '她带你去了一家小咖啡店，指着角落说："以后我的店，书架就放这儿。"' : '她买了一本《如何优雅地拒绝别人》，送给了你。'],
+    amy:['🧺','逛周末市集',40,'她买了一堆手作：给芸芸的发夹、给科一的猫薄荷、给雷雷女儿的贴纸。给你的是一个写着"准点下班"的钥匙扣。']};
+  Object.entries(hang).forEach(([k, [ic, what, cost, text]]) => {
+    if(!S.met[k] || S.rel[k] < 35 || w.done && w.done[k]) return;
+    if(k === 'lin' && S.flags.linGone && S.rel.lin < 50) return;
+    a.push({ic, t:`约${CHARS[k].name}${what}`, d:`¥-${cost} · 好感 +12`, hot:CHARS[k].love || k === S.partner, run:() => { (w.done = w.done || {})[k] = true; S.rel[k] = clamp(S.rel[k] + (CHARS[k].love ? 14 : 12)); wfx({money:-cost, mood:15}, text); }});
+  });
+  return a;
+}
+const movieOf = () => MOVIES[(WK(S.day) + S.wk.d * 2 + S.wk.slot) % MOVIES.length];
+function wfx(o, text){
+  if(o.money){ S.money += o.money; if(o.money < 0) S.spent -= o.money; }
+  if(o.energy) S.energy = clamp(S.energy + o.energy);
+  if(o.mood) S.mood = clamp(S.mood + o.mood);
+  S.wk.log.push(`${['周六','周日'][S.wk.d]}${WK_SLOTS[S.wk.slot]}：${text}`);
+  S.wk.last = text;
+  S.wk.slot++;
+  if(S.wk.slot > 2){ S.wk.slot = 0; S.wk.d++; S.energy = clamp(S.energy + 25); }
+  if(S.wk.d > 1){ endWeekend(); return; }
+  save(); render();
+}
+function endWeekend(extra){
+  S.nightText = extra || (S.wk.log.slice(-1)[0] || '').replace(/^.*?：/, '');
+  S.wk = null; nextDay();
+}
+
+/* =================== 商城 =================== */
+function openShop(inMall){
+  const el = document.getElementById('sheet');
+  el.innerHTML = `<div class="in"><h2>🛍️ ${inMall ? '商场' : '网购'}<button id="closeSheet">${inMall ? '逛完了' : '关闭'}</button></h2>
+    <p class="hint">余额 ¥${S.money}${inMall ? ' · 逛街本身心情 +6' : ''}</p>
+    <div class="shop">${Object.entries(ITEMS).map(([k, it]) => { const own = !it.use && has(k);
+      return `<button class="item ${own ? 'owned' : ''}" data-k="${k}" ${own || S.money < it.price ? 'disabled' : ''}><span class="ic">${it.ic}</span><span class="tx"><span class="t">${it.name}${it.use && S.items[k] ? ` ×${S.items[k]}` : ''}</span><span class="d">${it.d}</span></span><span class="pr">${own ? '已拥有' : '¥' + it.price}</span></button>`; }).join('')}</div></div>`;
+  el.hidden = false;
+  const close = () => { closeSheet(); if(inMall) wfx({mood:6}, S.wk.bought ? `你在商场买了${S.wk.bought.join('、')}。刷卡的那一刻，快乐是真的。` : '你逛了一下午，什么都没买。但试穿了七件衣服，也算运动了。'); else render(); };
+  el.onclick = e => { if(e.target === el) close(); };
+  el.querySelector('#closeSheet').onclick = close;
+  el.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { const k = b.dataset.k, it = ITEMS[k]; if(S.money < it.price) return;
+    S.money -= it.price; S.spent += it.price; S.items[k] = (S.items[k] || 0) + 1; toast(`买下了${it.name}！`, 'gold');
+    if(k === 'bag') S.mood = clamp(S.mood + 35);
+    if(k === 'phones' && S.rel.zhe < 100){ S.rel.zhe = clamp(S.rel.zhe + 5); toast('科一：同款！', 'good'); }
+    if(inMall){ (S.wk.bought = S.wk.bought || []).push(it.name); }
+    save(); openShop(inMall); });
+}
+
 /* =================== 渲染 =================== */
-const IN_GAME = ['office','todo','people','phone'];
+const IN_GAME = ['office','todo','people','phone','mine'];
 function renderHud(){
   const h = document.getElementById('hud');
   if(!IN_GAME.includes(S.scene)){ h.hidden = true; return; }
   h.hidden = false;
   const m = (label, v, cls) => `<div class="meter"><div class="top"><span>${label}</span><b>${v}</b></div><div class="bar ${cls} ${v < 25 ? 'low' : ''}"><i style="width:${clamp(v)}%"></i></div></div>`;
-  h.innerHTML = `<div class="hud-top"><span class="date">${DAYS[S.day]}</span><span class="clock">${fmt(S.time)}</span><span class="money">¥${S.money}</span></div>
-    <div class="meters">${m('⚡ 精力',S.energy,'energy')}${m('💗 心情',S.mood,'mood')}${m('⭐ 绩效',S.perf,'perf')}</div>`;
+  const ord = S.orders[0];
+  h.innerHTML = `<div class="hud-top"><span class="date">${dayName(S.day)}${isPayday(S.day) ? ' 💰' : ''}</span><span class="clock">${fmt(S.time)}</span><span class="money">¥${S.money}</span></div>
+    <div class="meters">${m('⚡ 精力',S.energy,'energy')}${m('💗 心情',S.mood,'mood')}${m('⭐ 绩效',S.perf - S.perfAtCycle,'perf')}</div>
+    ${ord ? `<div class="order-chip">🛵 「${ord.name}」配送中 · 预计 ${fmt(ord.at)}</div>` : ''}`;
 }
 function renderTabs(){
   const t = document.getElementById('tabbar');
@@ -679,26 +1003,26 @@ function renderTabs(){
   t.hidden = false;
   const unread = S.msgs.filter(m => !m.read).length, open = S.tasks.filter(x => !x.fin).length;
   const tab = (id, i, label, badge) => `<button role="tab" aria-selected="${S.scene === id}" data-tab="${id}"><span class="i">${i}</span>${label}${badge ? `<span class="badge">${badge}</span>` : ''}</button>`;
-  t.innerHTML = `<div class="in" role="tablist">${tab('office','🏢','办公室')}${tab('todo','📋','待办',open)}${tab('people','👥','同事')}${tab('phone','💬','消息',unread)}</div>`;
+  t.innerHTML = `<div class="in" role="tablist">${tab('office','🏢','办公室')}${tab('todo','📋','待办',open)}${tab('people','👥','同事')}${tab('phone','💬','消息',unread)}${tab('mine','🎒','我的')}</div>`;
   t.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.scene = b.dataset.tab; render(); if(S.scene === 'phone'){ S.msgs.forEach(m => m.read = true); save(); setTimeout(renderTabs, 600); } });
 }
 function render(){
   renderHud(); renderTabs();
   const v = document.getElementById('view');
-  ({title:renderTitle, morning:renderMorning, home:renderHome, weekend:renderWeekend, ending:renderEnding, todo:renderTodo, people:renderPeople, phone:renderPhone}[S.scene] || renderOffice)(v);
+  ({title:renderTitle, morning:renderMorning, home:renderHome, weekend:renderWeekend, payday:renderPayday, ending:renderEnding, todo:renderTodo, people:renderPeople, phone:renderPhone, mine:renderMine}[S.scene] || renderOffice)(v);
   window.scrollTo({top:0});
 }
 
 function renderOffice(v){
   const L = LOCS[S.loc], who = cast(S.loc), acts = actsFor(S.loc);
+  const art = typeof ART[S.loc] === 'function' ? ART[S.loc]() : ART[S.loc];
   v.innerHTML = `
-    <div class="place-head"><h1>${L.icon} ${L.name}</h1><button class="move" id="moveBtn">换个地方 ›</button></div>
-    <div class="stage"><svg class="bgart" viewBox="0 0 360 190" aria-hidden="true">${ART[S.loc]}</svg>
+    <div class="place-head"><h1>${L.icon} ${L.name}</h1><button class="pillbtn" id="moveBtn">换个地方 ›</button></div>
+    <div class="stage"><svg class="bgart" viewBox="0 0 360 190" aria-hidden="true">${art}</svg>
       <div class="cast ${who.length > 4 ? 'crowd' : ''}">${who.map(id => `<button class="person" data-p="${id}" aria-label="和${S.met[id] ? CHARS[id].name : '陌生同事'}说话">${avatar(id)}<span class="tag ${S.met[id] ? '' : 'new'}">${S.met[id] ? CHARS[id].name : '新面孔'}</span></button>`).join('')}</div></div>
     ${S.last ? `<div class="recent"><span>💭</span><span><b>刚刚：</b>${S.last}</span></div>` : ''}
     <div class="acts">${acts.map((a,i) => `<button class="act" data-a="${i}"><span class="ic">${a.ic}</span><span class="tx"><span class="t">${a.t}</span><span class="d">${a.d}</span></span></button>`).join('')}
-      ${who.length ? `<div class="act wide off"><span class="ic">👆</span><span class="tx"><span class="t">点画面里的人可以聊天</span><span class="d">${who.map(id => S.met[id] ? CHARS[id].name : '一个新面孔').join('、')}在这里</span></span></div>` : ''}
-      ${!acts.length && !who.length ? `<div class="act wide off"><span class="ic">🍃</span><span class="tx"><span class="t">这里现在没什么可做的</span><span class="d">换个地方看看？</span></span></div>` : ''}
+      ${who.length ? `<div class="act wide off"><span class="ic">👆</span><span class="tx"><span class="t">点画面里的人可以聊天、送东西</span><span class="d">${who.map(id => S.met[id] ? CHARS[id].name : '一个新面孔').join('、')}在这里</span></span></div>` : ''}
     </div>`;
   v.querySelector('#moveBtn').onclick = openMap;
   v.querySelectorAll('[data-p]').forEach(b => b.onclick = () => chatWith(b.dataset.p));
@@ -706,81 +1030,99 @@ function renderOffice(v){
 }
 function openMap(){
   const el = document.getElementById('sheet');
-  el.innerHTML = `<div class="in"><h2>去哪儿？<button id="closeSheet">关闭</button></h2><div class="locs">${Object.entries(LOCS).map(([id,L]) => {
-    const closed = L.open && !L.open(S.time), who = cast(id);
-    return `<button class="loc ${S.loc === id ? 'here' : ''}" data-l="${id}" ${closed ? 'disabled' : ''}><span class="t"><span>${L.icon}</span>${L.name}</span>
+  el.innerHTML = `<div class="in"><h2>去哪儿？<button id="closeSheet">关闭</button></h2><p class="hint">💬 表示那里有人想找你聊聊</p><div class="locs">${Object.entries(LOCS).map(([id,L]) => {
+    const closed = L.open && !L.open(S.time), who = cast(id), talkHere = who.some(c => ARCS[c] && beatReady(c));
+    return `<button class="loc ${S.loc === id ? 'here' : ''}" data-l="${id}" ${closed ? 'disabled' : ''}>${talkHere ? '<span class="talk">💬</span>' : ''}<span class="t"><span>${L.icon}</span>${L.name}</span>
       <span class="who">${who.map(p => avatar(p, S.met[p] ? {} : {ghost:true})).join('')}</span><small>${closed ? L.closedText : S.loc === id ? '你在这里' : (who.length ? who.length + ' 人在' : '没人') + ' · 走过去 5 分钟'}</small></button>`; }).join('')}</div></div>`;
   el.hidden = false;
   el.onclick = e => { if(e.target === el) closeSheet(); };
   el.querySelector('#closeSheet').onclick = closeSheet;
-  el.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { if(b.dataset.l !== S.loc){ S.loc = b.dataset.l; S.time += 5; S.last = ''; } closeSheet(); S.scene = 'office'; afterAction(); });
+  el.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { const moved = b.dataset.l !== S.loc; if(moved){ S.loc = b.dataset.l; S.time += 5; S.last = ''; } closeSheet(); S.scene = 'office'; afterAction(moved); });
 }
 function closeSheet(){ document.getElementById('sheet').hidden = true; }
 
 function renderTodo(v){
   const list = [...S.tasks].sort((a,b) => a.fin - b.fin || a.due - b.due);
   v.innerHTML = `<h2 class="sec-title">待办清单</h2>
-    ${list.length ? list.map(t => { const T = TASKS[t.key], p = Math.round(t.done / T.need * 100);
-      const dueTxt = t.fin ? '已完成' : t.due < S.day ? '已逾期' : t.due === S.day ? '今天截止' : `${DAYS[t.due]}截止`;
+    ${list.length ? list.map(t => { const T = taskDef(t.key), p = Math.round(t.done / T.need * 100);
+      const dueTxt = t.fin ? '已完成' : t.due < S.day ? '已逾期' : t.due === S.day ? '今天截止' : `${dayName(t.due)}截止`;
       return `<div class="card task ${t.fin ? 'done' : ''} ${S.focus === t.key && !t.fin ? 'focus' : ''}"><div class="row"><span class="nm">${T.name}</span><span class="pill ${t.fin ? 'ok' : t.due <= S.day ? 'due' : ''}">${dueTxt}</span></div>
-        <div class="bar"><i style="width:${p}%"></i></div><div class="meta"><span>${p}% · 还要约 ${Math.max(0, Math.round((T.need - t.done) / 6) / 10)} 小时 · 来自${CHARS[T.from].name}</span>${t.fin ? '' : S.focus === t.key ? '<span class="focusbtn">正在做</span>' : `<button class="focusbtn" data-f="${t.key}">先做这个</button>`}</div></div>`; }).join('') : '<p class="empty">暂时没有待办。享受这短暂的平静吧。</p>'}
-    <p class="empty" style="padding:4px 0 12px">在工位点「认真干活」，会推进蓝框的那一项。</p>`;
+        <div class="bar"><i style="width:${p}%"></i></div><div class="meta"><span>${p}% · 还要约 ${Math.max(0, Math.round((T.need - t.done) / 6) / 10)} 小时 · 来自${CHARS[T.from].name}</span>${t.fin ? '' : S.focus === t.key ? '<span class="linkbtn">正在做</span>' : `<button class="linkbtn" data-f="${t.key}">先做这个</button>`}</div></div>`; }).join('') : '<p class="empty">暂时没有待办。享受这短暂的平静吧。</p>'}
+    <p class="hint">在工位点「认真干活」，会推进蓝框的那一项。</p>`;
   v.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { S.focus = b.dataset.f; save(); render(); });
 }
 function renderPeople(v){
   const ids = Object.keys(CHARS).filter(k => k !== 'me');
   const nr = Object.keys(S.revealed).length;
-  v.innerHTML = `<h2 class="sec-title">同事图鉴 <small style="font-family:var(--f-body);font-size:13px;color:var(--muted)">已认识 ${ids.filter(k => S.met[k]).length}/${ids.length}</small></h2>
+  v.innerHTML = `<h2 class="sec-title">同事 <small>已认识 ${ids.filter(k => S.met[k]).length}/${ids.length}</small></h2>
     <div class="people">${ids.map(k => { const c = CHARS[k];
       if(!S.met[k]) return `<div class="pc">${avatar(k, {ghost:true})}<b>？？？</b><small>还没认识</small></div>`;
-      const h = Math.min(5, Math.round(S.rel[k] / 20));
-      return `<button class="pc ${S.revealed[k] ? 'rat' : ''}" data-c="${k}">${avatar(k)}<b>${c.name}${S.partner === k ? ' ❤' : ''}</b><small>${c.role}</small>${S.revealed[k] ? `<span class="ratchip">wén hào</span>` : `<span class="hearts">${'♥'.repeat(h)}${'♡'.repeat(5 - h)}</span>`}</button>`; }).join('')}</div>
-    <p class="empty" style="padding:4px 0 12px">${nr ? `你已经看穿了 ${nr} 个 wén hào。` : '有些同事，好像不太对劲……'}</p>`;
+      const h = Math.min(5, Math.round(S.rel[k] / 20)), ready = ARCS[k] && (() => { const nb = nextBeat(k); return nb && S.rel[k] >= nb.b.rel; })();
+      return `<button class="pc ${S.revealed[k] ? 'rat' : ''}" data-c="${k}">${ready ? '<span class="dot">💬</span>' : ''}${avatar(k)}<b>${c.name}${S.partner === k ? ' ❤' : ''}</b><small>${c.role}</small>${S.revealed[k] ? `<span class="ratchip">wén hào</span>` : `<span class="hearts">${'♥'.repeat(h)}${'♡'.repeat(5 - h)}</span>`}</button>`; }).join('')}</div>
+    <p class="hint">${nr ? `你已经看穿了 ${nr} 个 wén hào。` : '有些同事，好像不太对劲……'} 💬 = TA 有新故事，去 TA 常待的地方找 TA。</p>`;
   v.querySelectorAll('[data-c]').forEach(b => b.onclick = () => personCard(b.dataset.c));
 }
+const HAUNT = {lin:'工位 / 食堂 / 下午茶水间', zhe:'工位 / 午休便利店', boss:'组长办公室', jiang:'上午茶水间 / 午休和傍晚的天台', man:'食堂 / 下午茶水间 / 傍晚便利店', amy:'早上茶水间 / 午休便利店', xu:'食堂 / 傍晚茶水间'};
 function personCard(k){
   const c = CHARS[k], el = document.getElementById('sheet');
-  const facts = RATS.includes(k) ? (S.revealed[k] ? c.facts : []) : c.facts.slice(0, S.flags['fact_' + k] || 0);
+  const arc = ARCS[k], done = S.arc[k] || 0;
+  let body;
+  if(RATS.includes(k)) body = S.revealed[k] ? `<ul class="story">${c.facts.map(x => `<li class="done">${x}</li>`).join('')}</ul>` : '<p class="hint" style="text-align:left">你总觉得 TA 哪里不对，但说不上来。</p>';
+  else { const nb = nextBeat(k);
+    body = `<ol class="story">${arc.map((b, i) => S.flags['arcDone_' + k + '_' + i] ? `<li class="done">${b.title}</li>` : '').join('')}${nb ? `<li>${S.rel[k] >= nb.b.rel ? `💬 TA 有话想跟你说（常在：${HAUNT[k]}）` : `好感到 ${nb.b.rel} 解锁下一段`}</li>` : '<li>这段故事暂时告一段落。</li>'}</ol>`; }
   el.innerHTML = `<div class="in"><h2>${c.name}<button id="closeSheet">关闭</button></h2>
-    <div class="card" style="display:flex;gap:14px;align-items:center"><div style="width:84px;flex:none">${avatar(k)}</div><div><b>${c.role}</b><br><small style="color:var(--muted)">好感 ${S.rel[k]} / 100</small>${S.revealed[k] ? `<br><span class="ratchip">wén hào · ${c.rat}</span>` : ''}</div></div>
-    <div class="card" style="margin-top:10px"><b>小秘密</b>${facts.length ? `<ul style="margin:6px 0 0;padding-left:18px">${facts.map(x => `<li>${x}</li>`).join('')}</ul>` : `<p style="margin:6px 0 0;color:var(--muted);font-size:14px">${RATS.includes(k) ? '你总觉得 TA 哪里不对，但说不上来。' : '好感到 20 / 40 / 60 时，多聊几次，TA 会告诉你的。'}</p>`}</div></div>`;
+    <div class="card" style="display:flex;gap:14px;align-items:center"><div style="width:84px;flex:none">${avatar(k)}</div><div><b>${c.role}</b><br><small style="color:var(--muted)">好感 ${S.rel[k]} / 100${HAUNT[k] ? `<br>常在：${HAUNT[k]}` : ''}</small>${S.revealed[k] ? `<br><span class="ratchip">wén hào · ${c.rat}</span>` : ''}</div></div>
+    <div class="card"><b>${RATS.includes(k) ? '观察记录' : '你们的故事'}</b>${body}</div></div>`;
   el.hidden = false; el.onclick = e => { if(e.target === el) closeSheet(); };
   el.querySelector('#closeSheet').onclick = closeSheet;
 }
 function renderPhone(v){
   v.innerHTML = `<h2 class="sec-title">消息</h2>${S.msgs.length ? S.msgs.map(m => `<div class="msg ${m.read ? '' : 'unread'}">${avatar(m.from)}<div style="min-width:0"><div class="who">${CHARS[m.from].name} · ${m.when}</div><div class="bd">${m.text}</div></div></div>`).join('') : '<p class="empty">没有新消息。难得。</p>'}`;
 }
+function renderMine(v){
+  const owned = Object.entries(ITEMS).filter(([k]) => S.items[k] > 0);
+  v.innerHTML = `<h2 class="sec-title">我的</h2>
+    <div class="stats"><div>💰 余额<b>¥${S.money}</b></div><div>🛒 累计花掉<b>¥${S.spent}</b></div><div>📅 打工天数<b>${S.day} 天</b></div><div>🐭 看穿 wén hào<b>${Object.keys(S.revealed).length} / 4</b></div></div>
+    ${S.partner ? `<div class="card" style="display:flex;gap:12px;align-items:center"><div style="width:56px;flex:none">${avatar(S.partner)}</div><div><b>❤ 和${CHARS[S.partner].name}在一起</b><br><small style="color:var(--muted)">好感 ${S.rel[S.partner]}</small></div></div>` : ''}
+    <div class="card"><b>我的东西</b>${owned.length ? `<div class="shop" style="margin-top:8px">${owned.map(([k, it]) => `<div class="item owned"><span class="ic">${it.ic}</span><span class="tx"><span class="t">${it.name}${it.use ? ` ×${S.items[k]}` : ''}</span><span class="d">${it.d}</span></span></div>`).join('')}</div>` : '<p class="hint" style="text-align:left;margin-top:6px">还什么都没买。发工资了记得犒劳自己。</p>'}</div>
+    <button class="btn" id="shopBtn" style="align-self:center">🛍️ 打开网购</button>
+    <button class="btn ghost" id="endBtn" style="align-self:center">结束这一局，看总结</button>`;
+  v.querySelector('#shopBtn').onclick = () => openShop(false);
+  v.querySelector('#endBtn').onclick = () => { S.scene = 'ending'; save(); render(); };
+}
 
 function renderTitle(v){
-  const saved = load(), can = saved && saved.v === 2 && !['title','ending'].includes(saved.scene);
+  const saved = load(), can = saved && saved.v === 3 && !['title','ending'].includes(saved.scene);
   v.innerHTML = `<div class="big card" style="margin-top:28px">
     <div class="row">${['lin','jiang','me','man','boss'].map(k => avatar(k)).join('')}</div>
     <h1>Get <em>Rats</em> Out<br>My World</h1>
-    <p>一个打工人的两周。干活、摸鱼、吃饭、八卦、心动，以及那几个说不上哪里不对劲的同事。</p>
+    <p>一个打工人的日常。干活、摸鱼、点外卖、八卦、心动、发工资、挥霍，以及那几个说不上哪里不对劲的同事。</p>
     <button class="btn" id="newGame">开始上班</button>
-    ${can ? `<button class="btn ghost" id="resume">继续 · ${DAYS[saved.day]}</button>` : ''}
+    ${can ? `<button class="btn ghost" id="resume">继续 · ${dayName(saved.day)}</button>` : ''}
   </div>`;
   v.querySelector('#newGame').onclick = () => { S = fresh(); S.scene = 'morning'; save(); render(); };
   const r = v.querySelector('#resume'); if(r) r.onclick = () => { S = Object.assign(fresh(), saved); render(); };
 }
+const MORNING = {1:'闹钟响了第三遍。今天是周一，新的一周。',2:'地铁上有人吃韭菜盒子。你屏住呼吸三站。',3:'今天下午有个跨组周会。你有种不祥的预感。',4:'天气预报说今天是"适合摸鱼"的阴天。',5:'周五！空气里都是周末的味道。',6:'周一。周末过得太快了，像被谁偷走了一天。',7:'早上在电梯里遇到雷雷，他冲你点了点头。',8:'今天下午团建。蟀蟀在群里发了十个感叹号。',9:'明天发工资。你已经在购物车里放好了东西。',10:'发薪日！今天连空调都格外温柔。'};
+const MORNING_POOL = ['地铁准点了。今天也许是个好日子。','楼下的早餐摊换了新老板，煎饼多加了一个蛋。','你在电梯里遇到了尘尘，他冲你挥了挥手。','下雨了。你的伞在公司，你在楼下。','你今天穿了新衣服。没有人注意到。','闹钟没响。你在 9:28 冲进了打卡机。'];
 function renderMorning(v){
-  const line = {1:'闹钟响了第三遍。今天是周一，新的一周，和上周一模一样。',2:'地铁上有人吃韭菜盒子。你屏住呼吸三站。',3:'今天下午有个跨组周会。你有种不祥的预感。',4:'天气预报说今天是"适合摸鱼"的阴天。',5:'周五！空气里都是周末的味道。',6:'周一。周末过得太快了，像被谁偷走了一天。',7:'早上在电梯里遇到老周，他冲你点了点头。',8:'今天下午团建。Amy 在群里发了十个感叹号。',9:'倒数第二天。你开始想发工资那天要吃什么。',10:'发薪日！今天连空调都格外温柔。'}[S.day];
-  const hi = {5:['周五','快乐！'],10:['发工资','啦！']}[S.day] || ['早安，','打工人'];
-  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">${DAYS[S.day]}</div><h1>${hi[0]}<em>${hi[1]}</em></h1>
+  const line = MORNING[S.day] || MORNING_POOL[Math.floor(seed(S.day, 1) * MORNING_POOL.length)];
+  const hi = isPayday(S.day) ? ['发工资','啦！'] : WD(S.day) === 4 ? ['周五','快乐！'] : ['早安，','打工人'];
+  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">${dayName(S.day)}</div><h1>${hi[0]}<em>${hi[1]}</em></h1>
     <div style="width:110px">${avatar('me', {sad:S.mood < 30})}</div>
-    ${S.nightText ? `<p style="font-size:14px;color:var(--muted)">昨晚：${S.nightText}</p>` : ''}<p>${line}</p>
+    ${S.nightText ? `<p style="font-size:14px;color:var(--muted)">之前：${S.nightText}</p>` : ''}<p>${line}</p>
     <div class="stats"><div>⚡ 精力<b>${S.energy}</b></div><div>💗 心情<b>${S.mood}</b></div></div>
     <button class="btn" id="go">09:30 打卡上班</button></div>`;
   v.querySelector('#go').onclick = () => { S.scene = 'office'; S.nightText = ''; afterAction(); };
 }
 function renderHome(v){
   const canLove = S.partner || LOVERS.some(k => S.rel[k] >= 50), late = S.overtimeMin;
-  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">${DAYS[S.day]} · ${fmt(1080 + late)} 到家</div><h1>下班<em>啦</em></h1>
+  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">${dayName(S.day)} · ${fmt(1080 + late)} 到家</div><h1>下班<em>啦</em></h1>
     <div style="width:110px">${avatar('me', {sad:S.mood < 30})}</div>
     <p>${late ? '你加了班。到家的时候，楼下的烧烤摊都开始收了。' : '你准点走出大门。晚风刚好，天还没黑透。'}今晚想做点什么？</p>
     <div class="acts" style="width:100%">
       <button class="act" data-s="rest"><span class="ic">🛏️</span><span class="tx"><span class="t">早早睡觉</span><span class="d">精力 +60</span></span></button>
-      <button class="act" data-s="drama"><span class="ic">📺</span><span class="tx"><span class="t">追剧打游戏</span><span class="d">精力 +40 心情 +15</span></span></button>
+      <button class="act" data-s="drama"><span class="ic">${has('console') ? '🎮' : '📺'}</span><span class="tx"><span class="t">${has('console') ? '打游戏' : '追剧'}</span><span class="d">精力 +40 心情 +${has('console') ? 22 : 15}</span></span></button>
       <button class="act" data-s="study"><span class="ic">📚</span><span class="tx"><span class="t">学习充电</span><span class="d">精力 +35 绩效 +3</span></span></button>
       ${canLove ? `<button class="act hot" data-s="love"><span class="ic">💌</span><span class="tx"><span class="t">和${CHARS[topLover()].name}聊天</span><span class="d">心情 +14 好感 +5</span></span></button>` : ''}
     </div></div>`;
@@ -788,38 +1130,48 @@ function renderHome(v){
   v.querySelectorAll('[data-s]').forEach(b => b.onclick = () => night(b.dataset.s));
 }
 function renderWeekend(v){
-  const k = topLover(), canDate = S.partner || S.rel[k] >= 45;
-  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">周末</div><h1>两天<em>自由</em></h1>
-    <p>${S.flags.weekendWork ? '你答应了雯灏周末来加班。周六的办公室里，只有你和饮水机。' : '你关掉了工作群的消息提醒。这个周末怎么过？'}</p>
-    <div class="acts" style="width:100%">${S.flags.weekendWork ? `<button class="act wide" data-w="work"><span class="ic">🏢</span><span class="tx"><span class="t">去加班</span><span class="d">精力 -10 心情 -20 · 没有加班费</span></span></button>` : `
-      <button class="act" data-w="home"><span class="ic">🛋️</span><span class="tx"><span class="t">宅家睡到自然醒</span><span class="d">精力满 心情 +10</span></span></button>
-      <button class="act" data-w="out"><span class="ic">🎡</span><span class="tx"><span class="t">出门玩</span><span class="d">¥-300 心情 +30</span></span></button>
-      ${canDate ? `<button class="act hot wide" data-w="date"><span class="ic">🌸</span><span class="tx"><span class="t">约${CHARS[k].name}出去逛逛</span><span class="d">¥-200 心情 +25 好感 +12</span></span></button>` : ''}`}</div></div>`;
-  v.querySelectorAll('[data-w]').forEach(b => b.onclick = () => { const w = b.dataset.w;
-    if(w === 'work'){ S.energy = clamp(S.energy - 10); S.mood = clamp(S.mood - 20); S.nightText = '你周末加了班。雯灏在群里发了个"辛苦了🎉"，没有@你。'; }
-    if(w === 'home'){ S.energy = 100; S.mood = clamp(S.mood + 10); S.nightText = '你睡了两个十二小时。醒来的时候阳光很好。'; }
-    if(w === 'out'){ S.money -= 300; S.energy = clamp(S.energy + 40); S.mood = clamp(S.mood + 30); S.nightText = '你去了海边。手机一整天都没看。'; }
-    if(w === 'date'){ S.money -= 200; S.energy = clamp(S.energy + 50); S.mood = clamp(S.mood + 25); S.rel[k] = clamp(S.rel[k] + 12); S.nightText = k === 'jiang' ? '你们去了猫咖。他画了一整页你和猫。' : '你们逛了一下午书店。她买了一本《如何优雅地拒绝别人》，送给了你。'; }
-    nextDay(); });
+  const w = S.wk, acts = weekendActs();
+  v.innerHTML = `<div class="big card" style="margin-top:20px;gap:12px"><div class="wk-head">${['周六','周日'].map((d, i) => WK_SLOTS.map((s, j) => `<span class="${i === w.d && j === w.slot ? 'on' : ''}">${d}${s}</span>`).join('')).join('')}</div>
+    <h1>${['周六','周日'][w.d]}<em>${WK_SLOTS[w.slot]}</em></h1>
+    <div style="width:96px">${avatar('me', {sad:S.mood < 30})}</div>
+    ${w.last ? `<p style="font-size:14px">${w.last}</p>` : `<p>你关掉了工作群的消息提醒。这个周末是你自己的。</p>`}
+    <div class="stats"><div>⚡ 精力<b>${S.energy}</b></div><div>💗 心情<b>${S.mood}</b></div><div>💰 余额<b>¥${S.money}</b></div><div>📍 接下来<b>想干嘛？</b></div></div>
+    <div class="acts" style="width:100%">${acts.map((a, i) => `<button class="act ${a.hot ? 'hot' : ''}" data-w="${i}"><span class="ic">${a.ic}</span><span class="tx"><span class="t">${a.t}</span><span class="d">${a.d}</span></span></button>`).join('')}
+      <button class="act wide off" data-w="skip" style="opacity:1"><span class="ic">💤</span><span class="tx"><span class="t">什么都不做</span><span class="d">发呆也是一种休息</span></span></button></div></div>`;
+  v.querySelectorAll('[data-w]').forEach(b => b.onclick = () => { if(b.dataset.w === 'skip') return wfx({energy:10, mood:3}, '你在沙发上躺着，看天花板上的光影慢慢移动。'); acts[+b.dataset.w].run(); });
+}
+function renderPayday(v){
+  const p = payroll();
+  const title = p.grade === 'S' ? '卷出了天际' : p.grade === 'A' ? '稳定发挥' : p.grade === 'B' ? '还算过得去' : '雷雷有点担心你';
+  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">${dayName(S.day)} · 发薪日</div>
+    <div class="grade">${p.grade}</div><h1>${title}</h1><p>这两周你拿到了 ${p.gained} 点绩效。</p>
+    <div class="slip"><div><span>基本工资</span><span>+¥${p.salary}</span></div><div><span>绩效奖金（${p.grade}）</span><span>+¥${p.bonus}</span></div><div><span>房租</span><span>-¥${p.rent}</span></div><div class="sum"><span>到手</span><span>+¥${p.total}</span></div></div>
+    <p>余额将变成 <b>¥${S.money + p.total}</b>。这个周末，想怎么花都行。</p>
+    <button class="btn" id="spend">去挥霍！</button>
+    <button class="btn ghost" id="stop">不玩了，看总结</button></div>`;
+  const pay = () => { S.money += p.total; S.flags.paidOut = S.day; S.history.push({day:S.day, grade:p.grade, gained:p.gained}); S.perfAtCycle = S.perf; };
+  v.querySelector('#spend').onclick = () => { pay(); startWeekend(); };
+  v.querySelector('#stop').onclick = () => { pay(); S.scene = 'ending'; save(); render(); };
 }
 function renderEnding(v){
-  const p = S.perf, md = S.mood, grade = p >= 120 ? 'S' : p >= 90 ? 'A' : p >= 55 ? 'B' : 'C';
-  const good = grade === 'S' || grade === 'A';
+  const grades = S.history.map(h => h.grade).join(' → ') || '还没发过工资';
+  const md = S.mood, nr = Object.keys(S.revealed).length;
   const [title, text] = S.flags.rule ? ['规则制定者','你没有赢下每一场对线，但你让"口头派活"这件事，在这家公司里变得不可能。']
-    : good && md >= 60 ? ['人间清醒打工人','活干完了，班准点下了，心情也没丢。这大概就是打工的最优解。']
-    : good ? ['卷王','绩效很好看。黑眼圈也是。记得休息。']
-    : md >= 60 ? ['摸鱼宗师','你把摸鱼修炼成了一门艺术。老周看你的眼神很复杂。']
-    : ['打工人，辛苦了','这两周不容易。但工资还是到账了。'];
-  const best = Object.keys(S.rel).filter(k => !RATS.includes(k) && k !== 'boss' && S.met[k]).sort((a,b) => S.rel[b] - S.rel[a])[0];
-  const nr = Object.keys(S.revealed).length;
-  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">W2 周五 · 发薪日</div>
-    <div class="grade">${grade}</div><h1>${title}</h1><p>${text}</p>
-    <div class="stats"><div>💰 工资到账<b>¥9800</b></div><div>⭐ 绩效分<b>${p}</b></div><div>💗 最终心情<b>${md}</b></div><div>🐭 看穿 wén hào<b>${nr} / 4</b></div></div>
+    : S.spent >= 10000 ? ['快乐消费者','钱花了，快乐也是真的。打工的意义，有时候就是周末那一下刷卡。']
+    : S.flags.promo && md >= 50 ? ['人间清醒打工人','活干完了，晋升也来了，心情也没丢。这大概就是打工的最优解。']
+    : S.flags.promo ? ['卷王','晋升名单上有你。黑眼圈也是。记得休息。']
+    : md >= 60 ? ['摸鱼宗师','你把摸鱼修炼成了一门艺术。雷雷看你的眼神很复杂。']
+    : ['打工人，辛苦了','日子不容易。但你撑下来了。'];
+  const best = FRIENDS.filter(k => S.met[k] && k !== S.partner).sort((a,b) => S.rel[b] - S.rel[a])[0];
+  const arcsDone = FRIENDS.filter(k => (S.arc[k] || 0) >= (ARCS[k] || []).length - 1).length;
+  v.innerHTML = `<div class="big card" style="margin-top:28px"><div class="date" style="font-size:14px">打工 ${S.day} 天 · 总结</div>
+    <h1>${title}</h1><p>${text}</p>
+    <div class="stats"><div>📈 历次评级<b style="font-size:15px">${grades}</b></div><div>💰 余额<b>¥${S.money}</b></div><div>🛒 花掉<b>¥${S.spent}</b></div><div>🐭 看穿 wén hào<b>${nr} / 4</b></div><div>📖 走完的故事<b>${arcsDone} / ${FRIENDS.length}</b></div><div>💗 最终心情<b>${md}</b></div></div>
     <div class="row">${RATS.map(k => S.revealed[k] ? avatar(k) : avatar(k, {ghost:true})).join('')}</div>
-    ${S.partner ? `<p>💌 ${S.partner === 'jiang' ? '下班的时候，江屿在楼下等你。他说："发工资了，我请你吃饭团。"' : '陈蔓在你工位上留了一杯美式，杯套上写着：「发工资快乐。周末的展，别迟到。」'}</p>`
-      : best ? `<p>这两周和你最要好的，是${CHARS[best].name}。</p>` : ''}
+    ${S.partner ? `<p>💌 ${S.partner === 'jiang' ? '下班的时候，尘尘在楼下等你。他说："走吧，我请你吃饭团。"' : '环环在你工位上留了一杯美式，杯套上写着：「今天也辛苦了。周末的展，别迟到。」'}</p>` : best ? `<p>和你最要好的，是${CHARS[best].name}。</p>` : ''}
+    ${S.flags.linGone ? '<p style="font-size:14px">芸芸考上了。每个周末，你们还是会去吃火锅。</p>' : ''}
     ${nr < 4 ? '<p style="font-size:13px;color:var(--muted)">办公室里，好像还有你没看穿的人……</p>' : ''}
-    <button class="btn" id="again">再打一次工</button></div>`;
+    <button class="btn" id="again">重新开始</button></div>`;
   v.querySelector('#again').onclick = () => { S = fresh(); save(); render(); };
 }
 function showReveal(id){
@@ -833,6 +1185,6 @@ function showReveal(id){
 
 /* 热更新时保留进度 */
 window.claude?.hot?.snapshot?.(() => S);
-const boot = d => { S = d && d.v === 2 ? Object.assign(fresh(), d) : fresh(); render(); };
+const boot = d => { S = d && d.v === 3 ? Object.assign(fresh(), d) : fresh(); render(); };
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? null);
 </script>
